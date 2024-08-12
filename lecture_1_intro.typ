@@ -54,7 +54,7 @@
   This is a learning experience for me, too #pause
 
   Please provide feedback privately to me #pause
-  - Email
+  - Email smorad at symbol um.edu.mo
   - Chat after class #pause
 
   I would like to make the class *interactive* #pause
@@ -63,31 +63,60 @@
 ]
 
 #slide(title: [Brief Chat])[
-  I would like to get an understanding of why you have enrolled in this course/program. #pause
+  I will tell you about myself, and why I am interested in deep learning #pause
 
-  It will help me alter the course towards your goals. #pause
+  Then, *you* will tell me why you are interested in deep learning #pause
 
-  First, let me introduce myself and my interests in deep learning.
+  It will help me alter the course towards your goals
 ]
 
 #slide(title: [Brief Chat])[
-  I am interested in Deep Learning because I think it is the most promising approach for automating tasks that we do not want to do #pause
+  I was always interested in space and robotics #pause
 
-  I am interested in *deep reinforcement learning* and *memory* #pause
-  - Reinforcement learning trains agents that know how to interact with the world #pause
-  - Memory gives them the ability to remember your favorite food, where the agents live, etc #pause  
-
-  I am interested in this course because it enables me to continue my research #pause
-
-  #align(center)[What are you here to learn? What interests you?]
+  #side-by-side[#cimage("figures/lecture_1/az.jpg", height: 60%)][#cimage("figures/lecture_1/speer.png", height: 60%)]
 ]
 
+#slide[
+  After school, I realized much of the classical robotics that we learn in school *does not work* in reality #pause
+
+  #cimage("figures/lecture_1/curiosity.jpg", height: 50%) #pause
+
+  Today's robots are stupid -- important robots are human controlled
+]
+
+#slide[
+  Since then, I have focused on creating less stupid robots #pause
+
+  #side-by-side[#cimage("figures/lecture_1/cambridge.jpg", height: 70%)][#cimage("figures/lecture_1/robomaster.jpg", height: 70%)] #pause
+
+  Robots that *learn* from their mistakes
+]
+
+#slide[
+  I am interested in *deep learning* because I want to make smarter robots #pause
+
+  There are many tasks that humans do not like to do, that robots can do #pause
+
+  #v(2em)
+  #align(center)[What do you want to learn? Why?]
+]
+
+// #slide(title: [Brief Chat])[
+//   I am interested in Deep Learning because I think it is the most promising approach for automating tasks that we do not want to do #pause
+
+//   I am interested in *deep reinforcement learning* and *memory* #pause
+//   - Reinforcement learning trains agents that know how to interact with the world #pause
+//   - Memory gives them the ability to remember your favorite food, where the agents live, etc #pause  
+
+//   I am interested in this course because it enables me to continue my research #pause
+
+//   #align(center)[What are you here to learn? What interests you?]
+// ]
+
 #slide(title: [Brief Chat])[
-  I am looking for PhD students focusing on deep reinforcement learning and robotics #pause
+  I am starting a lab, and looking for research students focusing on deep reinforcement learning and robotics #pause
 
-  If you finish the course and find it too easy, send me an email! #pause
-
-  Strong background in robotics is desired #pause
+  If you finish the course and find it too easy, send me an email!
 ]
 
 #slide(title: [Overview])[
@@ -106,6 +135,13 @@
 ]
 
 #slide(title: [Course Info])[
+  Most communication will happen over Moodle #pause
+  - I will try and post lecture slides after each lecture #pause
+  - Assignments #pause
+  - Grading #pause
+]
+
+#slide(title: [Course Info])[
   *Prerequisites*: #pause
   - Programming in python #pause
     - Should be able to implement a stack, etc #pause
@@ -119,9 +155,10 @@
 ]
 
 #slide(title: [Course Info])[
-    *Grading:* #pause
-  - 80% assignments #pause
-  - 20% attendance and participation
+    *Grading (subject to change):* #pause
+  - 70% assignments #pause
+  - 20% quiz #pause
+  - 10% attendance and participation
 ]
 
 #slide(title: [Overview])[
@@ -197,6 +234,7 @@
   + Course Structure
   + *Lecture*
 ]
+// 25 mins very slow
 
 #focus-slide[Relax]
 
@@ -215,17 +253,16 @@
   + What is Deep Learning? #pause
   + Differences between AI, ML, DL #pause
   + Define Machine Learning #pause
-  + Supervised and Unsupervised Learning #pause
-  + Classification and Regression
+  + Machine Learning Libraries
 ]
+// TODO remove supervised/unsupervised and classification
 
 #slide(title: [Overview])[
   + *Deep Learning Successes*
   + What is Deep Learning?
   + Differences between AI, ML, DL
   + Define Machine Learning
-  + Supervised and Unsupervised Learning
-  + Classification and Regression
+  + Machine Learning Libraries
 ]
 
 
@@ -306,16 +343,14 @@
   + What is Deep Learning?
   + Differences between AI, ML, DL
   + Define Machine Learning
-  + Supervised and Unsupervised Learning
-  + Classification and Regression
+  + Machine Learning Libraries
 ]
 #slide(title: [Overview])[
   + Deep Learning Successes
   + *What is Deep Learning?*
   + Differences between AI, ML, DL
   + Define Machine Learning
-  + Supervised and Unsupervised Learning
-  + Classification and Regression
+  + Machine Learning Libraries
 ]
 
 #slide(title: [DL at a Glance])[
@@ -323,16 +358,6 @@
 
   It consists of four parts:
   + Dataset
-  + Deep neural network
-  + Loss function
-  + Optimization procedure
-]
-
-#slide(title: [DL at a Glance])[
-  At a high level, how does deep learning work?
-
-  It consists of four parts:
-  + *Dataset*
   + Deep neural network
   + Loss function
   + Optimization procedure
@@ -354,79 +379,19 @@
 ]
 
 #slide(title: [DL at a Glance])[
-  At a high level, how does deep learning work?
-
-  It consists of four parts:
-  + Dataset
-  + Deep neural network
-  + Loss function
-  + Optimizer
-]
-
-#slide(title: [DL at a Glance])[
-  At a high level, how does deep learning work?
-
-  It consists of four parts:
-  + Dataset
-  + *Deep neural network*
-  + Loss function
-  + Optimizer
-]
-
-#slide(title: [DL at a Glance])[
-  The deep neural network learns to map the inputs to outputs
+  The *neural network* learns to map the inputs to outputs
 
   #cimage("figures/lecture_1/dog_to_caption_nn.png", height: 80%)
 ]
 
 #slide(title: [DL at a Glance])[
-  At a high level, how does deep learning work?
-
-  It consists of four parts:
-  + Dataset
-  + Deep neural network
-  + Loss function
-  + Optimizer
-]
-
-#slide(title: [DL at a Glance])[
-  At a high level, how does deep learning work?
-
-  It consists of four parts:
-  + Dataset
-  + Deep neural network
-  + *Loss function*
-  + Optimizer
-]
-
-#slide(title: [DL at a Glance])[
-  The loss function describes how "wrong" the neural network is. We call this "wrongness" the *loss*. #pause
+  The *loss function* describes how "wrong" the neural network is. We call this "wrongness" the *loss*. #pause
 
   #cimage("figures/lecture_1/loss_function_nn.png", height: 70%)
 ]
 
 #slide(title: [DL at a Glance])[
-  At a high level, how does deep learning work?
-
-  It consists of four parts:
-  + Dataset
-  + Deep neural network
-  + *Loss function*
-  + Optimization procedure
-]
-
-#slide(title: [DL at a Glance])[
-  At a high level, how does deep learning work?
-
-  It consists of four parts:
-  + Dataset
-  + Deep neural network
-  + Loss function
-  + *Optimization procedure*
-]
-
-#slide(title: [DL at a Glance])[
-  The optimization procedure changes the neural network to reduce the loss #pause
+  The *optimization procedure* changes the neural network to reduce the loss #pause
 
   #cimage("figures/lecture_1/optimizer_nn.png", height: 70%)
 ]
@@ -438,10 +403,7 @@
   + Dataset
   + Deep neural network
   + Loss function
-  + Optimizer #pause
-
-  #v(2em)
-  #align(center)[Questions so far?]
+  + Optimization procedure
 ]
 
 #slide(title: [Overview])[
@@ -449,20 +411,19 @@
   + *What is Deep Learning?*
   + Differences between AI, ML, DL
   + Define Machine Learning
-  + Supervised and Unsupervised Learning
-  + Classification and Regression
+  + Machine Learning Libraries
 ]
+
+// 45 mins slow?
+#focus-slide[Relax]
 
 #slide(title: [Overview])[
   + Deep Learning Successes
   + What is Deep Learning?
   + *Differences between AI, ML, DL*
   + Define Machine Learning
-  + Supervised and Unsupervised Learning
-  + Classification and Regression
+  + Machine Learning Libraries
 ]
-
-// ~30 mins very slow
 
 #slide(title: [AI, ML, DL])[
   #side-by-side[
@@ -483,11 +444,8 @@
   + What is Deep Learning?
   + *Differences between AI, ML, DL*
   + Define Machine Learning
-  + Supervised and Unsupervised Learning
-  + Classification and Regression
+  + Machine Learning Libraries
 ]
-
-#focus-slide[Relax]
 
 
 #slide(title: [Overview])[
@@ -495,8 +453,7 @@
   + What is Deep Learning?
   + Differences between AI, ML, DL
   + *Define Machine Learning*
-  + Supervised and Unsupervised Learning
-  + Classification and Regression
+  + Machine Learning Libraries
 ]
 
 #slide(title: [ML])[
@@ -588,16 +545,16 @@
   
   #only(2)[$ f("你好吗", vec(theta_1, theta_2, dots.v)) = "You good?" $]
   
-  #only((3,4))[
+  #only((3))[
     $ f( #image("figures/lecture_1/dog.png", height: 20%), vec(theta_1, theta_2, dots.v) ) = "Dog" $
   ]
-  #only((5))[
+  #only((4))[
     $ f( #image("figures/lecture_1/muffin.png", height: 20%), vec(theta_1, theta_2, dots.v) ) = "Muffin" $
   ]
-  #only((6,7))[
+  #only((5,6))[
     $ f("Dog", vec(theta_1, theta_2, dots.v) ) = #image("figures/lecture_1/dog.png", height: 20%) $ 
   ]
-  #only(7)[
+  #only(6)[
     Machine learning learns the parameters that solve difficult problems
   ]
 ]
@@ -606,7 +563,7 @@
   *Summary:* #pause
   + Certain problems are difficult to solve with programming #pause
     - Dog or muffin? #pause
-  + Machine learning tells us how to solve difficult problems #pause
+  + Machine learning provides a framework to solve difficult problems #pause
     - We learn the parameters $theta$ for some function $f(x, theta) = y$
 ]
 
@@ -624,11 +581,11 @@
     - Play with the libraries
 ]
 
-#slide(title: [ML])[
-  + JAX vs PyTorch
-    + Based on numpy and matlab
-  + Matrix operations
-]
+// #slide(title: [ML])[
+//   + JAX vs PyTorch
+//     + Based on numpy and matlab
+//   + Matrix operations
+// ]
 
 #slide[
   Both JAX and PyTorch are libraries for the Python language #pause
@@ -649,7 +606,7 @@
   ```python
     import jax.numpy as jnp
     a = jnp.array(1) # Scalar
-    b = jnp.array([1, 2]) # 2D Vector
+    b = jnp.array([1, 2]) # Vector
     C = jnp.array([[1,2], [3,4]]) # 2x2 Matrix
     D = jnp.ones((3,3,3)) # 3x3x3 Tensor
   ```
@@ -669,7 +626,7 @@
   ```python
     import torch
     a = torch.tensor(1) # Scalar
-    b = torch.tensor([1, 2]) # 2D Vector
+    b = torch.tensor([1, 2]) # Vector
     C = torch.tensor([[1,2], [3,4]]) # 2x2 Matrix
     D = torch.ones((3,3,3)) # 3x3x3 Tensor
   ```
@@ -685,7 +642,7 @@
 
 #slide[
   Most operations in `jax` and `pytorch` are *vectorized* #pause
-    - Executed in parallel, very fast
+    - Executed in parallel, very fast #pause
 
   ```python
     import jax.numpy as jnp
@@ -766,6 +723,10 @@ TypeError: dot_general requires contracting dimensions to have the same shape, g
 ]
 
 #slide[
+  Let us do a Google Colab tutorial!
+]
+
+#slide[
   *Homework:* #pause
   - Review linear algebra if you are not familiar #pause
   - Install `pytorch` and `jax` onto your computer, or use Google Colab #pause
@@ -775,6 +736,10 @@ TypeError: dot_general requires contracting dimensions to have the same shape, g
     - How do you invert a matrix? #pause
     - What does `jnp.arange, jnp.zeros, jnp.full` do? #pause
       - `torch.arange, torch.zeros, torch.full` #pause
-    - Bonus: `einsum` #pause
-  - Skim the documentation
+  - Read the documentation #pause
 ]
+
+#slide[
+  There might be a quiz on `jax` and `pytorch` operations next lecture
+]
+// 1h25m + 30 min break = 1h55m total
