@@ -1,28 +1,14 @@
 #import "@preview/polylux:0.3.1": *
 #import themes.university: *
-#import "@preview/cetz:0.1.2": canvas, draw
+#import "@preview/cetz:0.2.2": canvas, draw
+#import "common.typ": *
 
-#set text(size: 25pt)
 #show: university-theme.with(
   aspect-ratio: "16-9",
   short-title: "CISC 7026: Introduction to Deep Learning",
   short-author: "Steven Morad",
   short-date: "Lecture 1: Introduction"
 )
-#set math.vec(delim: "[")
-#set math.mat(delim: "[")
-
-// TODO move deep learning at a glance to end
-
-
-
-
-#let cimage(..args) = { 
-  align(center + horizon, image(..args))
-}
-
-
-
 #title-slide(
   // Section time: 34 mins at leisurely pace
   title: [Introduction],

@@ -1,33 +1,14 @@
 #import "@preview/polylux:0.3.1": *
 #import themes.university: *
-#import "@preview/cetz:0.1.2": canvas, draw
+#import "@preview/cetz:0.2.2": canvas, draw
+#import "common.typ": *
 
-#set text(size: 25pt)
 #show: university-theme.with(
   aspect-ratio: "16-9",
   short-title: "CISC 7026: Introduction to Deep Learning",
   short-author: "Steven Morad",
   short-date: "Lecture 1: Introduction"
 )
-#set math.vec(delim: "[")
-#set math.mat(delim: "[")
-
-#let side-by-side(columns: none, gutter: 1em, align: center + horizon, ..bodies) = {
-  let bodies = bodies.pos()
-  let columns = if columns ==  none { (1fr,) * bodies.len() } else { columns }
-  if columns.len() != bodies.len() {
-    panic("number of columns must match number of content arguments")
-  }
-
-  grid(columns: columns, gutter: gutter, align: align, ..bodies)
-}
-
-
-#let cimage(..args) = { 
-  align(center + horizon, image(..args))
-}
-
-
 
 #title-slide(
   title: [Neural Networks],
@@ -178,7 +159,7 @@
 
   Yes, with neural networks #pause
 
-  TODO: diagram/flowchart history of ML
+  #cimage("figures/lecture_1/timeline.svg", height: 50%) 
 ]
 
 #slide[

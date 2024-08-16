@@ -1,6 +1,7 @@
 #import "@preview/polylux:0.3.1": *
 #import themes.university: *
 #import "@preview/cetz:0.2.2": canvas, draw, plot
+#import "common.typ": *
 
 // TODO handle x_i, y_i in the loss function, should be multiple x and y
 
@@ -8,7 +9,6 @@
 // TODO: Add review
 // TODO: Slide titles
 
-#let argmin = $op("arg min", limits: #true)$
 
 #set text(size: 25pt)
 #show: university-theme.with(
@@ -329,7 +329,7 @@ We can use this data to make future predictions
 #slide(title: [Linear Regression])[
   *Question:* How do we minimize:
   $ 
-   argmin_bold(theta) cal(L)(x_i, y_i, bold(theta)) = argmin_bold(theta) sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) = argmin_bold(theta) sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
+   argmin_bold(theta) cal(L)(x_i, y_i, bold(theta)) &= argmin_bold(theta) sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) \ &= argmin_bold(theta) sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
   $ #pause
 
   *Answer:* For now, magic! We need more knowledge before we can derive this.
