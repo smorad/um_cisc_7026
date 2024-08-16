@@ -208,6 +208,13 @@
 ]
 
 #slide(title: [Course Structure])[
+  We will be following the history of machine learning #pause
+
+  #cimage("figures/lecture_1/timeline.svg", height: 70%)
+]
+
+/*
+#slide(title: [Course Structure])[
   We will be touching on the following topics (subject to change) #pause
 
   - Introduction to machine learning #pause
@@ -218,6 +225,7 @@
   - Attention and Transformers #pause
   - Reinforcement Learning
 ]
+*/
 
 //#focus-slide[Questions?]
 
@@ -283,13 +291,19 @@
 #slide(title: [Successes])[
   It can beat the world champions at difficult video games like DotA 2
 
-  #cimage("figures/lecture_1/openai5.jpeg", height: 80%)
+  #cimage("figures/lecture_1/openai5.jpeg", height: 70%)
+
+  #link("https://www.youtube.com/watch?v=UZHTNBMAfAA")
 ]
 
 #slide(title: [Successes])[
   It is operating fully autonomous taxis in four cities
 
-  #cimage("figures/lecture_1/waymo.png", height: 80%)
+  #cimage("figures/lecture_1/waymo.png", height: 60%)
+
+  #link("https://www.youtube.com/watch?v=FpTdIeruqgI")
+  
+  #link("https://www.youtube.com/watch?v=Zeyv1bN9v4A")
 ]
 
 #slide(title: [Successes])[
@@ -319,7 +333,7 @@
 
   Our deep models keep improving as we get more data #pause
 
-  *Opinion:* In the next 10-20 years, our lives could look very different
+  *Opinion:* In the next 10-20 years, our lives will look very different
 ]
 
 // ~26 mins very slow
@@ -724,6 +738,10 @@ TypeError: dot_general requires contracting dimensions to have the same shape, g
 
 #slide[
   Let us do a Google Colab tutorial!
+]
+
+#slide[
+  Let us set up a local `conda` environment
 ]
 
 #slide[
