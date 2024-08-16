@@ -444,6 +444,7 @@ We can use this data to make future predictions
   #align(center)[You will be doing this in your first assignment!]
 ]
 
+/*
 #slide(title: [Example])[
   Back to the example...
 
@@ -451,6 +452,7 @@ We can use this data to make future predictions
 
   #cimage("figures/lecture_2/linear_regression.png", height: 60%)
 ]
+*/
 
 #slide[
   Tips for assignment 1 #pause
@@ -484,7 +486,19 @@ We can use this data to make future predictions
 #slide(title: [Example])[
   *Task:* Given your education, predict your life expectancy #pause
 
+  Plot the datapoints $(x_1, y_1), (x_2, y_2), dots $ #pause
+
+  Plot the curve $f(x, bold(theta)) = theta_1 x + theta_0; quad x in [0, 25]$ #pause
+
   #cimage("figures/lecture_2/linear_regression.png", height: 60%) #pause
+
+  //We figured out linear regression! #pause
+
+  //But can we do better?
+]
+
+#slide[
+  #cimage("figures/lecture_2/linear_regression.png", height: 60%) 
 
   We figured out linear regression! #pause
 
@@ -506,6 +520,7 @@ We can use this data to make future predictions
 ]
 
 #slide[
+  *Question:* #pause
   #side-by-side[
     Does the data look linear? #pause
     #cimage("figures/lecture_2/linear_regression.png", height: 60%) #pause
@@ -514,24 +529,24 @@ We can use this data to make future predictions
     #log_plot #pause
   ]
 
-  However, linear regression must be linear! #pause
+  However, linear regression must be linear! 
 ]
 
 #slide[
   *Question:* What does it mean when we say linear regression is linear? #pause
 
-  *Answer:* The function $f(x, theta)$ is a linear function of $x$ and $theta$ #pause
+  *Answer:* The function $f(x, theta)$ is a linear function of $x$ #pause
 
   *Trick:* Change of variables to make $f$ nonlinear: $x_"new" = log(1 + x_"data")$ #pause
 
   $ bold(X)_D = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => bold(X)_D = mat(log(1 + x_1), 1; log(1 + x_2), 1; dots.v, dots.v; log(1 + x_n), 1) $
 
-  Now, $f$ is a linear function of $log(x)$ -- a nonlinear function of $x$!
+  Now, $f$ is a linear function of $log(1 + x)$ -- a nonlinear function of $x$!
 ]
 
 #slide[
   New design matrix...
-  $ bold(X)_D = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => bold(X)_D = mat(log(1 + x_1), 1; log(1 + x_2), 1; dots.v, dots.v; log(1 + x_n), 1) $
+  $ bold(X)_D = mat(log(1 + x_1), 1; log(1 + x_2), 1; dots.v, dots.v; log(1 + x_n), 1) $
 
   #side-by-side[
   New function...
@@ -557,13 +572,13 @@ We can use this data to make future predictions
 
   Polynomials can approximate *any* function (universal function approximator) #pause
 
-  Can we extend linear regression to polynomials? #pause
+  Can we extend linear regression to polynomials?
 
   //$ f(x, bold(theta)) = theta_n x^n + theta_(n - 1) x^(n-1) + dots + theta_1 + x^1 + theta_0 $
 ]
 
 #slide[
-  Expand to multi-dimensional input space... #pause
+  Expand $x$ to a multi-dimensional input space... #pause
 
   $ bold(X)_D = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => bold(X)_D = mat(
     x_1^n, x_1^(n-1), dots, x_1, 1; 
@@ -573,7 +588,7 @@ We can use this data to make future predictions
     ) $
 
   And add some new parameters...
-  $ bold(theta) = mat(theta_n, theta_(n-1), dots, theta_1, theta_0)^top $
+  $ bold(theta) = mat(theta_1, theta_0)^top => bold(theta) =  mat(theta_n, theta_(n-1), dots, theta_1, theta_0)^top $
 ]
 
 #slide[
@@ -668,15 +683,107 @@ We can use this data to make future predictions
 
   *Question:* Which $n$ do you think has the smallest loss? #pause
 
-  *Answer:* $n=5$ -- but intuitively, $n=5$ does not seem very good...
+  *Answer:* $n=5$, but intuitively, $n=5$ does not seem very good...
 ]
+
+#slide[
+  #grid(
+    columns: 3,
+    row-gutter: 1em,
+    image("figures/lecture_2/polynomial_regression_n2.png"),
+    image("figures/lecture_2/polynomial_regression_n3.png"),
+    image("figures/lecture_2/polynomial_regression_n5.png"),
+    $ n = 2 $,
+    $ n = 3 $,
+    $ n = 5 $
+  ) 
+
+  More specifically, $n=5$ will not generalize to new data #pause
+
+  We will only use our model for new data (we already have the $y$ for a known $x$)! #pause
+]
+
+#slide[
+  When our model has a small loss but does not generalize to new data, we call it *overfitting* #pause
+
+  The model has fit too closely to the sampled data points, rather than the trend #pause
+
+  Models that overfit are not useful for making predictions #pause
+
+  Back to the question... #pause
+  
+  *Question:* How do we choose $n$ such that our polynomial model works for unseen/new data? #pause
+
+  *Answer:* Compute the loss on unseen data!
+]
+
+#slide[
+  To compute the loss on unseen data, we will need unseen data #pause
+
+  Let us create some unseen data! #pause
+
+    #cimage("figures/lecture_2/train_test_split.png", height: 60%)
+]
+
+#slide(title: [Example])[
+  *Question:* How do we choose the training and testing datasets? #pause
+
+  $ "Option 1:" bold(x)_"train" &= vec(
+    x_1, x_2, x_3
+  ) bold(y)_"train" &= vec(
+    y_1, y_2, y_3
+  ); quad
+  bold(x)_"test" &= vec(
+    x_4, x_5
+  ); bold(y)_"test" &= vec(
+    y_4, y_5
+  ) 
+  $ #pause
+
+  $ "Option 2:" bold(x)_"train" &= vec(
+    x_4, x_1, x_3
+  ) bold(y)_"train" &= vec(
+    y_4, y_1, y_3
+  ); quad
+  bold(x)_"test" &= vec(
+    x_2, x_5
+  ); bold(y)_"test" &= vec(
+    y_2, y_5
+  ) 
+  $ #pause
+
+  *Answer:* Always shuffle the data #pause
+
+  *Note:* The model must never see the testing dataset during training. This is very important!
+]
+
+#slide[
+  We can now measure how the model generalizes to new data #pause
+
+  #cimage("figures/lecture_2/train_test_regression.png", height: 60%)
+
+  Learn parameters from the train dataset, evaluate on the test dataset #pause
+
+  #side-by-side[
+    $cal(L)(bold(X)_"train", bold(y)_"train", bold(theta))$
+  ][
+    $cal(L)(bold(X)_"test", bold(y)_"test", bold(theta))$
+  ]
+]
+
+#slide[
+  We use separate training and testing datasets on *all* machine learning models, not just linear regression #pause
+]
+
+
+
 
 //
 
 // Cast this as an improvement step by step
 
 // Breakpoint after
-
+/*
 #slide(title: [Example])[
   Back to the example...
 
@@ -811,7 +918,7 @@ We can use this data to make future predictions
     columns: 2,
     column-gutter: 20%,
     align: center,
-    $ cal(D)_"train" &= mat(x_1, y_1; x_2, y_2; x_3, y_3) \ 
+    $ (D)_"train" &= mat(x_1, y_1; x_2, y_2; x_3, y_3) \ 
     cal(D)_"test" & = mat(x_4, y_4; x_5, y_5) $, 
     $ cal(D)_"train" &= mat(x_4, y_4; x_1, y_1; x_3, y_3) \ 
     cal(D)_"test" & = mat(x_2, y_2; x_5, y_5) $, 
@@ -833,3 +940,4 @@ We can use this data to make future predictions
   - Used a trick to extend linear regression to nonlinear functions #pause
   - Discussed overfitting and test/train splits
 ]
+*/

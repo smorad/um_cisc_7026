@@ -50,11 +50,11 @@
   This is my first course at UM #pause
   
   I taught a course on Deep Reinforcement Learning at Cambridge #pause
-  
-  This is a learning experience for me, too #pause
 
+  I am not perfect, and I am still learning how to teach effectively #pause
+  
   Please provide feedback privately to me #pause
-  - Email smorad at symbol um.edu.mo
+  - Email smorad at um.edu.mo
   - Chat after class #pause
 
   I would like to make the class *interactive* #pause
@@ -92,6 +92,7 @@
   Robots that *learn* from their mistakes
 ]
 
+// 16 mins when I blab
 #slide[
   I am interested in *deep learning* because I want to make smarter robots #pause
 
@@ -138,7 +139,7 @@
   Most communication will happen over Moodle #pause
   - I will try and post lecture slides after each lecture #pause
   - Assignments #pause
-  - Grading #pause
+  - Grading
 ]
 
 #slide(title: [Course Info])[
@@ -159,7 +160,9 @@
   - 70% assignments #pause
   - 20% quiz #pause
   - 10% attendance and participation
+    - Name plates
 ]
+// 26 mins blabbing
 
 #slide(title: [Overview])[
   + Brief chat
@@ -191,12 +194,13 @@
   - JAX
 ]
 
+//32 mins very slow
 #slide(title: [Course Structure])[
   3 hours is a very long time to pay attention #pause
 
-  I will place slides titled "Relax", every 20-45 minutes #pause
+  I will place slides titled "Relax", every $tilde 45$ minutes #pause
 
-  At the Relax slides, we may take a 5-15 minute break #pause
+  At the Relax slides, we may take a $tilde 15$ minute break #pause
 
   You can: #pause
   - Leave the classroom #pause
@@ -212,6 +216,8 @@
 
   #cimage("figures/lecture_1/timeline.svg", height: 70%)
 ]
+
+// 38 blabbing
 
 /*
 #slide(title: [Course Structure])[
@@ -243,6 +249,7 @@
   + *Lecture*
 ]
 // 25 mins very slow
+// 39 mins blabbing
 
 #focus-slide[Relax]
 
@@ -297,12 +304,18 @@
 ]
 
 #slide(title: [Successes])[
+  It is learning to use tools and break rules
+
+  #link("https://youtu.be/kopoLzvh5jY?si=keH4i8noY4zUVNrP")
+]
+
+// 55 mins blabbing, no break
+
+#slide(title: [Successes])[
   It is operating fully autonomous taxis in four cities
 
   #cimage("figures/lecture_1/waymo.png", height: 60%)
 
-  #link("https://www.youtube.com/watch?v=FpTdIeruqgI")
-  
   #link("https://www.youtube.com/watch?v=Zeyv1bN9v4A")
 ]
 
@@ -351,6 +364,8 @@
   #v(2em)
   #align(center)[*Request:* Before you train a deep model, ask yourself whether it is good or bad for the world]
 ]
+
+// 1h10m blabbing
 
 #slide(title: [Overview])[
   + *Deep Learning Successes*
@@ -419,6 +434,8 @@
   + Loss function
   + Optimization procedure
 ]
+
+// 1h19 blabbing no break
 
 #slide(title: [Overview])[
   + Deep Learning Successes
