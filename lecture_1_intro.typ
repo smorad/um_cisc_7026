@@ -3,12 +3,17 @@
 #import "@preview/cetz:0.2.2": canvas, draw
 #import "common.typ": *
 
+
+
+
 #show: university-theme.with(
   aspect-ratio: "16-9",
   short-title: "CISC 7026: Introduction to Deep Learning",
   short-author: "Steven Morad",
   short-date: "Lecture 1: Introduction"
 )
+#show: slide_template
+
 #title-slide(
   // Section time: 34 mins at leisurely pace
   title: [Introduction],
@@ -17,11 +22,21 @@
   //logo: image("logo.jpg", width: 25%)
 )
 
+/*
+#slide[
+  #utils.register-section[section1]
+  #utils.register-section[section2]
+  #utils.polylux-outline()
+  #utils.current-section
+]
+*/
+
 #slide(title: [Overview])[
   + Brief chat
   + Course Information
   + Course Structure
   + Lecture
+  #pdfpc.speaker-note("bork")
 ]
 
 #slide(title: [Overview])[
@@ -147,6 +162,15 @@
   - 20% quiz #pause
   - 10% attendance and participation
     - Name plates
+]
+
+#slide(title: [Course Info])[
+  *Office Hours:* Monday and Tuesday 11:00 - 12:00, E11 4026 #pause
+
+  Review assignments early, so you can attend Tuesday office hours #pause
+
+  Monday office hours will be crowded before deadlines #pause
+  - You will not have much time if you have not started!
 ]
 // 26 mins blabbing
 
@@ -286,7 +310,7 @@
 
   #cimage("figures/lecture_1/openai5.jpeg", height: 70%)
 
-  #link("https://www.youtube.com/watch?v=UZHTNBMAfAA")
+  #link("https://youtu.be/eHipy_j29Xw?si=iM8QVB6_P-ROUU1Y")
 ]
 
 #slide(title: [Successes])[
@@ -702,8 +726,8 @@
   print(x) # Sum across leading axis, array([4, 6])
   y = jnp.array([[1, 2], [3, 4]]).mean()
   print(y) # Mean across all axes, array(2.5)
-  z = jnp.array([[1, 2], [3, 4]]).reshape(4, 1)
-  print(z) # jnp.array([[1], [2], [3], [4]])
+  z = jnp.array([[1, 2], [3, 4]]).reshape((4,))
+  print(z) # jnp.array([1, 2, 3, 4])
   ```
 ]
 
@@ -716,8 +740,8 @@
   print(x) # Sum across leading axis, array([4, 6])
   y = torch.tensor([[1, 2], [3, 4]]).mean()
   print(y) # Mean across all axes, array(2.5)
-  z = torch.tensor([[1, 2], [3, 4]]).reshape(4, 1)
-  print(z) # torch.tensor([[1], [2], [3], [4]])
+  z = torch.tensor([[1, 2], [3, 4]]).reshape((4,))
+  print(z) # torch.tensor([1, 2, 3, 4])
   ```
 ]
 

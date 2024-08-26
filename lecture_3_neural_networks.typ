@@ -3,6 +3,13 @@
 #import "@preview/cetz:0.2.2": canvas, draw
 #import "common.typ": *
 
+#set math.vec(delim: "[")
+#set math.mat(delim: "[")
+
+
+// TODO: Implement XOR is transposed
+// TODO: is xor network actually wide?
+
 #show: university-theme.with(
   aspect-ratio: "16-9",
   short-title: "CISC 7026: Introduction to Deep Learning",
@@ -260,9 +267,19 @@
 
 #slide[
   #side-by-side(gutter: 4em)[#cimage("figures/lecture_3/neuron_anatomy.jpg")
-  $ f(vec(x_1, dots.v, x_n), vec(theta_(1),  dots.v, theta_(n)) ) = sigma(theta_0 + sum_(i=1)^n x_i theta_i) $  
+  $ f(vec(x_1, dots.v, x_n), vec(theta_(0),  dots.v, theta_(n)) ) = sigma(theta_0 + sum_(i=1)^n x_i theta_i) $  
   ][  
   #cimage("figures/lecture_3/neuron.png")]
+]
+
+#slide[
+  We can also write a neuron in terms of a dot product #pause
+
+  $ f(vec(x_1, dots.v, x_n), vec(theta_(0),  dots.v, theta_(n)) ) = sigma(theta_0 + bold(theta)_(1:n) dot bold(x)) $ #pause
+
+  Other books sometimes write the parameters as a *weight* and *bias* #pause
+
+  $ f(vec(x_1, dots.v, x_n), vec(b, w_1, dots.v, w_(n)) ) = sigma(b + bold(w) dot bold(x)) $ #pause
 ]
 
 #focus-slide[Relax]
@@ -400,6 +417,77 @@
 ]
 
 #slide[
+  How do we express a *wide* neural network mathematically? #pause
+
+  A single neuron:
+
+  $ f: bb(R)^n, bold(theta) |-> bb(R) $ #pause
+
+  Multiple neurons (wide):
+
+  $ f: bb(R)^n, bold(theta) |-> bb(R)^m $ #pause
+]
+
+#slide[
+  For a single neuron:
+  
+  $ f(vec(x_1, dots.v, x_n), vec(theta_(0),  dots.v, theta_(n)) ) = sigma(theta_0 + sum_(i=1)^n x_i theta_i) $  
+
+  $ f(vec(x_1, dots.v, x_n), vec(theta_(0),  dots.v, theta_(n)) ) = sigma(theta_0 + bold(theta)_(1:n) dot bold(x)) $ #pause
+]
+
+#slide[
+  // Must be m by n (m rows, n cols)
+  $ f(vec(x_1, dots.v, x_n), mat(theta_(1,0), theta_(2, 0), dots, theta_(n,0); theta_(1,1), theta_(2,1), dots, theta_(n, 1); dots.v, dots.v, dots.down, dots.v; theta_(1, m), theta_(2, m), dots, theta_(m, n)) ) = vec(
+    sigma( theta_(1,0) + sum_(i=1)^n x_i theta_(1,i)  ),
+    sigma( theta_(2,0) + sum_(i=1)^n x_i theta_(2,i)  ),
+    dots.v,
+    sigma( theta_(m,0) + sum_(i=1)^n x_i theta_(m,i)  ),
+  ) 
+  $  
+  Each row in the output corresponds to the output of a single neuron #pause
+
+  This is very confusing to write, but we can rewrite it as matrix multiplication
+]
+
+#slide[
+  $ f(vec(x_1, dots.v, x_n), mat(theta_(1,0), theta_(2, 0), dots, theta_(n,0); theta_(1,1), theta_(2,1), dots, theta_(n, 1); dots.v, dots.v, dots.down, dots.v; theta_(1, m), theta_(2, m), dots, theta_(m, n)) ) = vec(
+    sigma( theta_(1,0) + sum_(i=1)^n x_i theta_(1,i)  ),
+    sigma( theta_(2,0) + sum_(i=1)^n x_i theta_(2,i)  ),
+    dots.v,
+    sigma( theta_(m,0) + sum_(i=1)^n x_i theta_(m,i)  ),
+  ) 
+  $ #pause
+
+  $ f(bold(x), bold(theta)) = sigma( bold(theta)_(dot, 0) + bold(theta)_(dot, 1:n) bold(x) ) $ #pause
+
+  $ f(bold(x), (bold(b), bold(W))) = sigma( bold(b) + bold(W) bold(x) ) $
+]
+
+
+#slide[
+  How do we express a *deep* neural network mathematically? #pause
+
+  $ f_1(bold(x), bold(theta)) = bold(theta)_(dot, 0) + bold(theta)_(dot, 1:n) bold(x) $ #pause
+  $ f_2(bold(x), bold(psi)) = bold(psi)_(dot, 0) + bold(psi)_(dot, 1:n) bold(x) $ #pause
+  $ dots.v $ #pause
+  $ f_(ell)(bold(x), bold(rho)) = bold(rho)_(dot, 0) + bold(rho)_(dot, 1:n) bold(x) $ #pause
+
+  Use function composition #pause
+
+  $ f_(ell) (dots f_2(f_1(bold(x), bold(theta)_1), bold(psi)) dots ) $
+]
+
+#slide[
+  Written more plainly as
+
+  $ bold(z)_1 = f_1(bold(x), bold(theta)) = bold(theta)_(dot, 0) + bold(theta)_(dot, 1:n) bold(x) $ #pause
+  $ bold(z)_2 = f_2(bold(z_1), bold(psi)) = bold(psi)_(dot, 0) + bold(psi)_(dot, 1:n) bold(z)_1 $ #pause
+  $ dots.v $ #pause
+  $ bold(y) = f_(ell)(bold(x), bold(rho)) = bold(rho)_(dot, 0) + bold(rho)_(dot, 1:n) bold(z)_(ell - 1) $ #pause
+]
+
+#slide[
     Implement XOR using a deep and wide neural network #pause
     
     $ f(x_1, x_2, bold(theta)) = H( & theta_(3, 0) \
@@ -436,7 +524,7 @@
 
   #only((3, 4))[#cimage("figures/lecture_3/function_approximation.svg", height: 50%)]
 
-  #only(4)[$ "Roughly, " [lim_(n |-> oo) theta_(2, 0) + theta_(2, 1) sum_(j = 1)^n sigma(theta_(1, 0) + theta_(1, j) x) ] = g(x); quad forall g $]
+  #only(4)[$ "Roughly, " exists bold(theta) => lim_(n |-> oo) [ theta_(2, 0) + theta_(2, 1) sum_(j = 1)^n sigma(theta_(1, 0) + theta_(1, j) x) ] = g(x); quad forall g $]
 ]
 
 #slide[
@@ -448,10 +536,15 @@
   
   As we increase the width and depth of the network, $epsilon$ shrinks #pause
 
-
   #side-by-side[$ g(#image("figures/lecture_1/dog.png", height: 20%)) = "Dog"$][$ g(#image("figures/lecture_1/muffin.png", height: 20%)) = "Muffin" $] 
   
   #align(center)[Very powerful finding! The basis of deep learning.]
+]
+
+#slide[
+  All the models we examine in this course will use this neural network structure internally #pause
+    - Transformers #pause
+    - Graph neural networks #pause
 ]
 
 #focus-slide[Relax]
@@ -468,11 +561,14 @@
 
   #cimage("figures/lecture_3/timeline.svg", width: 85%) #pause
 
-  If the deep neural network was invented in 1958, why did it take 70 years for us to care about deep learning? #pause
+  *Question:* If the deep neural network was invented in 1958, why did it take 70 years for us to care about deep learning?
+]
 
+#slide[
+  *Answer:* Deep learning requires very deep and wide networks
+    + Hardware advances enabled very deep and wide networks #pause
 
-  Many small improvements over time eventually made NNs feasible
-  
+    + Many theoretical improvements allow us to successfully train deeper and wider networks #pause
 ]
 
 #slide[
@@ -482,6 +578,55 @@
 
   We often use the term "layers", when referring to a specific depth of the neural network
     - Four-layer MLP means a neural network with a depth of four
+    - Corresponds to four parameter matrices in $bold(theta)$
+]
+
+#slide[
+  Let us construct neural networks in `torch` and `jax`
+]
+
+#slide[
+
+  #text(size: 21pt)[
+    ```python
+    import torch
+    from torch import nn
+
+    class MyNetwork(nn.Module):
+      def __init__(self):
+        super().__init__() # Required by pytorch
+        self.input_layer = nn.Linear(5, 3) # 3 neurons, 5 inputs each 
+        self.output_layer = nn.Linear(3, 1) # 1 neuron with 3 inputs
+    
+      def forward(self, x):
+        z = torch.heaviside(self.input_layer(x))
+        y = self.output_layer(z)
+        return y
+    ```
+  ]
+]
+
+#slide[
+  #text(size: 21pt)[
+    ```python
+    import jax, equinox
+    from jax import numpy as jnp
+    from equinox import nn
+
+    class MyNetwork(equinox.Module):
+      input_layer: nn.Linear # Required by equinox
+      output_layer: nn.Linear
+
+      def __init__(self):
+        self.input_layer = nn.Linear(5, 3, key=jax.random.PRNGKey(0))
+        self.output_layer = nn.Linear(3, 1, key=jax.random.PRNGKey(1))
+
+      def __call__(self, x):
+        z = jnp.heaviside(self.input_layer(x))
+        y = self.output_layer(z)
+        return y 
+    ```
+  ]
 ]
 
 

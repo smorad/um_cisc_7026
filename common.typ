@@ -1,5 +1,4 @@
 #import "@preview/polylux:0.3.1": *
-#import themes.university: *
 #import "@preview/cetz:0.2.2": canvas, draw
 
 #set text(size: 25pt)
@@ -20,3 +19,23 @@
 
   grid(columns: columns, gutter: gutter, align: align, ..bodies)
 }
+
+#let slide_template(doc) = {
+  set text(size: 25pt)
+  set math.vec(delim: "[")
+  set math.mat(delim: "[")
+  doc
+}
+
+/*
+#let sections-state = state("polylux-sections", ())
+#let bold-outline(enum-args: (:), padding: 0pt) = locate( loc => {
+  let sections = sections-state.final(loc)
+  pad(padding, enum(
+    ..enum-args,
+    ..sections.map(section => {
+      link(section.loc, section.body))
+      }
+  ))
+})
+*/
