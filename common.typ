@@ -1,4 +1,5 @@
 #import "@preview/polylux:0.3.1": *
+#import themes.university: *
 #import "@preview/cetz:0.2.2": canvas, draw
 
 #set text(size: 25pt)
@@ -25,6 +26,13 @@
   set math.vec(delim: "[")
   set math.mat(delim: "[")
   doc
+}
+
+#let sslide(content) = {
+  //slide(title: utils.current-section)[
+  slide[
+    #content
+  ]
 }
 
 /*

@@ -273,13 +273,17 @@
 ]
 
 #slide[
+  #text(size: 23pt)[
   We can also write a neuron in terms of a dot product #pause
 
   $ f(vec(x_1, dots.v, x_n), vec(theta_(0),  dots.v, theta_(n)) ) = sigma(theta_0 + bold(theta)_(1:n) dot bold(x)) $ #pause
 
-  Other books sometimes write the parameters as a *weight* and *bias* #pause
+  We often write the parameters as a *weight* $bold(w)$ and *bias* $b$ #pause
 
   $ f(vec(x_1, dots.v, x_n), vec(b, w_1, dots.v, w_(n)) ) = sigma(b + bold(w) dot bold(x)) $ #pause
+
+  $ b = theta_0, bold(w) = bold(theta)_(1:n) $
+  ]
 ]
 
 #focus-slide[Relax]
@@ -464,16 +468,35 @@
   $ f(bold(x), (bold(b), bold(W))) = sigma( bold(b) + bold(W) bold(x) ) $
 ]
 
-
 #slide[
   How do we express a *deep* neural network mathematically? #pause
 
-  $ f_1(bold(x), bold(theta)) = bold(theta)_(dot, 0) + bold(theta)_(dot, 1:n) bold(x) $ #pause
-  $ f_2(bold(x), bold(psi)) = bold(psi)_(dot, 0) + bold(psi)_(dot, 1:n) bold(x) $ #pause
-  $ dots.v $ #pause
-  $ f_(ell)(bold(x), bold(rho)) = bold(rho)_(dot, 0) + bold(rho)_(dot, 1:n) bold(x) $ #pause
+  A single neuron:
 
-  Use function composition #pause
+  $ f: bb(R)^n, bold(theta) |-> bb(R) $ #pause
+
+  Multiple neurons (deep):
+
+  $ f: bb(R)^n, bold(theta), bold(psi), dots, bold(rho) |-> bb(R)^m $ 
+]
+
+#slide[
+  A single neuron
+
+  $ f(bold(x), bold(theta)) = bold(theta)_(dot, 0) + bold(theta)_(dot, 1:n) bold(x) $ #pause
+
+  A composition of neurons with parameters $bold(theta), bold(psi), bold(rho)$
+
+  #text(size: 22pt)[
+    $ f_1(bold(x), bold(theta)) = bold(theta)_(dot, 0) + bold(theta)_(dot, 1:n) bold(x) quad
+
+    f_2(bold(x), bold(psi)) = bold(psi)_(dot, 0) + bold(psi)_(dot, 1:n) bold(x) quad
+
+    dots quad
+
+    f_(ell)(bold(x), bold(rho)) = bold(rho)_(dot, 0) + bold(rho)_(dot, 1:n) bold(x) $ #pause
+  ] #pause
+
 
   $ f_(ell) (dots f_2(f_1(bold(x), bold(theta)_1), bold(psi)) dots ) $
 ]
@@ -582,9 +605,22 @@
 ]
 
 #slide[
-  Let us construct neural networks in `torch` and `jax`
+  Let us construct deep and wide neural networks in `torch` and `jax`
 ]
 
+#slide[
+  Here are the equations for one neural network layer 
+
+  #side-by-side[$ f(bold(x), bold(theta)) = sigma( bold(theta)_(dot, 0) + bold(theta)_(dot, 1:n) bold(x) ) $][or][
+  $ f(bold(x), (bold(b), bold(W))) = sigma( bold(b) + bold(W) bold(x) ) $ ] #pause
+
+  We must implement the linear function $bold(b) + bold(W) bold(x)$ and the activation function $sigma$ to create a neural network layer #pause
+
+  Let us do this in colab! https://colab.research.google.com/drive/1bLtf3QY-yROIif_EoQSU1WS7svd0q8j7?usp=sharing
+]
+
+
+/*
 #slide[
 
   #text(size: 21pt)[
@@ -630,7 +666,6 @@
 ]
 
 
-/*
 #slide[
   #side-by-side[#cimage("figures/neuron.png", width: 80%)][#cimage("figures/heaviside.png", height: 50%)] #pause
   *Question:* What kind of functions can we represent with our neuron? #pause

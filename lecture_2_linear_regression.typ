@@ -3,11 +3,12 @@
 #import "@preview/cetz:0.2.2": canvas, draw, plot
 #import "common.typ": *
 
-// TODO handle x_i, y_i in the loss function, should be multiple x and y
 
-// TODO: Motivate why we need a loss function
-// TODO: Add review
-// TODO: Slide titles
+// Translate setup:
+// Open slidepilot and start presentation (present on new screen)
+// Make it not full screen
+// Open OBS
+// Right click video, full-screen projector preview
 
 
 #set text(size: 25pt)
@@ -15,7 +16,7 @@
   aspect-ratio: "16-9",
   short-title: "CISC 7026: Introduction to Deep Learning",
   short-author: "Steven Morad",
-  short-date: "Lecture 1: Introduction"
+  short-date: "Lecture 2: Linear Regression"
 )
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
@@ -47,6 +48,19 @@
     })
 })
 
+#let argmin_plot = canvas(length: 1cm, {
+  plot.plot(size: (8, 6),
+    x-tick-step: 1,
+    y-tick-step: 2,
+    {
+      plot.add(
+        domain: (-2, 2), 
+        x => calc.pow(1 + x, 2),
+        label: $ (x + 1)^2 $
+      )
+    })
+})
+
 #title-slide(
   // Section time: 34 mins at leisurely pace
   title: [Regression],
@@ -55,26 +69,220 @@
   //logo: image("logo.jpg", width: 25%)
 )
 
-#slide[
+#slide(title: [Participation])[
+  Everyone take out paper and a pen #pause
+
+  Fold the paper into thirds, and write your full name in English and your student ID #pause
+
+  I will record when you *ask good questions* or *answer questions* #pause
+
+  Participate once: ok participation grade #pause
+
+  Participate more than once: perfect participation grade
+]
+
+#slide(title: [Agenda])[
+  + Review #pause
+  + Quiz #pause
+  + Linear Regression
+]
+
+#slide(title: [Agenda])[
+  + *Review*
+  + Quiz
+  + Linear Regression
+]
+
+#slide(title: [Review])[
+  We often know *what* we want, but we do not know *how* #pause
+
+  We have many pictures of either dogs or muffins $x in X$ #pause
+
+  We want to know if the picture is [dog | muffin] $y in Y$ #pause
+
+  We learn a function or mapping from $X$ to $Y$
+]
+
+#slide(title: [Review])[
+
+  #text(size: 23pt)[
+    Why do we call it machine *learning*? #pause
+
+    We learn the function $f$ from the *data* $x in X, y in Y$ #pause
+
+    More specifically, we learn function *parameters* $Theta$ #pause
+
+    $ f: X times Theta |-> Y $ #pause
+
+    $ f("你好吗", vec(theta_1, theta_2, dots.v)) = "You good?" $ #pause
+
+    $ x = "你好吗", quad X = "Chinese sentences" $ #pause
+    $ y = "You good?", quad Y = "English sentences" $
+  ]
+]
+
+#slide(title: [Review])[
+  Create vectors, matrices, or tensors in `jax`
+
+  ```python
+    import jax.numpy as jnp
+    a = jnp.array(1) # Scalar
+    b = jnp.array([1, 2]) # Vector
+    C = jnp.array([[1,2], [3,4]]) # 2x2 Matrix
+    D = jnp.ones((3,3,3)) # 3x3x3 Tensor
+  ```
+
+  You can determine the dimensions of a variable using `shape`
+
+  ```python
+    b.shape # Prints (2,)
+    C.shape # Prints (2,2)
+    D.shape # prints (3,3,3)
+  ```
+]
+
+#slide(title: [Review])[
+  Create vectors, matrices, or tensors in `pytorch`
+
+  ```python
+    import torch
+    a = torch.tensor(1) # Scalar
+    b = torch.tensor([1, 2]) # Vector
+    C = torch.tensor([[1,2], [3,4]]) # 2x2 Matrix
+    D = torch.ones((3,3,3)) # 3x3x3 Tensor
+  ```
+
+  You can determine the dimensions of a variable using `shape`
+
+  ```python
+    b.shape # Prints (2,)
+    C.shape # Prints (2,2)
+    D.shape # prints (3,3,3)
+  ```
+]
+
+#slide(title: [Review])[
+  ```python
+    import jax.numpy as jnp
+    
+    s = 5 * jnp.array([1, 2])
+    print(s) # jnp.array(5, 10)
+    x = jnp.array([1, 2]) + jnp.array([3, 4])
+    print(x) # jnp.array([4, 6])
+    y = jnp.array([1, 2]) * jnp.array([3, 4]) # Careful!
+    print(y) # jnp.array([3, 8])
+    z = jnp.array([[1], [2]]) @ jnp.array([[3, 4]])
+    print(z) # A^t B (dot product), jnp.array([[11]])
+
+  ```
+]
+
+#slide(title: [Review])[
+  `pytorch` is very similar to `jax`
+
+  ```python
+    import torch
+
+    s = 5 * torch.tensor([1, 2])
+    print(s) # torch.tensor(5, 10)
+    x = torch.tensor([1, 2]) + torch.tensor([3, 4])
+    print(x) # torch.tensor([4, 6])
+    y = torch.tensor([1, 2]) * torch.tensor([3, 4]) # Careful!
+    print(y) # torch.tensor([3, 8])
+    z = torch.tensor([[1], [2]]) @ torch.tensor([[3, 4]])
+    print(z) # A^t B (dot product), torch.tensor([[11]])
+  ```
+]
+
+#slide(title: [Review])[
+  You can also call various methods on arrays/tensors
+  ```python
+  import jax.numpy as jnp
+
+  x = jnp.array([[1, 2], [3, 4]]).sum(axis=0) 
+  print(x) # Sum across leading axis, array([4, 6])
+  y = jnp.array([[1, 2], [3, 4]]).mean()
+  print(y) # Mean across all axes, array(2.5)
+  z = jnp.array([[1, 2], [3, 4]]).reshape((4,))
+  print(z) # jnp.array([1, 2, 3, 4])
+  ```
+]
+
+#slide(title: [Review])[
+  Same thing for `pytorch`
+  ```python
+  import torch
+
+  x = torch.tensor([[1, 2], [3, 4]]).sum(axis=0) 
+  print(x) # Sum across leading axis, array([4, 6])
+  y = torch.tensor([[1, 2], [3, 4]]).mean()
+  print(y) # Mean across all axes, array(2.5)
+  z = torch.tensor([[1, 2], [3, 4]]).reshape((4,))
+  print(z) # torch.tensor([1, 2, 3, 4])
+  ```
+]
+
+// Review 8 mins
+
+#slide(title: [Agenda])[
+  + *Review*
+  + Quiz
+  + Linear Regression
+]
+
+#slide(title: [Agenda])[
+  + Review
+  + *Quiz*
+  + Linear Regression
+]
+
+#slide(title: [Quiz])[
+  Time for a quiz! #pause 
+
+  All laptops and phones away #pause
+  
+  Everyone take out paper and pen, write your name and student ID #pause
+  
+  I will explain the questions, then you have *15 minutes* to answer the questions #pause
+
+  You are not expected to answer all questions correctly, do not stress! #pause
+]
+
+
+#slide(title: [Agenda])[
+  + Review
+  + *Quiz*
+  + Linear Regression
+]
+
+#slide(title: [Agenda])[
+  + Review
+  + Quiz
+  + *Linear Regression*
+]
+
+#slide(title: [Linear Regression])[
   Today, we will learn about linear regression #pause
 
   Probably the oldest method for machine learning (Gauss and Legendre) #pause
 
-  #cimage("figures/lecture_1/timeline.svg")
+  #cimage("figures/lecture_1/timeline.svg", height: 55%) #pause
+
+  Neural networks share many similarities with linear regression
 ]
 
-#slide(title: [ML])[
+#slide(title: [Linear Regression])[
   Many problems in ML can be reduced to *regression* or *classification* #pause
 
   *Regression* asks how many #pause
-  - How much money will I make? #pause
-  - How much rain will there be tomorrow? #pause
-  - How far away is this object? #pause
+  - Given my parents height, How tall will I be? #pause
+  - Given the rain today, how much rain will there be tomorrow? #pause
+  - Given a camera image, how far away is this object? #pause
 
   *Classification* asks which one #pause
-  - Is this a dog or muffin? #pause
-  - Will it rain tomorrow? Yes or no? #pause
-  - What color is this object? #pause
+  - Is this image of a dog or muffin? #pause
+  - Given the rain today, will it rain tomorrow? Yes or no? #pause
+  - Given a camera image, what color is this object? Yellow, blue, red, ... ? #pause
 
   Let us start with regression
 ]
@@ -83,20 +291,30 @@
   Today, we will come up with a regression problem and then solve it! #pause
 
   + Define an example problem #pause
-  + Define our machine learning model $f$ #pause
+  + Define our linear model $f$ #pause
   + Define a loss function $cal(L)$ #pause
-  + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + Use $cal(L)$ to learn the parameters $theta$ of $f$ #pause
+  + Solve the example problem
+  + Expand to nonlinear models
+  + Discuss overfitting
+  + Interactive discussion
+  + Homework summary
 ]
 
 #slide(title: [Linear Regression])[
   + *Define an example problem*
-  + Define our machine learning model $f$
+  + Define our linear model $f$
   + Define a loss function $cal(L)$
   + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + Solve the example problem
+  + Expand to nonlinear models
+  + Discuss overfitting
+  + Interactive discussion
+  + Homework summary
 ]
 
 
-#slide(title: [Linear Regression])[
+#slide(title: [Example Problem])[
   The World Health Organization (WHO) has collected data on life expectancy #pause
 
   #cimage("figures/lecture_2/who.png", height: 60%)
@@ -106,7 +324,7 @@
 
 ]
 
-#slide(title: [Linear Regression])[
+#slide(title: [Example Problem])[
   The WHO collected data from roughly 3,000 people from 193 countries #pause
 
   For each person, they recorded: #pause
@@ -120,20 +338,22 @@
 We can use this data to make future predictions
 ]
 
-#slide(title: [Linear Regression])[
+#slide(title: [Example Problem])[
   Since everyone here is very educated, we will focus on how education affects life expectancy #pause
 
-  There are studies showing a causal effect on education on health #pause
+  There are studies showing a causal effect of education on health #pause
     - _The causal effects of education on health outcomes in the UK Biobank._ Davies et al. _Nature Human Behaviour_. #pause
     - By staying in school, you are likely to live longer 
 ]
 
-#slide(title: [Linear Regression])[
+#slide(title: [Example Problem])[
   *Task:* Given your education, predict your life expectancy #pause
 
   $X in bb(R)_+:$ Years in school #pause
   
   $Y in bb(R)_+:$ Age of death #pause
+
+  Each $x in X$ and $y in Y$ represent a single person #pause
 
   *Approach:* Learn the parameters $theta$ such that 
 
@@ -142,24 +362,33 @@ We can use this data to make future predictions
   *Goal:* Given someone's education, predict how long they will live
 ]
 
-
-// 16:00 very slow, no review
+// 40:00 
 
 #slide(title: [Linear Regression])[
   + *Define an example problem*
-  + Define our machine learning model $f$
+  + Define our linear model $f$
   + Define a loss function $cal(L)$
   + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + Solve the example problem
+  + Expand to nonlinear models
+  + Discuss overfitting
+  + Interactive discussion
+  + Homework summary
 ]
 
 #slide(title: [Linear Regression])[
   + Define an example problem
-  + *Define our machine learning model $f$*
+  + *Define our linear model $f$*
   + Define a loss function $cal(L)$
   + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + Solve the example problem
+  + Expand to nonlinear models
+  + Discuss overfitting
+  + Interactive discussion
+  + Homework summary
 ]
 
-#slide(title: [Linear Regression])[
+#slide(title: [Linear Model])[
   Soon, $f$ will be a deep neural network #pause
 
   For now, it is easier if we make $f$ a *linear function* #pause
@@ -177,56 +406,48 @@ We can use this data to make future predictions
 
 ]
 
-/*
-#slide(title: [Linear Regression])[
-  For simplicity, let $f$ be a linear function (we will make it deep later) #pause
-
-  $ f(x, bold(theta)) = f(x, vec(theta_2, theta_1)) = W x + b $ #pause
-
-  Now, we need to find the parameters $bold(theta) = vec(theta_2, theta_1)$ that makes $f(x, bold(theta)) = y$
-  //   To do this, we will need to find a *loss function* $cal(L)$
-]
-*/
-
 #slide(title: [Linear Regression])[
   + Define an example problem
-  + *Define our machine learning model $f$*
+  + *Define our linear model $f$*
   + Define a loss function $cal(L)$
   + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + Solve the example problem
+  + Expand to nonlinear models
+  + Discuss overfitting
+  + Interactive discussion
+  + Homework summary
 ]
 
 #slide(title: [Linear Regression])[
   + Define an example problem
-  + Define our machine learning model $f$
+  + Define our linear model $f$
   + *Define a loss function $cal(L)$*
   + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + Solve the example problem
+  + Expand to nonlinear models
+  + Discuss overfitting
+  + Interactive discussion
+  + Homework summary
 ]
 
 
-#slide(title: [Linear Regression])[
+#slide(title: [Loss Function])[
   Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that make $f(x, bold(theta)) = y$ #pause
 
-  *Question:* How do we find $bold(theta)$? (Hint: We want $f(x, bold(theta)) = y$) #pause
+  How do we find $bold(theta)$? (Hint: We want $f(x, bold(theta)) = y$) #pause
 
-  *Answer:* We will minimize the *loss* (error) between $f(x, bold(theta))$ and $y$, for all
+  We will minimize the *loss* (error) between $f(x, bold(theta))$ and $y$, for all
   
   $ x in X, y in Y $
 
-  /*
-  #align(center, grid(
-    columns: 2,
-    align: center,
-    column-gutter: 2em,
-    [E.g., $ argmin_(bold(theta)) (f(x, bold(theta)) - y)^2 = 0 $], 
-    cimage("figures/lecture_2/loss_function.png", height: 50%)
-  ))
-  */
 ]
 
-#slide(title: [Linear Regression])[
-  We compute the loss using the *loss function* $cal(L): X times Y times Theta |-> bb(R)$ #pause
+#slide(title: [Loss Function])[
+  We compute the loss using the *loss function* #pause
+  
+  $ cal(L): X^n times Y^n times Theta |-> bb(R) $ #pause
 
-  $ cal(L)(x, y, bold(theta)) $ #pause
+  // $ cal(L)(x, y, bold(theta)) $ #pause
 
   The loss function tells us how close $f(x, bold(theta))$ is to $y$ #pause
 
@@ -237,7 +458,7 @@ We can use this data to make future predictions
   $ "error"(y, hat(y)) = (y - hat(y))^2 $
 ]
 
-#slide(title: [Linear Regression])[
+#slide(title: [Loss Function])[
   //$ f(x, vec(theta_2, theta_1)) = W x + b $ #pause
 
   Let's derive the error function #pause
@@ -280,153 +501,176 @@ We can use this data to make future predictions
   
 ]
 
-#slide(title: [Linear Regression])[
+#slide(title: [Loss Function])[
   We can write the loss function for a single datapoint $x_i, y_i$ as
 
   $ cal(L)(x_i, y_i, bold(theta)) = "error"(f(x_i, bold(theta)),  y_i) = (f(x_i, bold(theta)) - y_i)^2 $ #pause
 
-  We want to find the parameters $bold(theta)$ that minimize $cal(L)$ #pause
+  *Question:* Will this $cal(L)$ give us a good prediction for all possible $x$? #pause
 
-  $ 
-   argmin_bold(theta) cal(L)(x_i, y_i, bold(theta)) = argmin_bold(theta) "error"(f(x_i, bold(theta)),  y_i) = argmin_bold(theta) (f(x_i, bold(theta)) - y_i)^2 
-  $ #pause
-
-  *Question:* Any issues with $cal(L)$? Will it give us a good prediction for all $x$? #pause
-
-  *Answer:* We only consider a single datapoint! We want to learn $bold(theta)$ for the entire dataset
+  *Answer:* No! We only consider a single datapoint $x_i, y_i$. We want to learn $bold(theta)$ for the entire dataset, for all $x in X, y in Y$
 ]
 
-#slide(title: [Linear Regression])[
+#slide(title: [Loss Function])[
   For a single $x_i, y_i$:
   $ 
-   argmin_bold(theta) cal(L)(x_i, y_i, bold(theta)) = argmin_bold(theta) "error"(f(x_i, bold(theta)),  y_i) = argmin_bold(theta) (f(x_i, bold(theta)) - y_i)^2 
+   cal(L)(x_i, y_i, bold(theta)) = "error"(f(x_i, bold(theta)),  y_i) = (f(x_i, bold(theta)) - y_i)^2 
   $ #pause
 
   For the entire dataset: 
-  $ bold(x) = mat(x_1, x_2, dots, x_n)^top, bold(y) = mat(y_1, y_2, dots, y_n)^top $
-  $ 
-   argmin_bold(theta) cal(L)(bold(x), bold(y), bold(theta)) = argmin_bold(theta) sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) = argmin_bold(theta) sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
-  $ #pause
+  $ bold(x) = mat(x_1, x_2, dots, x_n)^top, bold(y) = mat(y_1, y_2, dots, y_n)^top $ #pause
 
-  Minimizing this loss function will give us the optimal parameters!
+  #text(size: 22pt)[
+    $ 
+    cal(L)(bold(x), bold(y), bold(theta)) = sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) = sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
+    $
+  ] #pause
+
+  When $cal(L)(bold(x), bold(y), bold(theta))$ is small, then $f(x, bold(theta)) approx y$ for the whole dataset!
+
+  //Minimizing this loss function will give us the optimal parameters for the entire dataset!
 ]
 
-// 28:30 slow, no review
+// 50 mins
+
 #slide(title: [Linear Regression])[
   + Define an example problem
-  + Define our machine learning model $f$
+  + Define our linear model $f$
   + *Define a loss function $cal(L)$*
   + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + Solve the example problem
+  + Expand to nonlinear models
+  + Discuss overfitting
+  + Interactive discussion
+  + Homework summary
 ]
 
 #slide(title: [Linear Regression])[
   + Define an example problem
-  + Define our machine learning model $f$
+  + Define our linear model $f$
   + Define a loss function $cal(L)$
   + *Use $cal(L)$ to learn the parameters $theta$ of $f$*
+  + Solve the example problem
+  + Expand to nonlinear models
+  + Discuss overfitting
+  + Interactive discussion
+  + Homework summary
 ]
 
-#slide(title: [Linear Regression])[
-  *Question:* How do we minimize:
+#slide(title: [Optimization])[
+  Here is our loss function:
+
+  $ cal(L)(bold(x), bold(y), bold(theta)) = sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) = sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 $ #pause
+
+  When $cal(L)(bold(x), bold(y), bold(theta))$ is small, then $f(x, bold(theta)) approx y$ for the whole dataset! #pause
+
+  We want to find parameters $bold(theta)$ that make the loss small #pause
+
+  Let us state this more formally
+]
+
+#slide(title: [Optimization])[
+  Our objective is to *minimize* the loss, using $argmin$ #pause
+
+  $argmin_x f(x)$ means find the $x$ that makes $f(x)$ smallest #pause
+
+  #side-by-side[*Question:* $ "What is " argmin_(x) (x + 1)^2 $ ][  #argmin_plot] #pause
+
+  *Answer:* $argmin_(x) (x + 1)^2 = -1$, where $f(x) = 0$
+]
+
+#slide(title: [Optimization])[
+
+  Formally, our objective is to find the $argmin$ of the loss
   $ 
-   argmin_bold(theta) cal(L)(x_i, y_i, bold(theta)) &= argmin_bold(theta) sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) \ &= argmin_bold(theta) sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
+   argmin_bold(theta) cal(L)(bold(x), bold(y), bold(theta)) &= argmin_bold(theta) sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) \ &= argmin_bold(theta) sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
+  $ 
+]
+
+#slide(title: [Optimization])[
+  $ 
+   argmin_bold(theta) cal(L)(bold(x), bold(y), bold(theta)) &= argmin_bold(theta) sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) \ &= argmin_bold(theta) sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
   $ #pause
 
-  *Answer:* For now, magic! We need more knowledge before we can derive this.
+  *Question:* How do we evaluate this expression to find $bold(theta)$? #pause
+
+  *Answer:* Deriving the solution for this objective requires taking partial derivatives of matrices #pause
+
+  We will derive the solution later. For now, trust me! #pause
+
+  We will go over the steps to find $bold(theta)$ 
 ]
 
 
-/*
-#slide(title: [Linear Regression])[
-  Back to the original problem... #pause
-  
-  Now, we need to find the parameters $bold(theta) = vec(theta_2, theta_1)$ that makes $f(x, vec(theta_2, theta_1)) = y$ #pause
-
-  We will minimize this loss
-
-  $
-    argmin_bold(theta) sum_(i=1)^n cal(L) (f(x_i, bold(theta)), y_i)
-  $ #pause
-
-  But what is $cal(L)$? #pause
-
-  $cal(L)$ should be smaller when $f(x, bold(theta)) = y$ and bigger when $f(x, bold(theta)) != y$
-]
-
-
-
-#slide(title: [Linear Regression])[
-
-
-
-  #side-by-side[
-    $ argmin_(theta_2, theta_1) cal(L)(x, y) = argmin_(theta_2, theta_1) 1/2 (f(x,  bold(theta)) - y)^2 $
-  ][
-    We want to minimize the loss function
-  ] #pause
-
-  #v(2em)
-  #align(center)[How do we minimize $cal(L)$?]
-]
-
-#slide(title: [Linear Regression])[
-    #side-by-side[
-    $ argmin_(theta_2, theta_1) cal(L)(x, y) = argmin_(theta_2, theta_1) 1/2 (f(x, vec(theta_2, theta_1)) - y)^2 $
-  ][
-    How do we minimize this?
-  ] #pause
-
-  #v(2em)
-
-  #align(center)[Magic! For, now you will have to trust me -- we will see later in the course how to derive this expression] 
-]
-*/
-
-#slide(title: [Linear Regression])[
+#slide(title: [Optimization])[
   First, we will construct a *design matrix* $bold(X)_D$ containing input data $x$ #pause
 
-  $ bold(X)_D = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) $
+  $ bold(X)_D = mat(bold(x), bold(1)) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) $
 ]
 
-#slide(title: [Linear Regression])[  
-  We add the column of ones so that we can multiply $bold(X)^top_D$ with $bold(theta)$ to get a linear function $theta_1 x + theta_0$ evaluated at each data point
+#slide(title: [Optimization])[
+  We add the column of ones so that we can multiply $bold(X)_D$ with $bold(theta)$ to get a linear function $theta_1 x + theta_0$ evaluated at each data point
 
-  $ bold(X)_D bold(theta) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) vec(theta_1, theta_0) = vec(theta_1 x_1 + theta_0, theta_1 x_2 + theta_0, dots.v, theta_1 x_n + theta_0) $
+  $ bold(X)_D bold(theta) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) vec(theta_1, theta_0) = underbrace(vec(theta_1 x_1 + theta_0, theta_1 x_2 + theta_0, dots.v, theta_1 x_n + theta_0), "Predicted" y) $
 ]
 
-#slide(title: [Linear Regression])[
+#slide(title: [Optimization])[
   #side-by-side[
-    With our design matrix $bold(X)_D$ and desired output $bold(y),$
+    With our design matrix $bold(X)_D$ and desired output $bold(y)$,
     
   ][  
   $ bold(X)_D = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1), bold(y) = vec(y_1, y_2, dots.v, y_n) $
-  ]
+  ] #pause
   
   #side-by-side[
     and our parameters $bold(theta),$
-  ][ $ bold(theta) = vec(theta_1, theta_0),  $]
+  ][ $ bold(theta) = vec(theta_1, theta_0),  $] #pause
 
   #v(2em)
 
-  #side-by-side[$ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ ][We can find the parameters that minimize $cal(L)$]
+  #side-by-side[$ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ ][(Magic!) We can find the parameters that minimize $cal(L)$]
 ]
+
+#slide(title: [Optimization])[
+  To summarize: #pause
+
+  The $bold(theta)$ given by
+
+  $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
+
+  Provide the solution to 
+  $ 
+   argmin_bold(theta) cal(L)(bold(x), bold(y), bold(theta)) &= argmin_bold(theta) sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) \ &= argmin_bold(theta) sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
+  $ 
+]
+
+// 55:00, maybe 60:00 with more slides?
 
 #slide(title: [Linear Regression])[
   + Define an example problem
-  + Define our machine learning model $f$
+  + Define our linear model $f$
   + Define a loss function $cal(L)$
   + *Use $cal(L)$ to learn the parameters $theta$ of $f$*
+  + Solve the example problem
+  + Expand to nonlinear models
+  + Discuss overfitting
+  + Interactive discussion
+  + Homework summary
 ]
 
-// 34 minutes no review, very slow
 #slide(title: [Linear Regression])[
   + Define an example problem
-  + Define our machine learning model $f$
+  + Define our linear model $f$
   + Define a loss function $cal(L)$
   + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + *Solve the example problem*
+  + Expand to nonlinear models
+  + Discuss overfitting
+  + Interactive discussion
+  + Homework summary
 ]
 
-#slide(title: [Example])[
+#slide(title: [Linear Regression])[
   Back to the example... #pause
 
   *Task:* Given your education, predict your life expectancy #pause
@@ -444,48 +688,7 @@ We can use this data to make future predictions
   #align(center)[You will be doing this in your first assignment!]
 ]
 
-/*
-#slide(title: [Example])[
-  Back to the example...
-
-  *Task:* Given your education, predict your life expectancy #pause
-
-  #cimage("figures/lecture_2/linear_regression.png", height: 60%)
-]
-*/
-
-#slide[
-  Tips for assignment 1 #pause
-
-  ```py
-  def f(theta, design): 
-    # Linear function
-    return design @ theta
-  ``` #pause
-
-  Not all matrices can be inverted! Ensure the matrices are square and the condition number is low
-
-  ```py
-  A.shape
-  cond = jax.numpy.linalg.cond(A)
-  ``` #pause
-
-  Everything you need is in the lecture notes
-]
-
-// 38 mins very slow, no review
 #slide(title: [Linear Regression])[
-  + Define an example problem 
-  + Define our machine learning model $f$ 
-  + Define a loss function $cal(L)$ 
-  + Use $cal(L)$ to learn the parameters $theta$ of $f$
-]
-
-#focus-slide[Relax]
-
-#slide(title: [Example])[
-  *Task:* Given your education, predict your life expectancy #pause
-
   Plot the datapoints $(x_1, y_1), (x_2, y_2), dots $ #pause
 
   Plot the curve $f(x, bold(theta)) = theta_1 x + theta_0; quad x in [0, 25]$ #pause
@@ -497,7 +700,33 @@ We can use this data to make future predictions
   //But can we do better?
 ]
 
-#slide[
+#slide(title: [Linear Regression])[
+  + Define an example problem 
+  + Define our linear model $f$ 
+  + Define a loss function $cal(L)$ 
+  + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + *Solve the example problem*
+  + Expand to nonlinear models
+  + Discuss overfitting
+  + Interactive discussion
+  + Homework summary
+]
+
+// 70:00 maybe 75:00
+
+#focus-slide[Relax]
+
+#slide(title: [Linear Regression])[
+  *Task:* Given your education, predict your life expectancy #pause
+
+  Plot the datapoints $(x_1, y_1), (x_2, y_2), dots $ #pause
+
+  Plot the curve $f(x, bold(theta)) = theta_1 x + theta_0; quad x in [0, 25]$ #pause
+
+  #cimage("figures/lecture_2/linear_regression.png", height: 60%) 
+]
+
+#slide(title: [Linear Regression])[
   #cimage("figures/lecture_2/linear_regression.png", height: 60%) 
 
   We figured out linear regression! #pause
@@ -505,21 +734,31 @@ We can use this data to make future predictions
   But can we do better?
 ]
 
-#slide[
-  + Beyond linear functions #pause
-  + Overfitting #pause
-  + Outliers #pause
-  + Regularization 
+#slide(title: [Linear Regression])[
+  + Define an example problem 
+  + Define our linear model $f$ 
+  + Define a loss function $cal(L)$ 
+  + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + *Solve the example problem*
+  + Expand to nonlinear models
+  + Discuss overfitting
+  + Interactive discussion
+  + Homework summary
 ]
 
-#slide[
-  + *Beyond linear functions*
-  + Overfitting
-  + Outliers
-  + Regularization
+#slide(title: [Linear Regression])[
+  + Define an example problem 
+  + Define our linear model $f$ 
+  + Define a loss function $cal(L)$ 
+  + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + Solve the example problem
+  + *Expand to nonlinear models*
+  + Discuss overfitting
+  + Interactive discussion
+  + Homework summary
 ]
 
-#slide[
+#slide(title: [Nonlinear Regression])[
   *Question:* #pause
   #side-by-side[
     Does the data look linear? #pause
@@ -532,7 +771,7 @@ We can use this data to make future predictions
   However, linear regression must be linear! 
 ]
 
-#slide[
+#slide(title: [Nonlinear Regression])[
   *Question:* What does it mean when we say linear regression is linear? #pause
 
   *Answer:* The function $f(x, theta)$ is a linear function of $x$ #pause
@@ -544,7 +783,7 @@ We can use this data to make future predictions
   Now, $f$ is a linear function of $log(1 + x)$ -- a nonlinear function of $x$!
 ]
 
-#slide[
+#slide(title: [Nonlinear Regression])[
   New design matrix...
   $ bold(X)_D = mat(log(1 + x_1), 1; log(1 + x_2), 1; dots.v, dots.v; log(1 + x_n), 1) $
 
@@ -557,7 +796,7 @@ We can use this data to make future predictions
   ]
 ]
 
-#slide[
+#slide(title: [Nonlinear Regression])[
   #cimage("figures/lecture_2/log_regression.png", height: 60%) #pause
 
   Better, but still not perfect #pause
@@ -565,7 +804,7 @@ We can use this data to make future predictions
   Can we do even better?
 ]
 
-#slide[
+#slide(title: [Nonlinear Regression])[
   What about polynomials? #pause
 
   $ f(x) = a x^n + b x^(n-1) + dots + c x + d $ #pause
@@ -577,7 +816,7 @@ We can use this data to make future predictions
   //$ f(x, bold(theta)) = theta_n x^n + theta_(n - 1) x^(n-1) + dots + theta_1 + x^1 + theta_0 $
 ]
 
-#slide[
+#slide(title: [Nonlinear Regression])[
   Expand $x$ to a multi-dimensional input space... #pause
 
   $ bold(X)_D = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => bold(X)_D = mat(
@@ -585,56 +824,67 @@ We can use this data to make future predictions
     x_2^n, x_2^(n-1), dots, x_2, 1; 
     dots.v, dots.v, dots.down; 
     x_n, x_n^(n-1), dots, x_n, 1
-    ) $
+    ) $ #pause
 
   And add some new parameters...
   $ bold(theta) = mat(theta_1, theta_0)^top => bold(theta) =  mat(theta_n, theta_(n-1), dots, theta_1, theta_0)^top $
 ]
 
-#slide[
+#slide(title: [Nonlinear Regression])[
+  #text(size:22pt)[
   $ bold(X)_D bold(theta) = mat(
     x_1^n, x_1^(n-1), dots, x_1, 1; 
     x_2^n, x_2^(n-1), dots, x_2, 1; 
     dots.v, dots.v, dots.down; 
     x_n, x_n^(n-1), dots, x_n, 1
     ) vec(theta_n, theta_(n-1), dots.v, theta_0) = 
-    vec(
+    underbrace(vec(
       theta_n x_1^n + theta_(n-1) x_1^(n-1) + dots + theta_0,
       theta_n x_2 + theta_(n-1) x_2^(n-1) + dots + theta_0,
       dots.v,
       theta_n x_n^n + theta_(n-1) x_n^(n-1) + dots + theta_0
-    )
-   $ #pause
+    ), "Y prediction")
+   $] #pause
 
-  New function...
-  $ f(x, bold(theta)) = theta_n x^n + theta_(n - 1) x^(n-1), dots, theta_1 + x^1 + theta_0 $ #pause
+  $ "New function... " quad f(x, bold(theta)) = theta_n x^n + theta_(n - 1) x^(n-1), dots, theta_1 + x^1 + theta_0 $ #pause
 
-  Same solution...
-  $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
+  $ "Same solution... "quad bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
   //By changing the input space, we can fit a polynomial to the data!
 ]
 
-#slide[
+#slide(title: [Nonlinear Regression])[
   $ f(x, bold(theta)) = theta_n x^n + theta_(n - 1) x^(n-1), dots, theta_1 + x^1 + theta_0 $ #pause
 
   *Summary:* By changing the input space, we can fit a polynomial to the data using a linear fit!
 ]
 
-#slide[
-  + *Beyond linear functions*
-  + Overfitting
-  + Outliers
-  + Regularization
-]
-#slide[
-  + Beyond linear functions
-  + *Overfitting*
-  + Outliers
-  + Regularization
+#slide(title: [Linear Regression])[
+  + Define an example problem 
+  + Define our linear model $f$ 
+  + Define a loss function $cal(L)$ 
+  + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + Solve the example problem
+  + *Expand to nonlinear models*
+  + Discuss overfitting
+  + Interactive discussion
+  + Homework summary
 ]
 
-#slide[
+
+#slide(title: [Linear Regression])[
+  + Define an example problem 
+  + Define our linear model $f$ 
+  + Define a loss function $cal(L)$ 
+  + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + Solve the example problem
+  + Expand to nonlinear models
+  + *Discuss overfitting*
+  + Interactive discussion
+  + Homework summary
+]
+
+#slide(title: [Overfitting])[
   $ f(x, bold(theta)) = theta_n x^n + theta_(n - 1) x^(n-1), dots, theta_1 + x^1 + theta_0 $ #pause
 
   How do we choose $n$ (polynomial order) that provides the best fit? #pause
@@ -651,7 +901,7 @@ We can use this data to make future predictions
   )
 ]
 
-#slide[
+#slide(title: [Overfitting])[
   How do we choose $n$ (polynomial order) that provides the best fit? 
 
   #grid(
@@ -669,7 +919,7 @@ We can use this data to make future predictions
     $ argmin_(bold(theta), n) cal(L)(bold(x), bold(y), (bold(theta), n)) $]
 ]
 
-#slide[
+#slide(title: [Overfitting])[
   #grid(
     columns: 3,
     row-gutter: 1em,
@@ -686,7 +936,7 @@ We can use this data to make future predictions
   *Answer:* $n=5$, but intuitively, $n=5$ does not seem very good...
 ]
 
-#slide[
+#slide(title: [Overfitting])[
   #grid(
     columns: 3,
     row-gutter: 1em,
@@ -703,7 +953,7 @@ We can use this data to make future predictions
   We will only use our model for new data (we already have the $y$ for a known $x$)! #pause
 ]
 
-#slide[
+#slide(title: [Overfitting])[
   When our model has a small loss but does not generalize to new data, we call it *overfitting* #pause
 
   The model has fit too closely to the sampled data points, rather than the trend #pause
@@ -717,7 +967,7 @@ We can use this data to make future predictions
   *Answer:* Compute the loss on unseen data!
 ]
 
-#slide[
+#slide(title: [Overfitting])[
   To compute the loss on unseen data, we will need unseen data #pause
 
   Let us create some unseen data! #pause
@@ -725,7 +975,7 @@ We can use this data to make future predictions
     #cimage("figures/lecture_2/train_test_split.png", height: 60%)
 ]
 
-#slide(title: [Example])[
+#slide(title: [Overfitting])[
   *Question:* How do we choose the training and testing datasets? #pause
 
   $ "Option 1:" bold(x)_"train" &= vec(
@@ -757,7 +1007,7 @@ We can use this data to make future predictions
   *Note:* The model must never see the testing dataset during training. This is very important!
 ]
 
-#slide[
+#slide(title: [Overfitting])[
   We can now measure how the model generalizes to new data #pause
 
   #cimage("figures/lecture_2/train_test_regression.png", height: 60%)
@@ -771,173 +1021,91 @@ We can use this data to make future predictions
   ]
 ]
 
-#slide[
+#slide(title: [Overfitting])[
   We use separate training and testing datasets on *all* machine learning models, not just linear regression #pause
 ]
 
+// 55:00 + 20 break + 40 = 1h55m
 
-
-
-//
-
-// Cast this as an improvement step by step
-
-// Breakpoint after
-/*
-#slide(title: [Example])[
-  Back to the example...
-
-  *Task:* Given your education, predict your life expectancy #pause
-
-  #cimage("figures/lecture_2/linear_regression.png", height: 60%) #pause
-
-  #align(center)[Could we do better than a linear function $f$?]
+#slide(title: [Linear Regression])[
+  + Define an example problem 
+  + Define our linear model $f$ 
+  + Define a loss function $cal(L)$ 
+  + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + Solve the example problem
+  + Expand to nonlinear models
+  + *Discuss overfitting*
+  + Interactive discussion
+  + Homework summary
 ]
 
-#slide(title: [Example])[
-  #align(center)[Could we do better than a linear function $f$?] #pause
-
-  #cimage("figures/lecture_2/polynomial_regression_n2.png", height: 50%)
-
-  #align(center)[What if we used a polynomial instead?] #pause
-
-  $ f(x, bold(theta)) = theta_n x^n + theta_(n - 1) x^(n-1), dots, theta_1 + x^1 + theta_0 $
+#slide(title: [Linear Regression])[
+  + Define an example problem 
+  + Define our linear model $f$ 
+  + Define a loss function $cal(L)$ 
+  + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + Solve the example problem
+  + Expand to nonlinear models
+  + Discuss overfitting
+  + *Interactive discussion*
+  + Homework summary
 ]
 
-#slide(title: [Example])[
-  But we said we were using a linear model, how can we come up with a nonlinear polynomial? #pause
+#slide(title: [Discussion])[
+  *Q:* When should we use test and train splits? #pause
+
+  *Q:* Are neural networks more powerful than linear regression? #pause
+
+  *Q:* Why would we want to use linear regression instead of neural networks? #pause
+
+  *Q:* What are interesting problems that we can apply linear regression to? #pause
+
+  *Q:* We use a squared error loss. What effect does this have on outliers? #pause
 ]
 
-#slide(title: [Example])[
-  $ f(x, bold(theta)) = f(x, vec(theta_0, theta_1, theta_2, dots.v, theta_n)) = theta_n x^n + theta_(n - 1) x^(n-1), dots, theta_1 + x^1 + theta_0 $ #pause
-
-  //We can write this as a matrix product
-
-  $ f(x, bold(theta)) = mat(
-    theta_n, theta_(n-1), dots, theta_1, b
-  )  mat(
-    x^n;
-    x^(n-1);
-    dots.v;
-    x^1;
-    1
-  )
-  $
+#slide(title: [Linear Regression])[
+  + Define an example problem 
+  + Define our linear model $f$ 
+  + Define a loss function $cal(L)$ 
+  + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + Solve the example problem
+  + Expand to nonlinear models
+  + Discuss overfitting
+  + *Interactive discussion*
+  + Homework summary
 ]
 
-#slide(title: [Example])[
-  $ f(x, bold(theta)) = theta_n x^n + theta_(n - 1) x^(n-1), dots, theta_1 x^1 + theta_0 $ #pause
-
-  How do we choose $n$? Let us try different $n$ #pause
-
-  #grid(
-    columns: 3,
-    row-gutter: 1em,
-    image("figures/lecture_2/polynomial_regression_n2.png"),
-    image("figures/lecture_2/polynomial_regression_n3.png"),
-    image("figures/lecture_2/polynomial_regression_n5.png"),
-    $ n = 2 $,
-    $ n = 3 $,
-    $ n = 5 $
-  )
+#slide(title: [Linear Regression])[
+  + Define an example problem 
+  + Define our linear model $f$ 
+  + Define a loss function $cal(L)$ 
+  + Use $cal(L)$ to learn the parameters $theta$ of $f$
+  + Solve the example problem
+  + Expand to nonlinear models
+  + Discuss overfitting
+  + Interactive discussion
+  + *Homework summary*
 ]
 
-#slide(title: [Example])[
-  $ f(x, bold(theta)) = theta_n x^n + theta_(n - 1) x^(n-1), dots, theta_1 + x^1 + theta_0 $ #pause
+#slide(title: [Homework])[
+  Tips for assignment 1 #pause
 
-  #grid(
-    columns: 3,
-    row-gutter: 1em,
-    image("figures/lecture_2/polynomial_regression_n2.png", height: 45%),
-    image("figures/lecture_2/polynomial_regression_n3.png", height: 45%),
-    image("figures/lecture_2/polynomial_regression_n5.png", height: 45%),
-    $ n = 2 $,
-    $ n = 3 $,
-    $ n = 5 $
-  ) 
+  ```py
+  def f(theta, design): 
+    # Linear function
+    return design @ theta
+  ``` #pause
 
-  *Question:* Which $n$ should we pick? #pause
+  Not all matrices can be inverted! Ensure the matrices are square and the condition number is low
 
-  *Answer:* $n=2$ feels right, but why?
+  ```py
+  A.shape
+  cond = jax.numpy.linalg.cond(A)
+  ``` #pause
+
+  Everything you need is in the lecture notes
 ]
 
-#slide(title: [Example])[
-  #grid(
-    columns: 3,
-    row-gutter: 1em,
-    image("figures/lecture_2/polynomial_regression_n2.png", height: 45%),
-    image("figures/lecture_2/polynomial_regression_n3.png", height: 45%),
-    image("figures/lecture_2/polynomial_regression_n5.png", height: 45%),
-    $ n = 2 $,
-    $ n = 3 $,
-    $ n = 5 $
-  ) 
-
-  Data can be noisy and we want to fit the trend, not the noise
+#slide(title: [Homework])[
+  https://colab.research.google.com/drive/1I6YgapkfaU71RdOotaTPLYdX9WflV1me
 ]
-
-#slide(title: [Example])[
-  The world is governed by random processes #pause
-
-  #cimage("figures/lecture_2/normal_dist.png", height: 50%),
-]
-
-#slide(title: [Example])[
-  This is just an estimate
-  
-  #cimage("figures/lecture_2/polynomial_regression_n2.png", height: 60%) #pause
-
-  Going to school for 20 years will not save you from a hungry bear
-]
-
-#slide(title: [Example])[
-  #cimage("figures/lecture_2/polynomial_regression_n3.png", height: 60%) #pause
-
-  When we fit to noise instead of the trend, we call it *overfitting* #pause
-
-  Overfitting is bad because new predictions will be inaccurate
-]
-
-#slide(title: [Example])[
-  How can we measure overfitting? #pause
-
-  Learn our parameters from one subset of data: *training dataset* #pause
-
-  Test our model on a different subset of data: *testing dataset* #pause
-
-  #cimage("figures/lecture_2/train_test_split.png", height: 60%)
-
-  //Training and testing dataset must come from the same distribution #pause
-  //  - Select training and testing datasets randomly
-]
-
-#slide(title: [Example])[
-  *Question:* How do we choose the training and testing datasets? #pause
-
-  #align(center,grid(
-    columns: 2,
-    column-gutter: 20%,
-    align: center,
-    $ (D)_"train" &= mat(x_1, y_1; x_2, y_2; x_3, y_3) \ 
-    cal(D)_"test" & = mat(x_4, y_4; x_5, y_5) $, 
-    $ cal(D)_"train" &= mat(x_4, y_4; x_1, y_1; x_3, y_3) \ 
-    cal(D)_"test" & = mat(x_2, y_2; x_5, y_5) $, 
-  ))
-
-  *Answer:* Always shuffle the data #pause
-
-  *Note:* The model must never see the testing dataset during training. This is very important!
-
-  //ML relies on the *Independent and Identically Distributed (IID)* assumption 
-]
-
-#slide(title: [Conclusion])[
-  Today we: #pause
-  - Came up with a linear regression task #pause
-  - Proposed a linear model #pause
-  - Defined the square error loss function #pause
-  - Found $bold(theta)$ that minimized the loss
-  - Used a trick to extend linear regression to nonlinear functions #pause
-  - Discussed overfitting and test/train splits
-]
-*/
