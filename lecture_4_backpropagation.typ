@@ -1,7 +1,27 @@
 #import "@preview/polylux:0.3.1": *
 #import themes.university: *
-#import "@preview/cetz:0.2.2": canvas, draw
+#import "@preview/cetz:0.2.2": canvas, draw, plot
 #import "common.typ": *
+#import "@preview/algorithmic:0.1.0"
+#import algorithmic: algorithm
+
+#set math.vec(delim: "[")
+#set math.mat(delim: "[")
+#let local_optima_plot = canvas(length: 1cm, {
+  plot.plot(size: (8, 6),
+    x-tick-step: 2,
+    y-tick-step: 30,
+    {
+      plot.add(
+        domain: (-2, 2), 
+        x => - 2 * calc.pow(x, 3) - 2 * calc.pow(x, 4) + calc.pow(x, 5) + calc.pow(x, 6),
+      )
+      plot.add(((-1.4,0), (1.2,-2)),
+        mark: "o",
+        mark-style: (stroke: none, fill: black),
+        style: (stroke: none))
+    })
+})
 
 
 #show: university-theme.with(
@@ -17,6 +37,15 @@
   institution-name: "University of Macau",
   //logo: image("logo.jpg", width: 25%)
 )
+
+#slide[
+  + Review
+  + Optimization
+  + Calculus review
+  + Deriving linear regression
+  + Gradient descent
+  + Autograd
+]
 
 #slide[
   - Introduce Backpropagation
@@ -67,7 +96,7 @@
 
   We minimized a square error loss function #pause
 
-  $ min_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = min_bold(theta) sum_(i=1)^n ( f(x_i, bold(theta)) - y_i )^2  $ #pause
+  $ argmin_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = argmin_bold(theta) sum_(i=1)^n ( f(x_i, bold(theta)) - y_i )^2  $ #pause
 
   I then gave you a magical solution to this optimization problem #pause
 
@@ -197,11 +226,11 @@
 
   Write out the neuron fully #pause
 
-  $ min_bold(theta) cal(L)(x, y, bold(theta)) = min_bold(theta) [sigma( theta_0 + theta_1 x ) - y ]^2, quad sigma(x) = cases(0 "if" x <= 0, 1 "if" x > 0) $ #pause
+  $ argmin_bold(theta) cal(L)(x, y, bold(theta)) = argmin_bold(theta) [sigma( theta_0 + theta_1 x ) - y ]^2, quad sigma(x) = cases(0 "if" x <= 0, 1 "if" x > 0) $ #pause
 
   Let us differentiate and set it equal to zero #pause
 
-  $ 0 = gradient_bold(theta) ([sigma( theta_0 + theta_1 x ) - y ]^2  ), quad sigma(x) = cases(0 "if" x <= 0, 1 "if" x > 0) $ #pause
+  $ 0 = gradient_bold(theta) ([sigma( theta_0 + theta_1 x ) - y ]^2  ), quad sigma(x) = cases(0 "if" x <= 0, 1 "if" x > 0) $
 ]
 
 #slide[
@@ -227,5 +256,139 @@
 
   We need to find another way to find $bold(theta)$ #pause
 
-  Instead, we can use *gradient descent*
+  We will use *gradient descent* to find $bold(theta)$
 ]
+
+#slide[
+  Gradient descent is an optimization method for *differentiable* functions #pause
+
+  More formally, gradient descent approximates the $theta$ that solves
+
+  $ argmin_theta cal(L)(x, y, theta) $ #pause
+
+]
+
+#slide[
+
+  Gradient descent provides a *local* optima, not necessarily a *global* optima #pause
+
+  #align(center, local_optima_plot) #pause
+
+  In practice, a local optima provides a good enough model
+
+
+  //Given a loss function, we can take a step in the direction of the *negative gradient* to decrease the loss #pause
+]
+
+#slide[
+  Gradient descent relies on the *gradient* of $cal(L)$, therefore $cal(L)$ must be differentiable #pause
+
+  In gradient descent, we update the parameters in the direction of the negative gradient of the loss 
+]
+
+#slide[
+  The gradient descent algorithm is as follows:
+
+  #algorithm({
+    import algorithmic: *
+
+    Function("Gradient Descent", args: ($bold(x)$, $bold(y)$, $cal(L)$, $t$, $alpha$), {
+
+      Cmt[Randomly initialize parameters]
+      Assign[$bold(theta)$][$cal(N)(0, 1)$] 
+
+      For(cond: $i in 1 dots t$, {
+        Cmt[Compute the gradient of the loss]        
+        Assign[$bold(J)$][$partial cal(L)(bold(x), bold(y), bold(theta)) "/ " partial bold(theta)$]
+        Cmt[Update the parameters using the negative gradient]
+        Assign[$bold(theta)$][$bold(theta) - alpha bold(J)$]
+      })
+
+    Return[$bold(theta)$]
+    })
+  })
+]
+
+#slide[
+  We can visualize gradient descent of a bivariate function #pause
+
+  #cimage("figures/lecture_4/gradient_descent_3d.png", height: 80%)
+]
+
+#slide[
+  Let us do a very simple example #pause
+
+  *Goal:* Solve $argmin_bold(theta) cal(L)(x, y, bold(theta)) = theta_1^2 x + theta_0$ using gradient descent
+
+  *Dataset:* One item in the dataset, $x = 1, y = 2$
+
+  1. Randomly initialize $bold(theta)$ #pause
+
+  $ theta = mat(2.5, 1.1)^top $ #pause
+
+  2. Compute the gradient for our dataset
+
+  $ J = (partial cal(L)(x, y, theta)) / (partial theta) $
+]
+
+#slide[
+  #side-by-side[$ bold(J) = (partial cal(L)(x, y, theta)) / (partial theta) $][From the last slide] #pause
+
+  #side-by-side[$ bold(J) = mat(partial / (partial theta_1) cal(L)(x, y, theta), partial / (partial theta_0) cal(L)(x, y, theta) )^top $][Write out gradient w.r.t. all parameters] #pause
+
+  #side-by-side[$ bold(J) = mat(partial / (partial theta_1) (theta_1^2 x + theta_0), partial / (partial theta_0) (theta_1^2 x + theta_0))^top $][Plug in $cal(L)$]
+
+
+  #side-by-side[$ bold(J) = mat(2 theta_1 x, 1)^top $][Differentiate]
+
+  #side-by-side[$ bold(J) = mat(2 dot 2.5 dot 1, 1)^top = mat(5, 1)^top $][Plug in $x, y, bold(theta)$]
+]
+
+#slide[
+
+  #text(size: 24pt)[
+  3. Update $bold(theta)$ using $bold(J)$
+
+  #side-by-side[$ bold(theta) <- bold(theta) - alpha bold(J) $][From algorithm]
+
+  #side-by-side[$ vec(theta_1, theta_0) <- vec(2.5, 1.1) - alpha vec(5, 1) $][Plug in $bold(theta)$ and $bold(J)$]
+
+  #side-by-side[$ vec(theta_1, theta_0) <- vec(2.5, 1.1) - 0.1 vec(5, 1) $][Let $alpha = 0.1$]
+
+  #side-by-side[$ vec(theta_1, theta_0) <- vec(2, 1) $][Evaluate]
+  ]
+]
+
+#slide[
+  4. Repeat this process until convergence (loss no longer decreases)
+
+  $ bold(J) &= (partial cal(L)(x, y, bold(theta))) / (partial bold(theta)) \
+
+  bold(theta) & <- bold(theta) - alpha bold(J)
+  $
+]
+
+#slide[
+  #cimage("figures/lecture_4/gradient_descent_3d.png", height: 80%)
+]
+
+#slide[
+  TODO: Summary
+]
+
+#slide[
+  The are different types of gradient descent, depending on how much training data we use:
+ 
+  *Batch gradient descent:* uses the entire dataset $cal(L)(vec(bold(x)_1, dots.v, bold(x)_n), vec(bold(y)_1, dots.v, bold(y)_n), bold(theta))$
+
+  *Stochastic gradient descent:* Gradient descent over one datapoint at a time $cal(L)(bold(x)_i, bold(y)_i, bold(theta))$
+
+  *Minibatch gradient descent:* Gradient descent over many (but not all) datapoints$cal(L)(vec(bold(x)_i, dots.v, bold(x)_j), vec(bold(y)_i, dots.v, bold(y)_j), bold(theta))$
+]
+
+#slide[
+  In practice, we do not have enough computer memory for batch gradient descent #pause
+
+  Instead, we use stochastic gradient descent or minibatch gradient descent #pause
+]
+

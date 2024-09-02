@@ -24,6 +24,7 @@
   //logo: image("logo.jpg", width: 25%)
 )
 
+/*
 #slide()[
   + We looked at linear and polynomial $f$
     + Looked at both classification and regression
@@ -51,15 +52,15 @@
         + We use the gradient of the linear model
       + We use a similar approach
 ]
+*/
 
 #slide[
+  + Review
   + Limitations of linear models
   + History and overview of neural networks
   + Neurons
   + Perceptron
   + Multilayer Perceptron
-  + Backpropagation
-  + Gradient descent
 ]
 
 #slide[
@@ -75,7 +76,6 @@
 
   Issues with very complex problems #pause
   + Poor scalability #pause
-  + Prone to overfitting #pause
   + Polynomials do not generalize well
 ]
 
@@ -172,7 +172,7 @@
 #slide[
   *Brain:* Biological neurons $->$ Biological neural network #pause
 
-  *Computer:* Artificial neurons $->$ Artificial neural network #pause  
+  *Computer:* Artificial neurons $->$ Artificial neural network
 ]
 
 #slide[
@@ -215,7 +215,7 @@
     ]
 
     #only(5)[
-      $ f(vec(x_1, dots.v, x_n), vec(theta_(1),  dots.v, theta_(n)) ) $
+      $ f(vec(x[1], dots.v, x[n]), vec(theta_(1),  dots.v, theta_(n)) ) $
 
       $ vec(x_1, dots.v, x_n) = vec(0.5, dots.v, -0.3) $
     ]
