@@ -44,6 +44,7 @@
   + Calculus review
   + Deriving linear regression
   + Gradient descent
+  + Backpropagation
   + Autograd
 ]
 

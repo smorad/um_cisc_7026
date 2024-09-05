@@ -35,6 +35,8 @@
   ]
 }
 
+#let red(x) = text(fill: red)[x]
+
 /*
 #let sections-state = state("polylux-sections", ())
 #let bold-outline(enum-args: (:), padding: 0pt) = locate( loc => {

@@ -1,14 +1,36 @@
 #import "@preview/polylux:0.3.1": *
 #import themes.university: *
-#import "@preview/cetz:0.2.2": canvas, draw
+#import "@preview/cetz:0.2.2": canvas, draw, plot
 #import "common.typ": *
 
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
 
+#let la = $angle.l$
+#let ra = $angle.r$
 
+
+// FUTURE TODO: Should not waste m/n in linear regression, use c for count and ell for input
+// TODO: Work in bias earlier, as a means to shift the activation function
+// TODO: Design matrix is not square, discuss XtX
+// TODO: Reuse of n in neurons
 // TODO: Implement XOR is transposed
 // TODO: is xor network actually wide?
+// TODO: Handle subscripts for input dim rather than sample
+// TODO: Emphasize importance of very deep/wide nn
+
+#let argmin_plot = canvas(length: 1cm, {
+  plot.plot(size: (8, 4),
+    x-tick-step: 1,
+    y-tick-step: 2,
+    {
+      plot.add(
+        domain: (-2, 2), 
+        x => calc.pow(1 + x, 2),
+        label: $ (x + 1)^2 $
+      )
+    })
+})
 
 #show: university-theme.with(
   aspect-ratio: "16-9",
@@ -54,27 +76,230 @@
 ]
 */
 
+#let agenda(index: none) = {
+  let ag = (
+    [Review],
+    [Multivariate linear regression],
+    [Limitations of linear regression],
+    [History of neural networks],
+    [Biological neurons],
+    [Artificial neurons],
+    [Perceptron],
+    [Multilayer Perceptron]
+  )
+  for i in range(ag.len()){
+    if index == i {
+      enum.item(i + 1)[#text(weight: "bold", ag.at(i))]
+    } else {
+      enum.item(i + 1)[#ag.at(i)]
+    }
+  }
+}
+
+#slide[#agenda(index: none)]
+
+#slide[#agenda(index: 0)]
+
+#slide(title: [Review])[
+  Since you are very educated, we focused on how education affects life expectancy #pause
+
+  Studies show a causal effect of education on health #pause
+    - _The causal effects of education on health outcomes in the UK Biobank._ Davies et al. _Nature Human Behaviour_. #pause
+    - By staying in school, you are likely to live longer #pause
+    - Being rich also helps, but education alone has a *causal* relationship with life expectancy
+]
+
+#slide(title: [Review])[
+  *Task:* Given your education, predict your life expectancy #pause
+
+  $X in bb(R)_+:$ Years in school #pause
+  
+  $Y in bb(R)_+:$ Age of death #pause
+
+  $Theta in bb(R)^2:$ Parameters #pause 
+
+  $ f: X times Theta |-> Y $
+
+
+  *Approach:* Learn the parameters $theta$ such that 
+
+  $ f(x, theta) = y; quad x in X, y in Y $ #pause
+
+  *Goal:* Given someone's education, predict how long they will live
+]
+
+#slide(title: [Review])[
+  Started with a linear function $f$ #pause
+
+  #align(center, grid(
+    columns: 2,
+    align: center,
+    column-gutter: 2em,
+    $ f(x, bold(theta)) = f(x, vec(theta_1, theta_0)) = theta_1 x + theta_0 $,
+    cimage("figures/lecture_2/example_regression_graph.png", height: 50%)
+  )) #pause
+  
+  Then, we derived the square error function #pause
+
+  $ "error"(f(x, bold(theta)), y) = (f(x, bold(theta)) - y)^2 $
+]
+
+#slide(title: [Review])[
+  We wrote the loss function for a single datapoint $x_i, y_i$ using the square error
+
+  $ cal(L)(x_i, y_i, bold(theta)) = "error"(f(x_i, bold(theta)),  y_i) = (f(x_i, bold(theta)) - y_i)^2 $ #pause
+
+  But we wanted to learn a model over *all* the data, not a single datapoint #pause
+
+  We wanted to make *new* predictions, to *generalize* #pause
+
+  $ bold(x) = mat(x_1, x_2, dots, x_n)^top, bold(y) = mat(y_1, y_2, dots, y_n)^top $ #pause
+
+  $ 
+  cal(L)(bold(x), bold(y), bold(theta)) = sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) = sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
+  $
+]
+
+#slide(title: [Review])[
+  Our objective was to find the parameters that minimized the loss function over the dataset #pause
+
+  We introduced the $argmin$ operator #pause
+
+  #side-by-side[ $f(x) = (x + 1)^2$][#argmin_plot] #pause
+
+  $ argmin_x f(x) = -1 $
+]
+
+#slide(title: [Review])[
+  With the $argmin$ operator, we formally wrote our optimization objective #pause
+
+  $ 
+   #text(fill: color.red)[$argmin_bold(theta)$] cal(L)(bold(x), bold(y), bold(theta)) &= #text(fill: color.red)[$argmin_bold(theta)$] sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) \ &= #text(fill: color.red)[$argmin_bold(theta)$] sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
+  $ #pause
+]
+
+#slide(title: [Review])[
+  We defined the design matrix $bold(X)_D$ #pause
+
+  $ bold(X)_D = mat(bold(x), bold(1)) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) $ #pause
+
+  With the design matrix, provided an *analytical* solution to the optimization objective #pause
+  
+$ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
+]
+
+#slide(title: [Review])[
+  With this analytical solution, we were able to learn a linear model #pause
+
+  #cimage("figures/lecture_2/linear_regression.png", height: 60%)
+]
+
+#slide(title: [Review])[
+  Then, we used a trick to extend linear regression to nonlinear models #pause
+
+  $ bold(X)_D = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => bold(X)_D = mat(log(1 + x_1), 1; log(1 + x_2), 1; dots.v, dots.v; log(1 + x_n), 1) $ #pause
+]
+
+#slide(title: [Review])[
+  We extended to polynomial, which are *universal function approximators* #pause
+
+  $ bold(X)_D = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => bold(X)_D = mat(
+    x_1^m, x_1^(m-1), dots, x_1, 1; 
+    x_2^m, x_2^(m-1), dots, x_2, 1; 
+    dots.v, dots.v, dots.down; 
+    x_n^m, x_n^(m-1), dots, x_n, 1
+    ) $ #pause
+
+  $ f: X times Theta |-> bb(R) $ #pause
+
+  $ Theta in bb(R)^2 => Theta in bb(R)^m $ 
+]
+
+#slide(title: [Review])[
+  Finally, we discussed overfitting #pause
+
+  $ f(x, bold(theta)) = theta_n x^m + theta_(m - 1) x^(m - 1), dots, theta_1 + x^1 + theta_0 $ #pause
+
+  #grid(
+    columns: 3,
+    row-gutter: 1em,
+    image("figures/lecture_2/polynomial_regression_n2.png"),
+    image("figures/lecture_2/polynomial_regression_n3.png"),
+    image("figures/lecture_2/polynomial_regression_n5.png"),
+    $ m = 2 $,
+    $ m = 3 $,
+    $ m = 5 $
+  )
+]
+
+#slide(title: [Review])[
+  We care about *generalization* in machine learning #pause
+
+  So we should always split our dataset into a training dataset and a testing dataset #pause
+
+  #cimage("figures/lecture_2/train_test_regression.png", height: 60%)
+]
+
+#slide[#agenda(index: 0)]
+#slide[#agenda(index: 1)]
+
 #slide[
-  + Review
-  + Limitations of linear models
-  + History and overview of neural networks
-  + Neurons
-  + Perceptron
-  + Multilayer Perceptron
+  Last time, we assumed a single-input system #pause
+
+  Years of education: $X in bb(R)$ #pause
+
+  But sometimes we want to consider multiple input dimensions #pause
+
+  Years of education, BMI, GDP: $X in bb(R)^3$ #pause
+
+  We can solve these problems using linear regression too
+]
+
+#slide[
+  For multivariate problems, we use vector inputs #pause
+
+  $ bold(x) in X; quad X in bb(R)^3 $ #pause
+
+  I will write
+
+  $ bold(x)_i = vec(
+    x_i angle.l 1 angle.r,
+    x_i angle.l 2 angle.r,
+    x_i angle.l 3 angle.r
+  ) $ #pause
+
+  $x_i angle.l 1 angle.r$ refers to the first dimension of training data $i$
+]
+
+#slide[
+  Assume an input space $X in bb(R)^ell$ #pause
+
+  The design matrix for this *multivariate* linear system is
+
+  $ bold(X)_D = mat(bold(X), bold(1)) = mat(
+    x_1 angle.l ell angle.r, x_1 angle.l ell - 1 angle.r, dots, 1; 
+    x_2 angle.l ell angle.r, x_2 angle.l ell - 1 angle.r, dots, 1; 
+    dots.v, dots.v, dots.down, dots.v; 
+    x_n angle.l ell angle.r, x_n angle.l ell - 1 angle.r, dots, 1
+  ) $ #pause
+
+  Remember $x_n angle.l ell$ refers to dimension $ell$ of training data $n$ #pause
 ]
 
 #slide[
   We previously looked at linear and polynomial models for regression #pause
 
-  $ f(bold(x), bold(theta)) = theta_0 + bold(theta) bold(x) = theta_0 + theta_1 x_1 + theta_2 x_2, dots $ #pause
+  $ f(bold(x), bold(theta)) = bold(X)_D bold(theta) = theta_(m) x^m + theta_(m - 1) x^(m - 1) + dots + theta_0 $ #pause
 
   $ bold(theta) = (bold(X)^top bold(X) )^(-1) bold(X)^top bold(y) $
 ]
 
 #slide[
-  Linear models are useful for simple problems #pause
+  Linear models are useful for certain problems #pause
+  + Interpretability #pause
+  + Low data requirement #pause
 
-  Issues with very complex problems #pause
+  But issues arise with other problems #pause
   + Poor scalability #pause
   + Polynomials do not generalize well
 ]
@@ -86,31 +311,38 @@
 ]
 
 #slide[
-  Polynomials fit tabular data well #pause
+  Last time, we learned a polynomial function of a *one-dimensional* $x$ using linear regression #pause
 
-  However, they scale poorly to higher-dimensional data like image pixels #pause
+  However, we can also learn such functions for *multi-dimensional* $x$
 
-  #side-by-side[#cimage("figures/lecture_1/dog.png", height: 30%)][$ 256 times 256 "pixels" = 65536 "pixels" $]
+  //Polynomials fit tabular data well #pause
+
+  //However, they scale poorly to higher-dimensional data like image pixels #pause
+
+  #side-by-side[#cimage("figures/lecture_1/dog.png", height: 30%)][$ X in bb(Z)_+^(256 times 256) $] #pause
+
+  This image contains 65536 pixels, so $x$ has 65536 dimensions
 ]
 
 #slide[
-  #side-by-side[#cimage("figures/lecture_1/dog.png", height: 30%)][$ 256 times 256 "pixels" = 65536 "pixels" $]
+  #side-by-side[#cimage("figures/lecture_1/dog.png", height: 30%)][$ 256 times 256 "pixels" = 65536 "pixels" $] #pause
   
-  What does the design matrix look like for an n-degree polynomial? #pause
+  What does the design matrix look like for an m-degree polynomial of this image? 
 
 ]
 
 #slide[
-  $ bold(X) = mat(
-    x_1^n, x_1^(n-1), dots, x_1^1, 1;
-    x_2^n, x_2^(n-1), dots, x_2^1, 1;
+  $ bold(X)_D = mat(
+    x_1^m, x_1^(m-1), dots, x_1^1, 1;
+    x_2^m, x_2^(m-1), dots, x_2^1, 1;
     dots.v, dots.v, dots.down, dots.v, dots.v;
-    x_p^n, x_p^(n-1), dots, x_p^1, 1;
+    x_n^m, x_n^(m-1), dots, x_n^1, 1;
     x_1^(n-1) x_2, x^(n-2) x_2^2, dots, 0, 1;
-    dots.v, dots.v, , dots.v, dots.v
+    dots.v, dots.v, dots.down, dots.v, dots.v;
+    x_1 x_2 dots x_n, 0, dots, 0, 1;
   ) $ #pause
 
-  *Question:* How big is the matrix for 65,536 pixels and $n=3$?
+  *Question:* How big is the matrix for 65,536 pixels and $m=3$?
 
   *Answer:* $65,536^3 approx 10^14$ parameters #pause
 ]
@@ -119,16 +351,16 @@
   *Question:* How big is the matrix for 65,536 pixels and $n=3$?
 
   *Answer:* $65,536^3 approx 10^14$ parameters #pause
-
-  We must invert $bold(X)^top bold(X)$, requiring $O(n^3)$ time #pause
-
-  Largest matrix ever inverted is $approx 10^12$ #pause
 
   For comparison, GPT-4 has $10^12$ parameters #pause
 
-  #v(2em)
+  We must invert $bold(X)_D^top bold(X)_D$, requiring $O(n^3)$ time #pause
 
-  #align(center)[Polynomial regression scales poorly to high dimensional data]
+  Largest matrix ever inverted has $approx 10^12$ elements #pause
+
+  One day this will be possible, but today it is not #pause
+
+  Polynomial regression scales poorly to high dimensional data
 ]
 
 #slide[
@@ -144,61 +376,193 @@
 ]
 
 #slide[
-  Polynomials tend towards $-oo, oo$ outside of the support #pause
+  What happens to polynomials outside of the support (dataset)? #pause
+
+  #side-by-side[$ theta_m x^m + theta_(m-1) x^(m-1) + dots $][Equation of a polynomial] #pause
+
+  #side-by-side[$ x^m (theta_m + theta_(m-1) / x + dots) $][Factor out $x^m$] #pause
+
+  #side-by-side[$ lim_(x -> oo) x^m (theta_m + theta_(m-1) / x + dots) $][Take the limit] #pause
+
+  #side-by-side[$ lim_(x -> oo) x^m dot lim_(x-> oo) (theta_m + theta_(m-1) / x + dots) $][Split the limit (limit of products)] 
+]
+
+#slide[
+  #side-by-side[$ lim_(x -> oo) x^m dot lim_(x-> oo) (theta_m + theta_(m-1) / x + dots) $][Split the limit (limit of products)]
+  
+  #side-by-side[$ (lim_(x -> oo) x^m) dot (theta_m + 0 + dots) $][Evaluate right limit] #pause
+
+  #side-by-side[$ theta_m lim_(x -> oo) x^m  $][Rewrite] #pause
+
+  #side-by-side[$ theta_m lim_(x -> oo) x^m = oo $][If $theta_m > 0$] #pause
+
+  #side-by-side[$ theta_m lim_(x -> oo) x^m = -oo $][If $theta_m < 0$]
+]
+#slide[
+  Polynomials quickly tend towards $-oo, oo$ outside of the support #pause
 
   $ f(x) = x^3-2x^2-x+2 $ #pause
 
   #cimage("figures/lecture_3/polynomial_generalize.png", height: 50%) #pause
 
-  If breed of dog missing from training set, we still want to classify it as dog!
+  Remember, to predict new data we want our functions to generalize
 ]
 
 #slide[
-  Linear and polynomial regression have issues #pause
+  Linear regression has issues #pause
   + Poor scalability #pause
   + Polynomials do not generalize well
 ]
 
-#focus-slide[Relax]
+#slide[#agenda(index: 1)]
+#slide[#agenda(index: 2)]
 
 #slide[
-  Can we improve upon the linear/polynomial model? #pause
+  Can we improve upon linear regression? #pause
 
-  Yes, with neural networks #pause
+  Yes, with neural networks
 
-  #cimage("figures/lecture_1/timeline.svg", height: 50%) 
+  //#cimage("figures/lecture_1/timeline.svg", height: 50%) 
 ]
 
 #slide[
+  In 1939-1945, there was a World War #pause
+
+  Militaries invested funding for research, and invented the computer #pause
+
+  #cimage("figures/lecture_3/turing.jpg", height: 70%)
+]
+
+#slide[
+  #side-by-side[Meanwhile, a neuroscientist and mathematician (McCullough and Pitts) were trying to understand the human brain][#cimage("figures/lecture_3/mccullough-pitts.png", height: 70%)] #pause
+
+  They designed the theory for the first neural network
+]
+
+#slide[
+  #side-by-side[
+  A few years later, Rosenblatt implemented this neural network using a new invention -- the computer
+][#cimage("figures/lecture_3/original_nn.jpg", height: 70%)] 
+]
+
+#slide[
+  Through advances in theory and hardware, neural networks became slightly better #pause
+
+  #cimage("figures/lecture_1/timeline.svg", height: 40%) #pause
+
+  Around 2012, these improvements culminated in neural networks that perform like humans
+]
+
+
+#slide[
+  So what is a neural network? #pause
+
+  It is a function, inspired by how the brain works #pause
+
+  $ f: X times Theta |-> Y $ 
+
+]
+
+#slide[
+  Brains and neural networks rely on *neurons* #pause
+
   *Brain:* Biological neurons $->$ Biological neural network #pause
 
-  *Computer:* Artificial neurons $->$ Artificial neural network
+  *Computer:* Artificial neurons $->$ Artificial neural network #pause
+
+  First, let us review biological neurons #pause
+
+  *Note:* I am not a neuroscientist! I may make simplifications or errors with biology
+]
+
+#slide[#agenda(index: 2)]
+#slide[#agenda(index: 3)]
+
+#slide[
+  #cimage("figures/lecture_3/neuron_anatomy.jpg") 
+  A simplified neuron consists of many parts 
+
 ]
 
 #slide[
-  Neurons send and receive electrical impulses along axons and dendrites #pause
-  #cimage("figures/lecture_3/neuron_anatomy.jpg")
+  #cimage("figures/lecture_3/neuron_anatomy.jpg") 
+  Neurons send and process messages from other neurons
 ]
 
 #slide[
-  How does a neuron send an impulse ("fire")? #pause
+  #cimage("figures/lecture_3/neuron_anatomy.jpg") 
+  Incoming electrical signals travel along dendrites
+]
 
-  Incoming impulses (via dendrites) change the electric potential of the neuron #pause
+#slide[
+  #cimage("figures/lecture_3/neuron_anatomy.jpg") 
+  Dendrites are not all equal! Different dendrites have different diameters and structures
+]
+
+#slide[
+  #cimage("figures/lecture_3/neuron_anatomy.jpg") 
+  The axon outputs an electrical signal to other neurons
+]
+
+#slide[
+  #cimage("figures/lecture_3/neuron_anatomy.jpg") 
+  The axon terminals will connect to dendrites of other neurons
+]
+
+#slide[
+  #cimage("figures/lecture_3/neuron_anatomy.jpg") 
+  For our purposes, we can consider the axon terminals  and dendrites to be the same thing
+]
+
+#slide[
+  #cimage("figures/lecture_3/neuron_anatomy.jpg") 
+  The neuron takes many inputs, and produces a single output
+]
+
+#slide[
+  #cimage("figures/lecture_3/neuron_anatomy.jpg") 
+  The neuron will only output a signal down the axon ("fire") at certain times
+]
+
+#slide[
+  How does a neuron decide to send an impulse ("fire")? #pause
+
+  #side-by-side[Incoming impulses (via dendrites) change the electric potential of the neuron][  #cimage("figures/lecture_3/bio_neuron_activation.png", height: 50%)] #pause
+
+  Recall that in a parallel circuit, we can sum voltages together #pause
+
+  Many active dendrites will add together and trigger an impulse
   
-  #cimage("figures/lecture_3/bio_neuron_activation.png", height: 50%) #pause
-
-  Pain triggers initial nerve impulse, sets of impulse chain into the brain
 ]
 
 #slide[
-  #cimage("figures/lecture_3/neuron_anatomy.jpg") #pause
-  
-  *Question:* How would you model a neuron mathematically?
+  #side-by-side[Pain triggers initial nerve impulse, starts a chain reaction into the brain][#cimage("figures/lecture_3/nervous-system.jpg")]
+]
+
+#slide[
+  #side-by-side[When the signal reaches the brain, we will think][#cimage("figures/lecture_3/nervous-system.jpg")]
+]
+
+#slide[
+  #side-by-side[After thinking, we will take action][#cimage("figures/lecture_3/nervous-system.jpg")]
+]
+
+#slide[#agenda(index: 3)]
+#slide[#agenda(index: 4)]
+
+#slide[
+  #cimage("figures/lecture_3/neuron_anatomy.jpg", height: 50%) #pause
+
+  *Question:* How could we write a neuron as a function? $quad f: "___" |-> "___"$ #pause
+
+  *Answer*:
+
+  $ f: underbrace(bb(R)^m, "Dendrite voltages") times underbrace(bb(R)^m, "Dendrite size") |-> underbrace(bb(R), "Axon voltage") $
 ]
 
 
 #slide[
-  Let us define a neuron as a function #pause
+  Let us implement an artifical neuron as a function #pause
 
   #side-by-side[#cimage("figures/lecture_3/neuron_anatomy.jpg")][
     #only((2,3))[
@@ -206,18 +570,17 @@
 
     ]
     #only(3)[
-      $ f(vec(theta_1, theta_2, dots.v, theta_n)) = f(vec(1, 0, dots.v, 1)) $
+      $ f(vec(theta_1, theta_2, dots.v, theta_n)) = f(vec(0.5, 3.1, dots.v, 2.0)) $
 
     ]
     #only((4,5))[
       Each incoming dendrite has some voltage potential
-
     ]
 
     #only(5)[
-      $ f(vec(x[1], dots.v, x[n]), vec(theta_(1),  dots.v, theta_(n)) ) $
+      $ f(vec(x_i angle.l 1 angle.r, dots.v, x_i angle.l n angle.r), vec(theta_(1),  dots.v, theta_(n)) ) $
 
-      $ vec(x_1, dots.v, x_n) = vec(0.5, dots.v, -0.3) $
+      $ bold(x)_i = vec(x_i angle.l 1 angle.r, dots.v, x_i angle.l n angle.r) = vec(0.5, dots.v, -0.3) $
     ]
 
     #only((6, 7))[
@@ -226,7 +589,7 @@
     ]
 
     #only(7)[
-      $ f(vec(x_1, dots.v, x_n), vec(theta_(1),  dots.v, theta_(n)) ) = sum_(i=1)^n x_i theta_i $
+      $ f(vec(x_i angle.l 1 angle.r, dots.v, x_i angle.l n angle.r), vec(theta_(1),  dots.v, theta_(n)) ) = sum_(j=1)^n x_i angle.l j angle.r theta_j $
     ]
 
     #only((8, 9, 10))[
@@ -237,21 +600,40 @@
       $ sigma(x) = #image("figures/lecture_3/heaviside.png", height: 30%) $
     ]
     #only(10)[
-      $ f(vec(x_1, dots.v, x_n), vec(theta_(1),  dots.v, theta_(n)) ) = sigma(sum_(i=1)^n x_i theta_i) $
+      $ f(vec(x_1, dots.v, x_n), vec(theta_(1),  dots.v, theta_(n)) ) = sigma(sum_(j=1)^n x_i angle.l j angle.r theta_j) $
     ]
   ]
 ]
 
 #slide[
   This is almost the artificial neuron!
-  $ f(vec(x_1, dots.v, x_n), vec(theta_(1),  dots.v, theta_(n)) ) = sigma(sum_(i=1)^n x_i theta_i) $ #pause
+  $ f(vec(x_1, dots.v, x_n), vec(theta_(1),  dots.v, theta_(n)) ) = sigma(sum_(j=1)^n x_i angle.l j angle.r theta_j) $ #pause
 
-  $ f(bold(x), bold(theta)) = sigma(sum_(i=1)^n x_i theta_i) $
+  $ f(bold(x), bold(theta)) = sigma(sum_(j=1)^n x angle.l j angle.r theta_j) $ #pause
 
+  Let us write this out for clarity
+]
+
+#slide[
+  $ f(bold(x), bold(theta)) = sigma(
+    x angle.l n angle.r theta_n + 
+    x angle.l n-1 angle.r theta_(n-1) + 
+    dots + 
+    x angle.l 1 angle.r theta_1
+  ) $ #pause
+
+  *Question:* Does this look familiar to anyone? #pause
+
+  *Answer:* This is a multivariate linear model!
+]
+
+
+/*
   *Question:* Does it look familiar to any other functions we have seen? #pause
 
   *Answer:* The linear model!
 ]
+*/
 #slide[
   #side-by-side[$ f(bold(x), bold(theta)) = sigma(sum_(i=1)^n x_i theta_i) $][Artificial neuron] #pause
 
@@ -391,7 +773,7 @@
 #slide[
   *Brain:* Biological neurons $->$ Biological neural network #pause
 
-  *Computer:* Artificial neurons $->$ Artificial neural network  
+  *Computer:* Artificial neurons $->$ Artificial neural network
 ]
 
 #slide[

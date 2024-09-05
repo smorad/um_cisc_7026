@@ -63,12 +63,24 @@
 
 #title-slide(
   // Section time: 34 mins at leisurely pace
-  title: [Regression],
+  title: [Linear Regression],
   subtitle: "CISC 7026: Introduction to Deep Learning",
   institution-name: "University of Macau",
   //logo: image("logo.jpg", width: 25%)
 )
 
+#slide(title: [Participation])[
+  I need the class to ask questions when they do not understand #pause
+
+  I need the class to answer my questions, so I know that you understand #pause
+
+  If you ask/answer questions I will give the class 100% participation grade #pause 
+
+  Otherwise, I will have to grade students individually on participation #pause
+
+  You will make name tags, and I will count each time you participate
+]
+/*
 #slide(title: [Participation])[
   Everyone take out paper and a pen #pause
 
@@ -80,6 +92,7 @@
 
   Participate more than once: perfect participation grade
 ]
+*/
 
 #slide(title: [Agenda])[
   + Review #pause
@@ -248,6 +261,59 @@
   You are not expected to answer all questions correctly, do not stress! #pause
 ]
 
+#slide(title: [Quiz])[
+  *Q1:* What is the function signature for machine learning?
+  $ quad "___" : "_______" quad |-> quad "___" $
+
+  *Q2:* What does the following code print?
+  ```python
+  jnp.array([1, 2]) * jnp.array([2, 1]) + jnp.array([5, 6])
+  ```
+
+  *Q3:* What does the following code print?
+  ```python
+  jnp.array([[1, 2], [3, 4]]).sum(axis=1)
+  ```
+
+  *Q4:* What does the following code print?
+  ```python
+  torch.arange(4)
+  ```
+]
+
+#slide(title: [Quiz])[
+  *Q1:* What is the function signature for machine learning? #pause
+
+  *A1:* $f: X times Theta |-> Y$ #h(2em) $f: X, Theta |-> Y$ also ok. #pause
+
+  *Q2:* What does the following code print?
+  ```python
+  jnp.array([1, 2]) * jnp.array([2, 1]) + jnp.array([5, 6])
+  ``` #pause
+
+  `[1 * 2 + 5, 2 * 1 + 6]` #pause
+
+  *A2:* `Array([7, 8], dtype=int32)`, #h(2em) `[7, 8]` also ok
+]
+#slide(title: [Quiz])[
+  *Q3:* What does the following code print?
+  ```python
+  jnp.array([[1, 2], [3, 4]]).sum(axis=1)
+  ``` #pause
+
+  `[1 + 2, 3 + 4]` #pause
+
+  *A3:* `Array([3, 7], dtype=int32)`, #h(2em) `[3, 7]` also ok #pause
+
+  *Q4:* What does the following code print?
+  ```python
+  jnp.arange(4)
+  ``` #pause
+
+  *A4:* `Array([0, 1, 2, 3], dtype=int32)`, `[0, 1, 2, 3]` also ok  
+]
+
+// 15 + 15 = 30 mins no questions
 
 #slide(title: [Agenda])[
   + Review
@@ -580,7 +646,6 @@ We can use this data to make future predictions
 ]
 
 #slide(title: [Optimization])[
-
   Formally, our objective is to find the $argmin$ of the loss
   $ 
    argmin_bold(theta) cal(L)(bold(x), bold(y), bold(theta)) &= argmin_bold(theta) sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) \ &= argmin_bold(theta) sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
@@ -609,15 +674,21 @@ We can use this data to make future predictions
 ]
 
 #slide(title: [Optimization])[
+  #text(size: 22pt)[
   We add the column of ones so that we can multiply $bold(X)_D$ with $bold(theta)$ to get a linear function $theta_1 x + theta_0$ evaluated at each data point
 
   $ bold(X)_D bold(theta) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) vec(theta_1, theta_0) = underbrace(vec(theta_1 x_1 + theta_0, theta_1 x_2 + theta_0, dots.v, theta_1 x_n + theta_0), "Predicted" y) $
+
+  We can also evaluate our model for new datapoints #pause
+
+  $ bold(X)_D bold(theta) = mat(x_"Steven", 1) vec(theta_1, theta_0) = underbrace(vec(theta_1 x_"Steven" + theta_0), "Predicted" y) $ 
+  ]
+
 ]
 
 #slide(title: [Optimization])[
   #side-by-side[
     With our design matrix $bold(X)_D$ and desired output $bold(y)$,
-    
   ][  
   $ bold(X)_D = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1), bold(y) = vec(y_1, y_2, dots.v, y_n) $
   ] #pause
@@ -807,46 +878,49 @@ We can use this data to make future predictions
 #slide(title: [Nonlinear Regression])[
   What about polynomials? #pause
 
-  $ f(x) = a x^n + b x^(n-1) + dots + c x + d $ #pause
+  $ f(x) = a x^m + b x^(m-1) + dots + c x + d $ #pause
 
   Polynomials can approximate *any* function (universal function approximator) #pause
 
   Can we extend linear regression to polynomials?
 
-  //$ f(x, bold(theta)) = theta_n x^n + theta_(n - 1) x^(n-1) + dots + theta_1 + x^1 + theta_0 $
+  //$ f(x, bold(theta)) = theta_m x^m + theta_(m - 1) x^(m-1) + dots + theta_1 + x^1 + theta_0 $
 ]
 
 #slide(title: [Nonlinear Regression])[
   Expand $x$ to a multi-dimensional input space... #pause
 
   $ bold(X)_D = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => bold(X)_D = mat(
-    x_1^n, x_1^(n-1), dots, x_1, 1; 
-    x_2^n, x_2^(n-1), dots, x_2, 1; 
+    x_1^m, x_1^(m-1), dots, x_1, 1; 
+    x_2^m, x_2^(m-1), dots, x_2, 1; 
     dots.v, dots.v, dots.down; 
-    x_n, x_n^(n-1), dots, x_n, 1
+    x_n^m, x_n^(m-1), dots, x_n, 1
     ) $ #pause
 
+  Remember, $n$ datapoints and $m + 1$ polynomial terms #pause
+
   And add some new parameters...
-  $ bold(theta) = mat(theta_1, theta_0)^top => bold(theta) =  mat(theta_n, theta_(n-1), dots, theta_1, theta_0)^top $
+  $ bold(theta) = mat(theta_1, theta_0)^top => bold(theta) =  mat(theta_m, theta_(m-1), dots, theta_1, theta_0)^top $
 ]
 
 #slide(title: [Nonlinear Regression])[
   #text(size:22pt)[
-  $ bold(X)_D bold(theta) = mat(
-    x_1^n, x_1^(n-1), dots, x_1, 1; 
-    x_2^n, x_2^(n-1), dots, x_2, 1; 
+  $ bold(X)_D bold(theta) = underbrace(mat(
+    x_1^m, x_1^(m-1), dots, x_1, 1; 
+    x_2^m, x_2^(m-1), dots, x_2, 1; 
     dots.v, dots.v, dots.down; 
-    x_n, x_n^(n-1), dots, x_n, 1
-    ) vec(theta_n, theta_(n-1), dots.v, theta_0) = 
+    x_n^m, x_n^(m-1), dots, x_n, 1
+    ), n times (m + 1)) 
+    underbrace(vec(theta_m, theta_(m-1), dots.v, theta_0), (m + 1) times 1) = 
     underbrace(vec(
-      theta_n x_1^n + theta_(n-1) x_1^(n-1) + dots + theta_0,
-      theta_n x_2 + theta_(n-1) x_2^(n-1) + dots + theta_0,
+      theta_m x_1^m + theta_(m-1) x_1^(m-1) + dots + theta_0,
+      theta_m x_2 + theta_(m-1) x_2^(m-1) + dots + theta_0,
       dots.v,
-      theta_n x_n^n + theta_(n-1) x_n^(n-1) + dots + theta_0
-    ), "Y prediction")
+      theta_n x_n^m + theta_(m-1) x_n^(m-1) + dots + theta_0
+    ), "Y prediction, " n times 1)
    $] #pause
 
-  $ "New function... " quad f(x, bold(theta)) = theta_n x^n + theta_(n - 1) x^(n-1), dots, theta_1 + x^1 + theta_0 $ #pause
+  $ "New function... " quad f(x, bold(theta)) = theta_m x^m + theta_(m - 1) x^(m-1), dots, theta_1 + x^1 + theta_0 $ #pause
 
   $ "Same solution... "quad bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
@@ -854,7 +928,7 @@ We can use this data to make future predictions
 ]
 
 #slide(title: [Nonlinear Regression])[
-  $ f(x, bold(theta)) = theta_n x^n + theta_(n - 1) x^(n-1), dots, theta_1 + x^1 + theta_0 $ #pause
+  $ f(x, bold(theta)) = theta_m x^m + theta_(m - 1) x^(m-1), dots, theta_1 + x^1 + theta_0 $ #pause
 
   *Summary:* By changing the input space, we can fit a polynomial to the data using a linear fit!
 ]
@@ -885,9 +959,9 @@ We can use this data to make future predictions
 ]
 
 #slide(title: [Overfitting])[
-  $ f(x, bold(theta)) = theta_n x^n + theta_(n - 1) x^(n-1), dots, theta_1 + x^1 + theta_0 $ #pause
+  $ f(x, bold(theta)) = theta_n x^m + theta_(m - 1) x^(m - 1), dots, theta_1 + x^1 + theta_0 $ #pause
 
-  How do we choose $n$ (polynomial order) that provides the best fit? #pause
+  How do we choose $m$ (polynomial order) that provides the best fit? #pause
 
   #grid(
     columns: 3,
@@ -895,9 +969,9 @@ We can use this data to make future predictions
     image("figures/lecture_2/polynomial_regression_n2.png"),
     image("figures/lecture_2/polynomial_regression_n3.png"),
     image("figures/lecture_2/polynomial_regression_n5.png"),
-    $ n = 2 $,
-    $ n = 3 $,
-    $ n = 5 $
+    $ m = 2 $,
+    $ m = 3 $,
+    $ m = 5 $
   )
 ]
 
@@ -910,13 +984,13 @@ We can use this data to make future predictions
     image("figures/lecture_2/polynomial_regression_n2.png"),
     image("figures/lecture_2/polynomial_regression_n3.png"),
     image("figures/lecture_2/polynomial_regression_n5.png"),
-    $ n = 2 $,
-    $ n = 3 $,
-    $ n = 5 $
+    $ m = 2 $,
+    $ m = 3 $,
+    $ m = 5 $
   ) 
 
-  #side-by-side[Pick the $n$ with the smallest loss][
-    $ argmin_(bold(theta), n) cal(L)(bold(x), bold(y), (bold(theta), n)) $]
+  #side-by-side[Pick the $m$ with the smallest loss][
+    $ argmin_(bold(theta), m) cal(L)(bold(x), bold(y), (bold(theta), m)) $]
 ]
 
 #slide(title: [Overfitting])[
@@ -926,14 +1000,14 @@ We can use this data to make future predictions
     image("figures/lecture_2/polynomial_regression_n2.png"),
     image("figures/lecture_2/polynomial_regression_n3.png"),
     image("figures/lecture_2/polynomial_regression_n5.png"),
-    $ n = 2 $,
-    $ n = 3 $,
-    $ n = 5 $
+    $ m = 2 $,
+    $ m = 3 $,
+    $ m = 5 $
   ) 
 
-  *Question:* Which $n$ do you think has the smallest loss? #pause
+  *Question:* Which $m$ do you think has the smallest loss? #pause
 
-  *Answer:* $n=5$, but intuitively, $n=5$ does not seem very good...
+  *Answer:* $m=5$, but intuitively, $m=5$ does not seem very good...
 ]
 
 #slide(title: [Overfitting])[
@@ -943,12 +1017,12 @@ We can use this data to make future predictions
     image("figures/lecture_2/polynomial_regression_n2.png"),
     image("figures/lecture_2/polynomial_regression_n3.png"),
     image("figures/lecture_2/polynomial_regression_n5.png"),
-    $ n = 2 $,
-    $ n = 3 $,
-    $ n = 5 $
+    $ m = 2 $,
+    $ m = 3 $,
+    $ m = 5 $
   ) 
 
-  More specifically, $n=5$ will not generalize to new data #pause
+  More specifically, $m=5$ will not generalize to new data #pause
 
   We will only use our model for new data (we already have the $y$ for a known $x$)! #pause
 ]
@@ -962,7 +1036,7 @@ We can use this data to make future predictions
 
   Back to the question... #pause
   
-  *Question:* How do we choose $n$ such that our polynomial model works for unseen/new data? #pause
+  *Question:* How do we choose $m$ such that our polynomial model works for unseen/new data? #pause
 
   *Answer:* Compute the loss on unseen data!
 ]
@@ -985,7 +1059,7 @@ We can use this data to make future predictions
   ); quad
   bold(x)_"test" &= vec(
     x_4, x_5
-  ); bold(y)_"test" &= vec(
+  ) bold(y)_"test" &= vec(
     y_4, y_5
   ) 
   $ #pause
@@ -997,7 +1071,7 @@ We can use this data to make future predictions
   ); quad
   bold(x)_"test" &= vec(
     x_2, x_5
-  ); bold(y)_"test" &= vec(
+  ) bold(y)_"test" &= vec(
     y_2, y_5
   ) 
   $ #pause
