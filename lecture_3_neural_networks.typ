@@ -8,9 +8,12 @@
 
 #let la = $angle.l$
 #let ra = $angle.r$
+#let redm(x) = {
+  text(fill: color.red, $#x$)
+}
 
 
-// TODO: Use subscript bracket for sample
+// TODO: Deeper neural networks are more efficient
 // FUTURE TODO: Should not waste m/n in linear regression, use c for count and d_x, d_y
 // TODO: Fix nn image indices
 // TODO: Implement XOR is transposed
@@ -96,8 +99,7 @@
     [Artificial neurons],
     [Wide neural networks],
     [Deep neural networks],
-    [Perceptron],
-    [Multilayer Perceptron]
+    [Practical considerations]
   )
   for i in range(ag.len()){
     if index == i {
@@ -314,13 +316,13 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   + Analytical solution #pause
   + Low data requirement #pause
 
-  But issues arise with other problems #pause
+  Issues arise with other problems #pause
   + Poor scalability #pause
   + Polynomials do not generalize well
 ]
 
 #slide[
-  Issues with very complex problems
+  Issues arise with other problems
   + *Poor scalability* 
   + Polynomials do not generalize well
 ]
@@ -351,13 +353,13 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide[
   Let us do an example #pause
 
-  *Task:* predict how many #text(fill: color.red)[#sym.suit.heart] a photo gets on social media #pause
+  #side-by-side[*Task:* predict how many #text(fill: color.red)[#sym.suit.heart] a photo gets on social media][#cimage("figures/lecture_1/dog.png", height: 30%)] #pause
 
-  #side-by-side[#cimage("figures/lecture_1/dog.png", height: 30%)][$ X in bb(Z)_+^(256 times 256) $] #pause
+  $ f: X times Theta |-> Y; quad X: "Image", quad Y: "Number of " #redm[$#sym.suit.heart$]  $ #pause
 
-  In this case, $d_x = 65,536$ #pause
+  $ X in bb(Z)_+^(256 times 256) = bb(Z)_+^(65536); quad Y in bb(Z)_+ $  #pause
 
-  This task is highly nonlinear, so we will use a polynomial model of order $m=20$ #pause
+  Highly nonlinear task, use a polynomial with order $m=20$ 
 ]
 
 #slide[
@@ -396,13 +398,13 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 ]
 
 #slide[
-  Issues with very complex problems
+  Issues arise with other problems
   + *Poor scalability* 
   + Polynomials do not generalize well
 ]
 
 #slide[
-  Issues with very complex problems
+  Issues arise with other problems
   + Poor scalability
   + *Polynomials do not generalize well*
 ]
@@ -446,16 +448,27 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   + Polynomials do not generalize well
 ]
 
-#slide[#agenda(index: 2)]
-#slide[#agenda(index: 3)]
+// 38:00 fast
 
 #slide[
-  Can we improve upon linear regression? #pause
+  We can use neural networks as an alternative to linear regression #pause
 
-  Yes, with neural networks
+  Neural network benefits: #pause
+    + Scale to large inputs #pause
+    + Slightly better generalization #pause
+
+  Drawbacks: #pause
+    + No analytical solution #pause
+    + High data requirement 
+
+
 
   //#cimage("figures/lecture_1/timeline.svg", height: 50%) 
 ]
+// 40:00 fast
+#slide[#agenda(index: 2)]
+#slide[#agenda(index: 3)]
+
 
 #slide[
   In 1939-1945, there was a World War #pause
@@ -472,8 +485,9 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 ]
 
 #slide[
+  Rosenblatt implemented this neural network theory on a computer a few years later #pause
   #side-by-side[
-  A few years later, Rosenblatt implemented this neural network using a new invention -- the computer
+    At the time, computers were very slow and expensive
 ][#cimage("figures/lecture_3/original_nn.jpg", height: 70%)] 
 ]
 
@@ -516,9 +530,10 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
 ]
 
+// 47:00 fast
 #slide[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
-  Neurons send and process messages from other neurons
+  Neurons send messages based on messages received from other neurons
 ]
 
 #slide[
@@ -529,6 +544,11 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   Dendrites are not all equal! Different dendrites have different diameters and structures
+]
+
+#slide[
+  #cimage("figures/lecture_3/neuron_anatomy.jpg") 
+  Electrical charges collect in the Soma (cell body)
 ]
 
 #slide[
@@ -579,6 +599,8 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   #side-by-side[After thinking, we will take action][#cimage("figures/lecture_3/nervous-system.jpg")]
 ]
 
+// 57:00
+
 #slide[#agenda(index: 4)]
 #slide[#agenda(index: 5)]
 
@@ -592,10 +614,6 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   $ f: underbrace(bb(R)^(d_x), "Dendrite voltages") times underbrace(bb(R)^(d_x), "Dendrite size") |-> underbrace(bb(R), "Axon voltage") $
 ]
 
-
-#let redm(x) = {
-  text(fill: color.red, $#x$)
-}
 #slide[
   Let us implement an artifical neuron as a function #pause
 
@@ -641,21 +659,22 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
       $ sigma(x) = #image("figures/lecture_3/heaviside.png", height: 30%) $
     ]
     #only(10)[
-      $ f(vec(x_(1), dots.v, x_(n)), vec(theta_(1),  dots.v, theta_(n)) ) = #redm[$sigma$] (sum_(j=1)^(d_x) x_(j) theta_j) $
+      $ f(vec(x_(1), dots.v, x_(n)), vec(theta_(1),  dots.v, theta_(n)) ) = #redm[$sigma$] (sum_(j=1)^(d_x) theta_j x_(j) ) $
     ]
   ]
 ]
+// 1:05
 
 #slide[
-  #side-by-side[Maybe we want to vary the activation threshold][#cimage("figures/lecture_3/bio_neuron_activation.png", height: 35%)][#image("figures/lecture_3/heaviside.png", height: 35%)] #pause
+  #side-by-side[Maybe we want to vary the activation threshold][#cimage("figures/lecture_3/bio_neuron_activation.png", height: 30%)][#image("figures/lecture_3/heaviside.png", height: 30%)] #pause
 
-  $ f(vec(x_(1), dots.v, x_(d_x)), vec(#redm[$theta_0$], theta_(1),  dots.v, theta_(d_x)) ) = sigma( #redm[$theta_0$] + sum_(j=1)^(d_x) theta_j x_j) $
+  $ f(vec(x_(1), dots.v, x_(d_x)), vec(#redm[$theta_0$], theta_(1),  dots.v, theta_(d_x)) ) = sigma( #redm[$theta_0$] + sum_(j=1)^(d_x) theta_j x_j) $ #pause
 
-  $ f(bold(x), bold(theta)) = #redm[$theta_0$] + bold(theta)_(1:d_x)^top bold(x) $
+  $ f(bold(x), bold(theta)) = #redm[$theta_0$] + bold(theta)_(#redm[$1:d_x$])^top bold(x) $
 ]
 
 #slide[
-  $ f(bold(x), bold(theta)) = theta_0 + bold(theta)_(1:d_x)^top bold(x) $ #pause
+  $ f(bold(x), bold(theta)) = sigma(theta_0 + bold(theta)_(1:d_x)^top bold(x)) $ #pause
 
   This is the artificial neuron! #pause
 
@@ -684,12 +703,12 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
   Sometimes, we will write $bold(theta)$ as a bias and weight $b, bold(w)$ #pause
 
-  $ bold(theta) = vec(b, bold(w)); quad vec(theta_0, theta_1, dots.v, theta_(d_x)) = vec(b_" ", w_1, dots.v, w_(d_x)) $
+  $ bold(theta) = vec(b, bold(w)); quad vec(theta_0, theta_1, dots.v, theta_(d_x)) = vec(b_" ", w_1, dots.v, w_(d_x)) $ #pause
 
   $ f(bold(x), vec(b, bold(w))) = b + bold(w)^top bold(x) $ 
 ]
 
-
+// 1:15
 #focus-slide[Relax]
 
 #slide[
@@ -699,6 +718,8 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
       Recall that in machine learning we deal with functions #pause
      
       What kinds of functions can our neuron represent? #pause
+
+      Let us consider some *boolean* functions #pause
 
       Let us start with a logical AND function
     ]
@@ -714,7 +735,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
       #cimage("figures/lecture_3/heaviside.png", height: 50%)
 
       $
-        H(x) = cases(
+        sigma(x) = cases(
           1 "if" x > 0,
           0 "if" x <= 0
         )
@@ -727,7 +748,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide[
     Implement AND using an artificial neuron #pause
     
-    $ f(x_1, x_2, bold(theta)) = H(theta_0 + x_1 theta_1 + x_2 theta_2) $ #pause
+    $ f(mat(x_1, x_2)^top, mat(theta_0, theta_1, theta_2)^top) = sigma(theta_0 + x_1 theta_1 + x_2 theta_2) $ #pause
       
     $ bold(theta) = mat(theta_0, theta_1, theta_2)^top = mat(-1, 1, 1)^top $ #pause
     
@@ -735,17 +756,17 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
       columns: 5,
       inset: 0.4em,
       $x_1$, $x_2$, $y$, $f(x_1, x_2, bold(theta))$, $hat(y)$,
-      $0$, $0$, $0$, $H(-1 + 1 dot 0 + 1 dot 0) = H(-1)$, $0$,
-      $0$, $1$, $0$, $H(-1 + 1 dot 0 + 1 dot 1) = H(0)$, $0$,
-      $1$, $0$, $0$, $H(-1 + 1 dot 1 + 1 dot 0) = H(0)$, $0$,
-      $1$, $1$, $1$, $H(-1 + 1 dot 1 + 1 dot 1) = H(1)$, $1$
+      $0$, $0$, $0$, $sigma(-1 + 1 dot 0 + 1 dot 0) = sigma(-1)$, $0$,
+      $0$, $1$, $0$, $sigma(-1 + 1 dot 0 + 1 dot 1) = sigma(0)$, $0$,
+      $1$, $0$, $0$, $sigma(-1 + 1 dot 1 + 1 dot 0) = sigma(0)$, $0$,
+      $1$, $1$, $1$, $sigma(-1 + 1 dot 1 + 1 dot 1) = sigma(1)$, $1$
   ))
 ]
 
 #slide[
     Implement OR using an artificial neuron #pause
     
-    $ f(x_1, x_2, bold(theta)) = H(theta_0 + x_1 theta_1 + x_2 theta_2) $ #pause
+    $ f(mat(x_1, x_2)^top, mat(theta_0, theta_1, theta_2)^top) = sigma(theta_0 + x_1 theta_1 + x_2 theta_2) $ #pause
       
     $ bold(theta) = mat(theta_0, theta_1, theta_2)^top = mat(0, 1, 1)^top $ #pause
     
@@ -753,17 +774,17 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
       columns: 5,
       inset: 0.4em,
       $x_1$, $x_2$, $y$, $f(x_1, x_2, bold(theta))$, $hat(y)$,
-      $0$, $0$, $0$, $H(0 + 1 dot 0 + 1 dot 0) = H(0)$, $0$,
-      $0$, $1$, $0$, $H(0 + 1 dot 1 + 1 dot 0) = H(1)$, $1$,
-      $1$, $0$, $1$, $H(0 + 1 dot 0 + 1 dot 1) = H(1)$, $1$,
-      $1$, $1$, $1$, $H(1 + 1 dot 1 + 1 dot 1) = H(2)$, $1$
+      $0$, $0$, $0$, $sigma(0 + 1 dot 0 + 1 dot 0) = sigma(0)$, $0$,
+      $0$, $1$, $0$, $sigma(0 + 1 dot 1 + 1 dot 0) = sigma(1)$, $1$,
+      $1$, $0$, $1$, $sigma(0 + 1 dot 0 + 1 dot 1) = sigma(1)$, $1$,
+      $1$, $1$, $1$, $sigma(1 + 1 dot 1 + 1 dot 1) = sigma(2)$, $1$
   ))
 ]
 
 #slide[
     Implement XOR using an artificial neuron #pause
     
-    $ f(x_1, x_2, bold(theta)) = H(theta_0 + x_1 theta_1 + x_2 theta_2) $ #pause
+    $ f(mat(x_1, x_2)^top, mat(theta_0, theta_1, theta_2)^top) = sigma(theta_0 + x_1 theta_1 + x_2 theta_2) $ #pause
       
     $ bold(theta) = mat(theta_0, theta_1, theta_2)^top = mat(?, ?, ?)^top $ #pause
     
@@ -781,9 +802,9 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide[
   Why can't we represent XOR using a neuron? #pause
   
-  $ f(x_1, x_2, bold(theta)) = H(theta_0 + x_1 theta_1 + x_2 theta_2) $ #pause
+  $ f(mat(x_1, x_2)^top, mat(theta_0, theta_1, theta_2)^top) = sigma(theta_0 + x_1 theta_1 + x_2 theta_2) $ #pause
 
-  We can only represent $H("linear function")$ #pause
+  We can only represent $sigma("linear function")$ #pause
 
   XOR is not a linear combination of $x_1, x_2$! #pause
 
@@ -840,7 +861,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
   $ f: bb(R)^(d_x) times Theta |-> bb(R)^(d_y) $ 
   
-  $ Theta in bb(R)^((d_x + 1) times d_y) $#pause
+  $ Theta in bb(R)^((d_x + 1) times d_y) $
 ]
 
 #slide[
@@ -853,12 +874,14 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
 #slide[
   // Must be m by n (m rows, n cols)
-  $ f(vec(x_1, x_2, dots.v, x_n), mat(theta_(1,0), theta_(2, 0), dots, theta_(d_x,0); theta_(1,1), theta_(2,1), dots, theta_(d_x, 1); dots.v, dots.v, dots.down, dots.v; theta_(1, d_y), theta_(2, d_y), dots, theta_(d_y, d_x)) ) = vec(
+  #text(size: 24pt)[
+  For a wide network:
+  $ f(vec(x_1, x_2, dots.v, x_(d_x)), mat(theta_(1,0), theta_(2, 0), dots, theta_(d_x,0); theta_(1,1), theta_(2,1), dots, theta_(d_x, 1); dots.v, dots.v, dots.down, dots.v; theta_(1, d_y), theta_(2, d_y), dots, theta_(d_y, d_x)) ) = vec(
     sigma( theta_(1,0) + sum_(i=1)^(d_x) x_i theta_(1,i)  ),
     sigma( theta_(2,0) + sum_(i=1)^(d_x) x_i theta_(2,i)  ),
     dots.v,
     sigma( theta_(d_y,0) + sum_(i=1)^(d_x) x_i theta_(d_y,i)  ),
-  ) 
+  )
   $  
 
 
@@ -868,56 +891,69 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   $
     f(bold(x), vec(bold(b), bold(W))) = sigma( bold(b) + bold(W) bold(x) ); quad bold(b) in bb(R)^(d_y), bold(W) in bb(R)^( d_y times d_x ) 
   $
+  ]
 ]
+
+#slide[#agenda(index: 6)]
+#slide[#agenda(index: 7)]
 
 #slide[
   How do we express a *deep* neural network mathematically? #pause
 
-  A single neuron:
+  A wide network and deep network have a similar function signature:
 
-  $ f: bb(R)^n, bold(theta) |-> bb(R) $ #pause
+  $ f: bb(R)^(d_x) times Theta |-> bb(R)^(d_y) $ #pause
 
-  Multiple neurons (deep):
+  But the parameters change!
 
-  $ f: bb(R)^n, bold(theta), bold(psi), dots, bold(rho) |-> bb(R)^m $ 
+  Wide: $Theta in bb(R)^((d_x + 1) times d_y)$ #pause 
+
+  Deep: $Theta in bb(R)^((d_x + 1) times d_h) times bb(R)^((d_h + 1) times d_h) times dots times bb(R)^((d_h + 1) times d_y)$ #pause
+
+  $ bold(theta) = mat(bold(theta)_1, bold(theta)_2, dots, bold(theta)_ell)^top = mat(bold(phi), bold(psi), dots, bold(xi))^top $ 
 ]
 
 #slide[
-  A single neuron
+  A wide network:
 
-  $ f(bold(x), bold(theta)) = bold(theta)_(dot, 0) + bold(theta)_(dot, 1:n) bold(x) $ #pause
+  $ f(bold(x), bold(theta)) = bold(theta)_(dot, 0) + bold(theta)_(dot, 1:d_x) bold(x) $ #pause
 
-  A composition of neurons with parameters $bold(theta), bold(psi), bold(rho)$
+  A deep network has many internal functions
 
   #text(size: 22pt)[
-    $ f_1(bold(x), bold(theta)) = bold(theta)_(dot, 0) + bold(theta)_(dot, 1:n) bold(x) quad
+    $ f_1(bold(x), bold(phi)) = bold(phi)_(dot, 0) + bold(phi)_(dot, 1:d_x) bold(x) quad
 
-    f_2(bold(x), bold(psi)) = bold(psi)_(dot, 0) + bold(psi)_(dot, 1:n) bold(x) quad
+    f_2(bold(x), bold(psi)) = bold(psi)_(dot, 0) + bold(psi)_(dot, 1:d_h) bold(x) quad
 
     dots quad
 
-    f_(ell)(bold(x), bold(rho)) = bold(rho)_(dot, 0) + bold(rho)_(dot, 1:n) bold(x) $ #pause
+    f_(ell)(bold(x), bold(xi)) = bold(xi)_(dot, 0) + bold(xi)_(dot, 1:d_h) bold(x) $ #pause
   ] #pause
 
 
-  $ f_(ell) (dots f_2(f_1(bold(x), bold(theta)_1), bold(psi)) dots ) $
+  $ f(bold(x), bold(theta)) = f_(ell) (dots f_2(f_1(bold(x), bold(phi)), bold(psi)) dots bold(xi) ) $
 ]
 
 #slide[
-  Written more plainly as
+  Written another way
 
-  $ bold(z)_1 = f_1(bold(x), bold(theta)) = bold(theta)_(dot, 0) + bold(theta)_(dot, 1:n) bold(x) $ #pause
-  $ bold(z)_2 = f_2(bold(z_1), bold(psi)) = bold(psi)_(dot, 0) + bold(psi)_(dot, 1:n) bold(z)_1 $ #pause
+  $ bold(z)_1 = f_1(bold(x), bold(phi)) = bold(phi)_(dot, 0) + bold(phi)_(dot, 1:d_x) bold(x) $ #pause
+  $ bold(z)_2 = f_2(bold(z_1), bold(psi)) = bold(psi)_(dot, 0) + bold(psi)_(dot, 1:d_h) bold(z)_1 $ #pause
   $ dots.v $ #pause
-  $ bold(y) = f_(ell)(bold(x), bold(rho)) = bold(rho)_(dot, 0) + bold(rho)_(dot, 1:n) bold(z)_((d_x) - 1) $ #pause
+  $ bold(y) = f_(ell)(bold(x), bold(xi)) = bold(xi)_(dot, 0) + bold(xi)_(dot, 1:d_h) bold(z)_(ell - 1) $
+
+  We call each function a *layer* #pause
+
+  A deep neural network is made of many layers
 ]
 
+/*
 #slide[
-    Implement XOR using a deep and wide neural network #pause
+    Implement XOR using a deep neural network #pause
     
-    $ f(x_1, x_2, bold(theta)) = H( & theta_(3, 0) \
-       + & theta_(3, 1) quad dot quad H(theta_(1,0) + x_1 theta_(1,1) + x_2 theta_(1,2)) \ 
-      + & theta_(3, 2) quad dot quad H(theta_(2,0) + x_1 theta_(2,1) + x_2 theta_(2,2))) $ #pause
+    $ f(x_1, x_2, bold(theta)) = sigma( & theta_(3, 0) \
+       + & theta_(3, 1) quad dot quad sigma(theta_(1,0) + x_1 theta_(1,1) + x_2 theta_(1,2)) \ 
+      + & theta_(3, 2) quad dot quad sigma(theta_(2,0) + x_1 theta_(2,1) + x_2 theta_(2,2))) $ #pause
       
     $ bold(theta) = mat(
       theta_(1,0), theta_(1,1), theta_(1,2);
@@ -929,17 +965,18 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
       -0.5, 1, -2
     ) $ #pause
 ]
+*/
 
 #slide[
-  What other functions can we represent using a deep and wide neural network? #pause
+  What functions can we represent using a deep neural network? #pause
 
   Consider a one-dimensional arbitrary function $g(x) = y$ #pause
 
   We can approximate $g$ using our neural network $f$ #pause
 
-  $ f(x_1, x_2, bold(theta)) = H( & theta_(3, 0) \
-       + & theta_(3, 1) quad dot quad H(theta_(1,0) + x_1 theta_(1,1) + x_2 theta_(1,2)) \ 
-      + & theta_(3, 2) quad dot quad H(theta_(2,0) + x_1 theta_(2,1) + x_2 theta_(2,2))) $
+  $ f(x_1, x_2, bold(theta)) = sigma( & theta_(3, 0) \
+       + & theta_(3, 1) quad dot quad sigma(theta_(1,0) + x_1 theta_(1,1) + x_2 theta_(1,2)) \ 
+      + & theta_(3, 2) quad dot quad sigma(theta_(2,0) + x_1 theta_(2,1) + x_2 theta_(2,2))) $
 ]
 
 #slide[
@@ -947,78 +984,64 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
   #only(2)[#cimage("figures/lecture_3/function_noapproximation.svg", height: 50%)]
 
-  #only((3, 4))[#cimage("figures/lecture_3/function_approximation.svg", height: 50%)]
+  #only(3)[#cimage("figures/lecture_3/function_approximation.svg", height: 50%)]
 
-  #only(4)[$ "Roughly, " exists bold(theta) => lim_(n |-> oo) [ theta_(2, 0) + theta_(2, 1) sum_(j = 1)^n sigma(theta_(1, 0) + theta_(1, j) x) ] = g(x); quad forall g $]
+  //#only(4)[$ "Roughly, " exists bold(theta) => lim_(n |-> oo) [ theta_(2, 0) + theta_(2, 1) sum_(j = 1)^n sigma(theta_(1, 0) + theta_(1, j) x) ] = g(x); quad forall g $]
 ]
 
 #slide[
-  More formally, a wide and deep neural network is a *universal function approximator* #pause
+  A deep neural network is a *universal function approximator* #pause
 
-  It can approximate *any* continuous function to precision $epsilon$ #pause
+  It can approximate *any* continuous function $g(x)$ to precision $epsilon$ #pause
 
   $ | g(bold(x)) - f(bold(x), bold(theta)) | < epsilon $ #pause
-  
-  As we increase the width and depth of the network, $epsilon$ shrinks #pause
 
-  #side-by-side[$ g(#image("figures/lecture_1/dog.png", height: 20%)) = "Dog"$][$ g(#image("figures/lecture_1/muffin.png", height: 20%)) = "Muffin" $] 
-  
   #align(center)[Very powerful finding! The basis of deep learning.]
+
+  #side-by-side[*Task:* predict how many #text(fill: color.red)[#sym.suit.heart] a photo gets on social media][#cimage("figures/lecture_1/dog.png", height: 30%)] 
+]
+
+
+#slide[#agenda(index: 7)]
+#slide[#agenda(index: 8)]
+
+
+#slide[
+  We call wide neural networks *perceptrons* #pause
+
+  We call deep neural networks *multi-layer perceptrons* (MLP) #pause
+
+  #cimage("figures/lecture_3/timeline.svg", width: 85%)
 ]
 
 #slide[
-  All the models we examine in this course will use this neural network structure internally #pause
-    - Transformers #pause
+  *All* the models we examine in this course will use MLPs #pause
+    - Recurrent neural networks #pause
     - Graph neural networks #pause
-]
+    - Transformers #pause
+    - Chatbots #pause
 
-#focus-slide[Relax]
+  It is very important to understand MLPs! #pause
 
-#slide[
-  We call this form of a neural network a *feedforward network* or *perceptron* (invented in 1943) #pause
-
-  #cimage("figures/lecture_3/mark_1_perceptron.jpeg", height: 60%)
-
-  $20 times 20$ grid of pixels to process images
+  I will explain them again very simply 
 ]
 
 #slide[
+  A *layer* is a linear operation and an activation function
 
-  #cimage("figures/lecture_3/timeline.svg", width: 85%) #pause
+  $ f(bold(x), vec(bold(b), bold(W))) = sigma(bold(b) + bold(W) bold(x)) $
 
-  *Question:* If the deep neural network was invented in 1958, why did it take 70 years for us to care about deep learning?
+  #side-by-side[Many layers makes a deep neural network][
+  #text(size: 22pt)[
+    $ bold(z)_1 &= f(bold(x), vec(bold(b)_1, bold(W)_1)) \
+    bold(z)_2 &= f(bold(z)_1, vec(bold(b)_2, bold(W)_2)) \ quad bold(y) &= f(bold(z)_2, vec(bold(b)_2, bold(W)_2)) $
+  ]
+  ]
 ]
 
-#slide[
-  *Answer:* Deep learning requires very deep and wide networks
-    + Hardware advances enabled very deep and wide networks #pause
-
-    + Many theoretical improvements allow us to successfully train deeper and wider networks #pause
-]
 
 #slide[
-  The neural network we created today is called a feedforward network or perceptron #pause
-
-  When the network is deep, we call it a Multi-Layer Perceptron (MLP) #pause
-
-  We often use the term "layers", when referring to a specific depth of the neural network
-    - Four-layer MLP means a neural network with a depth of four
-    - Corresponds to four parameter matrices in $bold(theta)$
-]
-
-#slide[
-  Let us construct deep and wide neural networks in `torch` and `jax`
-]
-
-#slide[
-  Here are the equations for one neural network layer 
-
-  #side-by-side[$ f(bold(x), bold(theta)) = sigma( bold(theta)_(dot, 0) + bold(theta)_(dot, 1:n) bold(x) ) $][or][
-  $ f(bold(x), (bold(b), bold(W))) = sigma( bold(b) + bold(W) bold(x) ) $ ] #pause
-
-  We must implement the linear function $bold(b) + bold(W) bold(x)$ and the activation function $sigma$ to create a neural network layer #pause
-
-  Let us do this in colab! https://colab.research.google.com/drive/1bLtf3QY-yROIif_EoQSU1WS7svd0q8j7?usp=sharing
+  Let us create a wide neural network in colab! https://colab.research.google.com/drive/1bLtf3QY-yROIif_EoQSU1WS7svd0q8j7?usp=sharing
 ]
 
 
