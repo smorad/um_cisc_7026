@@ -10,10 +10,9 @@
 #let ra = $angle.r$
 
 
-// FUTURE TODO: Should not waste m/n in linear regression, use c for count and ell for input
-// TODO: Work in bias earlier, as a means to shift the activation function
-// TODO: Design matrix is not square, discuss XtX
-// TODO: Reuse of n in neurons
+// TODO: Use subscript bracket for sample
+// FUTURE TODO: Should not waste m/n in linear regression, use c for count and d_x, d_y
+// TODO: Fix nn image indices
 // TODO: Implement XOR is transposed
 // TODO: is xor network actually wide?
 // TODO: Handle subscripts for input dim rather than sample
@@ -76,6 +75,17 @@
 ]
 */
 
+#slide(title: [Notation Change])[
+  *Notation change:* Previously $x_i, y_i$ referred to data $i$ #pause
+
+  From now on, we will write $x_[i]$ to refer to data $i$ #pause
+
+  $x_i$ will refer to element $i$ of a vector $bold(x)$ or matrix $bold(X)$ #pause
+
+  $ bold(x) = vec(x_1, x_2, dots.v), quad bold(X) = mat(x_(1,1), dots, x_(1, n); dots.v, dots.down, dots.v; x_(m, 1), dots, x_(m, n)) $
+  
+]
+
 #let agenda(index: none) = {
   let ag = (
     [Review],
@@ -84,6 +94,8 @@
     [History of neural networks],
     [Biological neurons],
     [Artificial neurons],
+    [Wide neural networks],
+    [Deep neural networks],
     [Perceptron],
     [Multilayer Perceptron]
   )
@@ -118,14 +130,12 @@
 
   $Theta in bb(R)^2:$ Parameters #pause 
 
-  $ f: X times Theta |-> Y $
+  $ f: X times Theta |-> Y $ #pause
 
 
   *Approach:* Learn the parameters $theta$ such that 
 
-  $ f(x, theta) = y; quad x in X, y in Y $ #pause
-
-  *Goal:* Given someone's education, predict how long they will live
+  $ f(x, theta) = y; quad x in X, y in Y $
 ]
 
 #slide(title: [Review])[
@@ -145,18 +155,18 @@
 ]
 
 #slide(title: [Review])[
-  We wrote the loss function for a single datapoint $x_i, y_i$ using the square error
+  We wrote the loss function for a single datapoint $x_[i], y_[i]$ using the square error
 
-  $ cal(L)(x_i, y_i, bold(theta)) = "error"(f(x_i, bold(theta)),  y_i) = (f(x_i, bold(theta)) - y_i)^2 $ #pause
+  $ cal(L)(x_[i], y_[i], bold(theta)) = "error"(f(x_[i], bold(theta)),  y_[i]) = (f(x_[i], bold(theta)) - y_[i])^2 $ #pause
 
   But we wanted to learn a model over *all* the data, not a single datapoint #pause
 
   We wanted to make *new* predictions, to *generalize* #pause
 
-  $ bold(x) = mat(x_1, x_2, dots, x_n)^top, bold(y) = mat(y_1, y_2, dots, y_n)^top $ #pause
+  $ bold(x) = mat(x_[1], x_[2], dots, x_[n])^top, bold(y) = mat(y_[1], y_[2], dots, y_[n])^top $ #pause
 
   $ 
-  cal(L)(bold(x), bold(y), bold(theta)) = sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) = sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
+  cal(L)(bold(x), bold(y), bold(theta)) = sum_(i=1)^n "error"(f(x_[i], bold(theta)),  y_[i]) = sum_(i=1)^n (f(x_[i], bold(theta)) - y_[i])^2 
   $
 ]
 
@@ -174,18 +184,18 @@
   With the $argmin$ operator, we formally wrote our optimization objective #pause
 
   $ 
-   #text(fill: color.red)[$argmin_bold(theta)$] cal(L)(bold(x), bold(y), bold(theta)) &= #text(fill: color.red)[$argmin_bold(theta)$] sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) \ &= #text(fill: color.red)[$argmin_bold(theta)$] sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
-  $ #pause
+   #text(fill: color.red)[$argmin_bold(theta)$] cal(L)(bold(x), bold(y), bold(theta)) &= #text(fill: color.red)[$argmin_bold(theta)$] sum_(i=1)^n "error"(f(x_[i], bold(theta)),  y_[i]) \ &= #text(fill: color.red)[$argmin_bold(theta)$] sum_(i=1)^n (f(x_[i], bold(theta)) - y_[i])^2 
+  $ 
 ]
 
 #slide(title: [Review])[
   We defined the design matrix $bold(X)_D$ #pause
 
-  $ bold(X)_D = mat(bold(x), bold(1)) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) $ #pause
+  $ bold(X)_D = mat(bold(x), bold(1)) = mat(x_[1], 1; x_[2], 1; dots.v, dots.v; x_[n], 1) $ #pause
 
-  With the design matrix, provided an *analytical* solution to the optimization objective #pause
+  We use the design matrix to find an *analytical* solution to the optimization objective #pause
   
-$ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
+$ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ 
 ]
 
 #slide(title: [Review])[
@@ -197,17 +207,17 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
 #slide(title: [Review])[
   Then, we used a trick to extend linear regression to nonlinear models #pause
 
-  $ bold(X)_D = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => bold(X)_D = mat(log(1 + x_1), 1; log(1 + x_2), 1; dots.v, dots.v; log(1 + x_n), 1) $ #pause
+  $ bold(X)_D = mat(x_[1], 1; x_[2], 1; dots.v, dots.v; x_[n], 1) => bold(X)_D = mat(log(1 + x_[1]), 1; log(1 + x_[2]), 1; dots.v, dots.v; log(1 + x_[n]), 1) $
 ]
 
 #slide(title: [Review])[
-  We extended to polynomial, which are *universal function approximators* #pause
+  We extended to polynomials, which are *universal function approximators* #pause
 
-  $ bold(X)_D = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => bold(X)_D = mat(
-    x_1^m, x_1^(m-1), dots, x_1, 1; 
-    x_2^m, x_2^(m-1), dots, x_2, 1; 
+  $ bold(X)_D = mat(x_[1], 1; x_[2], 1; dots.v, dots.v; x_[n], 1) => bold(X)_D = mat(
+    x_[1]^m, x_[1]^(m-1), dots, x_[1], 1; 
+    x_[2]^m, x_[2]^(m-1), dots, x_[2], 1; 
     dots.v, dots.v, dots.down; 
-    x_n^m, x_n^(m-1), dots, x_n, 1
+    x_[n]^m, x_[n]^(m-1), dots, x_[n], 1
     ) $ #pause
 
   $ f: X times Theta |-> bb(R) $ #pause
@@ -240,6 +250,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
   #cimage("figures/lecture_2/train_test_regression.png", height: 60%)
 ]
 
+// 16:00 fast
 #slide[#agenda(index: 0)]
 #slide[#agenda(index: 1)]
 
@@ -256,47 +267,51 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
 ]
 
 #slide[
-  For multivariate problems, we use vector inputs #pause
+  For multivariate problems, we will define the input dimension as $d_x$ #pause
 
-  $ bold(x) in X; quad X in bb(R)^3 $ #pause
+  $ bold(x) in X; quad X in bb(R)^(d_x) $ #pause
 
-  I will write
+  We will write the vectors as
 
-  $ bold(x)_i = vec(
-    x_i angle.l 1 angle.r,
-    x_i angle.l 2 angle.r,
-    x_i angle.l 3 angle.r
+  $ bold(x)_[i] = vec(
+    x_([i], 1),
+    x_([i], 2),
+    dots.v,
+    x_([i], d_x)
   ) $ #pause
 
-  $x_i angle.l 1 angle.r$ refers to the first dimension of training data $i$
+  $x_([i], 1)$ refers to the first dimension of training data $i$
 ]
 
 #slide[
-  Assume an input space $X in bb(R)^ell$ #pause
+  The design matrix for a *multivariate* linear system is
 
-  The design matrix for this *multivariate* linear system is
-
-  $ bold(X)_D = mat(bold(X), bold(1)) = mat(
-    x_1 angle.l ell angle.r, x_1 angle.l ell - 1 angle.r, dots, 1; 
-    x_2 angle.l ell angle.r, x_2 angle.l ell - 1 angle.r, dots, 1; 
+  $ bold(X)_D = mat(
+    x_([1], d_x), x_([1], d_x - 1),  dots, x_([1], 1), 1; 
+    x_([2], d_x), x_([2], d_x - 1), dots, x_([2], 1), 1; 
     dots.v, dots.v, dots.down, dots.v; 
-    x_n angle.l ell angle.r, x_n angle.l ell - 1 angle.r, dots, 1
+    x_([n], d_x), x_([n], d_x - 1), dots, x_([n], 1), 1
   ) $ #pause
 
-  Remember $x_n angle.l ell$ refers to dimension $ell$ of training data $n$ #pause
+  Remember $x_([n], d_x)$ refers to dimension $d_x$ of training data $n$ #pause
+
+  The solution is the same as before
+
+  $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ 
 ]
 
-#slide[
-  We previously looked at linear and polynomial models for regression #pause
+// 22:00 fast
 
-  $ f(bold(x), bold(theta)) = bold(X)_D bold(theta) = theta_(m) x^m + theta_(m - 1) x^(m - 1) + dots + theta_0 $ #pause
-
-  $ bold(theta) = (bold(X)^top bold(X) )^(-1) bold(X)^top bold(y) $
+#slide(title: [Agenda])[
+  #agenda(index: 1)
+]
+#slide(title: [Agenda])[
+  #agenda(index: 2)
 ]
 
 #slide[
   Linear models are useful for certain problems #pause
-  + Interpretability #pause
+  + Analytical solution #pause
   + Low data requirement #pause
 
   But issues arise with other problems #pause
@@ -311,56 +326,73 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
 ]
 
 #slide[
-  Last time, we learned a polynomial function of a *one-dimensional* $x$ using linear regression #pause
+  So far, we have seen: #pause
 
-  However, we can also learn such functions for *multi-dimensional* $x$
+  #side-by-side[
+    One-dimensional polynomial functions
+    $ bold(X)_D = mat(
+      x_[1]^m, x_[1]^(m-1), dots, x_[1], 1; 
+      x_[2]^m, x_[2]^(m-1), dots, x_[2], 1; 
+      dots.v, dots.v, dots.down; 
+      x_[n]^m, x_[n]^(m-1), dots, x_[n], 1
+      ) $ #pause][
+    Multi-dimensional linear functions
+    $ bold(X)_D = mat(
+      x_([1], d_x), x_([1], d_x - 1),  dots, 1; 
+      x_([2], d_x), x_([2], d_x - 1), dots, 1; 
+      dots.v, dots.v, dots.down, dots.v; 
+      x_([n], d_x), x_([n], d_x - 1), dots, 1
+    ) $ #pause
+  ]
 
-  //Polynomials fit tabular data well #pause
+  Combine them to create multi-dimensional polynomial functions #pause
+]
 
-  //However, they scale poorly to higher-dimensional data like image pixels #pause
+#slide[
+  Let us do an example #pause
+
+  *Task:* predict how many #text(fill: color.red)[#sym.suit.heart] a photo gets on social media #pause
 
   #side-by-side[#cimage("figures/lecture_1/dog.png", height: 30%)][$ X in bb(Z)_+^(256 times 256) $] #pause
 
-  This image contains 65536 pixels, so $x$ has 65536 dimensions
+  In this case, $d_x = 65,536$ #pause
+
+  This task is highly nonlinear, so we will use a polynomial model of order $m=20$ #pause
 ]
 
 #slide[
-  #side-by-side[#cimage("figures/lecture_1/dog.png", height: 30%)][$ 256 times 256 "pixels" = 65536 "pixels" $] #pause
-  
-  What does the design matrix look like for an m-degree polynomial of this image? 
+  $ 
+  bold(X)_D = mat(
+    x_([1],d_x)^m, dots, x_([1],1)^m, dots, x_([1], d_x)^(m-1), dots, x_([1], 1)^(m-1), dots, dots,  1;
+    dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;
+    x_([n],d_x)^m, dots, x_([n],1)^m, dots, x_([n], d_x)^(m-1), dots, x_([n], 1)^(m-1), dots, dots,  1;
+    x_([1],d_x)^(m), x_([1],d_x)^(m-1) x_([1], d_x - 1), dots, dots, dots, dots, dots, dots, dots,  1;
+    dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;
+  )
+  $ #pause
 
+
+  *Question:* How many rows in this matrix? #pause
+
+  *Hint:* $d_x = 2, m = 3$: $x^3 + y^3 + x^2 y + y^2 x + x y + x + y + 1$ #pause
+
+  *Answer:* $(d_x)^m + 1 = 65536^20 + 1 approx 10^96$
+
+  //*Question:* What is the size of $bold(X)_D^top bold(X)_D$
 ]
 
 #slide[
-  $ bold(X)_D = mat(
-    x_1^m, x_1^(m-1), dots, x_1^1, 1;
-    x_2^m, x_2^(m-1), dots, x_2^1, 1;
-    dots.v, dots.v, dots.down, dots.v, dots.v;
-    x_n^m, x_n^(m-1), dots, x_n^1, 1;
-    x_1^(n-1) x_2, x^(n-2) x_2^2, dots, 0, 1;
-    dots.v, dots.v, dots.down, dots.v, dots.v;
-    x_1 x_2 dots x_n, 0, dots, 0, 1;
-  ) $ #pause
+  To find $bold(theta)$, we must invert $bold(X)^top_D bold(X)_D$ #pause
 
-  *Question:* How big is the matrix for 65,536 pixels and $m=3$?
+  $bold(X)^top_D bold(X)_D: 10^96 times 10^96$ #pause
 
-  *Answer:* $65,536^3 approx 10^14$ parameters #pause
-]
+  *Question:* What is the largest matrix ever inverted? #pause
 
-#slide[
-  *Question:* How big is the matrix for 65,536 pixels and $n=3$?
+  *Answer:* $10^6 times 10^6$ #pause
 
-  *Answer:* $65,536^3 approx 10^14$ parameters #pause
+  #side-by-side[We cannot predict how many #text(fill: color.red)[#sym.suit.heart] the picture will get][#cimage("figures/lecture_1/dog.png", height: 30%)] #pause
 
-  For comparison, GPT-4 has $10^12$ parameters #pause
-
-  We must invert $bold(X)_D^top bold(X)_D$, requiring $O(n^3)$ time #pause
-
-  Largest matrix ever inverted has $approx 10^12$ elements #pause
-
-  One day this will be possible, but today it is not #pause
-
-  Polynomial regression scales poorly to high dimensional data
+  Polynomial regression does not scale to large inputs
 ]
 
 #slide[
@@ -378,11 +410,11 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
 #slide[
   What happens to polynomials outside of the support (dataset)? #pause
 
-  #side-by-side[$ theta_m x^m + theta_(m-1) x^(m-1) + dots $][Equation of a polynomial] #pause
+  We will evaluate polynomials in the limit #pause
 
-  #side-by-side[$ x^m (theta_m + theta_(m-1) / x + dots) $][Factor out $x^m$] #pause
+  #side-by-side[$ lim_(x -> oo) theta_m x^m + theta_(m-1) x^(m-1) + dots $][Equation of a polynomial] #pause
 
-  #side-by-side[$ lim_(x -> oo) x^m (theta_m + theta_(m-1) / x + dots) $][Take the limit] #pause
+  #side-by-side[$ lim_(x -> oo) x^m (theta_m + theta_(m-1) / x + dots) $][Factor out $x^m$] #pause
 
   #side-by-side[$ lim_(x -> oo) x^m dot lim_(x-> oo) (theta_m + theta_(m-1) / x + dots) $][Split the limit (limit of products)] 
 ]
@@ -414,8 +446,8 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
   + Polynomials do not generalize well
 ]
 
-#slide[#agenda(index: 1)]
 #slide[#agenda(index: 2)]
+#slide[#agenda(index: 3)]
 
 #slide[
   Can we improve upon linear regression? #pause
@@ -475,8 +507,8 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
   *Note:* I am not a neuroscientist! I may make simplifications or errors with biology
 ]
 
-#slide[#agenda(index: 2)]
 #slide[#agenda(index: 3)]
+#slide[#agenda(index: 4)]
 
 #slide[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
@@ -547,8 +579,8 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
   #side-by-side[After thinking, we will take action][#cimage("figures/lecture_3/nervous-system.jpg")]
 ]
 
-#slide[#agenda(index: 3)]
 #slide[#agenda(index: 4)]
+#slide[#agenda(index: 5)]
 
 #slide[
   #cimage("figures/lecture_3/neuron_anatomy.jpg", height: 50%) #pause
@@ -557,10 +589,13 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
 
   *Answer*:
 
-  $ f: underbrace(bb(R)^m, "Dendrite voltages") times underbrace(bb(R)^m, "Dendrite size") |-> underbrace(bb(R), "Axon voltage") $
+  $ f: underbrace(bb(R)^(d_x), "Dendrite voltages") times underbrace(bb(R)^(d_x), "Dendrite size") |-> underbrace(bb(R), "Axon voltage") $
 ]
 
 
+#let redm(x) = {
+  text(fill: color.red, $#x$)
+}
 #slide[
   Let us implement an artifical neuron as a function #pause
 
@@ -570,7 +605,11 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
 
     ]
     #only(3)[
-      $ f(vec(theta_1, theta_2, dots.v, theta_n)) = f(vec(0.5, 3.1, dots.v, 2.0)) $
+      $ f(
+        #redm[$vec(theta_1, theta_2, dots.v, theta_(d_x))$])
+      $
+
+      $ f(#redm[$bold(theta)$]) $
 
     ]
     #only((4,5))[
@@ -578,9 +617,9 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
     ]
 
     #only(5)[
-      $ f(vec(x_i angle.l 1 angle.r, dots.v, x_i angle.l n angle.r), vec(theta_(1),  dots.v, theta_(n)) ) $
-
-      $ bold(x)_i = vec(x_i angle.l 1 angle.r, dots.v, x_i angle.l n angle.r) = vec(0.5, dots.v, -0.3) $
+      $ f(#redm[$vec(x_(1), dots.v, x_(d_x))$], vec(theta_(1),  dots.v, theta_(d_x)) ) $ 
+      
+      $ f(#redm[$bold(x)$], bold(theta)) $
     ]
 
     #only((6, 7))[
@@ -589,7 +628,9 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
     ]
 
     #only(7)[
-      $ f(vec(x_i angle.l 1 angle.r, dots.v, x_i angle.l n angle.r), vec(theta_(1),  dots.v, theta_(n)) ) = sum_(j=1)^n x_i angle.l j angle.r theta_j $
+      $ f(vec(x_(1), dots.v, x_(d_x)), vec(theta_(1),  dots.v, theta_(d_x)) ) = #redm[$sum_(j=1)^(d_x) theta_j x_(j)$] $
+
+      $ f(bold(x), bold(theta)) = #redm[$bold(theta)^top bold(x)$] $
     ]
 
     #only((8, 9, 10))[
@@ -600,78 +641,59 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
       $ sigma(x) = #image("figures/lecture_3/heaviside.png", height: 30%) $
     ]
     #only(10)[
-      $ f(vec(x_1, dots.v, x_n), vec(theta_(1),  dots.v, theta_(n)) ) = sigma(sum_(j=1)^n x_i angle.l j angle.r theta_j) $
+      $ f(vec(x_(1), dots.v, x_(n)), vec(theta_(1),  dots.v, theta_(n)) ) = #redm[$sigma$] (sum_(j=1)^(d_x) x_(j) theta_j) $
     ]
   ]
 ]
 
 #slide[
-  This is almost the artificial neuron!
-  $ f(vec(x_1, dots.v, x_n), vec(theta_(1),  dots.v, theta_(n)) ) = sigma(sum_(j=1)^n x_i angle.l j angle.r theta_j) $ #pause
+  #side-by-side[Maybe we want to vary the activation threshold][#cimage("figures/lecture_3/bio_neuron_activation.png", height: 35%)][#image("figures/lecture_3/heaviside.png", height: 35%)] #pause
 
-  $ f(bold(x), bold(theta)) = sigma(sum_(j=1)^n x angle.l j angle.r theta_j) $ #pause
+  $ f(vec(x_(1), dots.v, x_(d_x)), vec(#redm[$theta_0$], theta_(1),  dots.v, theta_(d_x)) ) = sigma( #redm[$theta_0$] + sum_(j=1)^(d_x) theta_j x_j) $
 
-  Let us write this out for clarity
+  $ f(bold(x), bold(theta)) = #redm[$theta_0$] + bold(theta)_(1:d_x)^top bold(x) $
 ]
 
 #slide[
-  $ f(bold(x), bold(theta)) = sigma(
-    x angle.l n angle.r theta_n + 
-    x angle.l n-1 angle.r theta_(n-1) + 
-    dots + 
-    x angle.l 1 angle.r theta_1
-  ) $ #pause
+  $ f(bold(x), bold(theta)) = theta_0 + bold(theta)_(1:d_x)^top bold(x) $ #pause
+
+  This is the artificial neuron! #pause
+
+  Let us write out the full equation for a neuron #pause
+  
+  $ f(bold(x), bold(theta)) = sigma( theta_(d_x) x_(d_x) + theta_(d_x - 1) x_(d_x - 1) + dots + theta_0 ) $ #pause
 
   *Question:* Does this look familiar to anyone? #pause
 
-  *Answer:* This is a multivariate linear model!
+  *Answer:* Inside $sigma$ is the multivariate linear model!
+
+  $ f(bold(x), bold(theta)) = theta_(d_x) x_(d_x) + theta_(d_x - 1) x_(d_x - 1) + dots + theta_0 $
 ]
-
-
-/*
-  *Question:* Does it look familiar to any other functions we have seen? #pause
-
-  *Answer:* The linear model!
-]
-*/
-#slide[
-  #side-by-side[$ f(bold(x), bold(theta)) = sigma(sum_(i=1)^n x_i theta_i) $][Artificial neuron] #pause
-
-  #side-by-side[$ f(bold(x), bold(theta)) = theta_0 + theta_1 x_1 + theta_2 x_2  + dots + theta_n x_n $][Linear model] #pause
-
-  It is the linear model with an activation function! #pause
-
-  We add a bias term to the neuron, for the same reason we add a bias term to the linear model #pause
-
-  $ f(bold(x), bold(theta)) = sigma(theta_0 + sum_(i=1)^n x_i theta_i) $ #pause
-]
-
 
 #slide[
-  #side-by-side(gutter: 4em)[#cimage("figures/lecture_3/neuron_anatomy.jpg")
-  $ f(vec(x_1, dots.v, x_n), vec(theta_(0),  dots.v, theta_(n)) ) = sigma(theta_0 + sum_(i=1)^n x_i theta_i) $  
+  We model a neuron using a linear model and activation function #pause
+  #side-by-side(gutter: 4em)[#cimage("figures/lecture_3/neuron_anatomy.jpg", height: 40%)
   ][  
-  #cimage("figures/lecture_3/neuron.png")]
+  #cimage("figures/lecture_3/neuron.svg", height: 40%)]
+
+  $ f(bold(x), bold(theta)) = theta_0 + bold(theta)_(1:d_x)^top bold(x) $ 
 ]
 
 #slide[
-  #text(size: 23pt)[
-  We can also write a neuron in terms of a dot product #pause
+  $ f(bold(x), bold(theta)) = theta_0 + bold(theta)_(1:d_x)^top bold(x) $ #pause
 
-  $ f(vec(x_1, dots.v, x_n), vec(theta_(0),  dots.v, theta_(n)) ) = sigma(theta_0 + bold(theta)_(1:n) dot bold(x)) $ #pause
+  Sometimes, we will write $bold(theta)$ as a bias and weight $b, bold(w)$ #pause
 
-  We often write the parameters as a *weight* $bold(w)$ and *bias* $b$ #pause
+  $ bold(theta) = vec(b, bold(w)); quad vec(theta_0, theta_1, dots.v, theta_(d_x)) = vec(b_" ", w_1, dots.v, w_(d_x)) $
 
-  $ f(vec(x_1, dots.v, x_n), vec(b, w_1, dots.v, w_(n)) ) = sigma(b + bold(w) dot bold(x)) $ #pause
-
-  $ b = theta_0, bold(w) = bold(theta)_(1:n) $
-  ]
+  $ f(bold(x), vec(b, bold(w))) = b + bold(w)^top bold(x) $ 
 ]
+
 
 #focus-slide[Relax]
 
 #slide[
-  #side-by-side[#cimage("figures/lecture_3/neuron.png") #pause][
+  #side-by-side[#cimage("figures/lecture_3/neuron.svg") #pause][
     #align(left)[
     
       Recall that in machine learning we deal with functions #pause
@@ -783,7 +805,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
     columns: 2,
     align: center,
     column-gutter: 2em,
-    cimage("figures/lecture_3/neuron.png", width: 80%), cimage("figures/lecture_3/deep_network.png", height: 75%),
+    cimage("figures/lecture_3/neuron.svg", width: 80%), cimage("figures/lecture_3/deep_network.png", height: 75%),
     [Neuron], [Neural Network] 
   )
 ]
@@ -802,52 +824,50 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
   ]
 ]
 
+#slide[#agenda(index: 5)]
+#slide[#agenda(index: 6)]
+
 #slide[
   How do we express a *wide* neural network mathematically? #pause
 
   A single neuron:
 
-  $ f: bb(R)^n, bold(theta) |-> bb(R) $ #pause
+  $ f: bb(R)^(d_x) times Theta |-> bb(R) $ 
+  
+  $ Theta in bb(R)^(d_x + 1) $ #pause
 
-  Multiple neurons (wide):
+  $d_y$ neurons (wide):
 
-  $ f: bb(R)^n, bold(theta) |-> bb(R)^m $ #pause
+  $ f: bb(R)^(d_x) times Theta |-> bb(R)^(d_y) $ 
+  
+  $ Theta in bb(R)^((d_x + 1) times d_y) $#pause
 ]
 
 #slide[
   For a single neuron:
   
-  $ f(vec(x_1, dots.v, x_n), vec(theta_(0),  dots.v, theta_(n)) ) = sigma(theta_0 + sum_(i=1)^n x_i theta_i) $  
+  $ f(vec(x_1, dots.v, x_(d_x)), vec(theta_(0),  dots.v, theta_(d_x)) ) = sigma(theta_0 + sum_(i=1)^(d_x) theta_i x_i) $ #pause
 
-  $ f(vec(x_1, dots.v, x_n), vec(theta_(0),  dots.v, theta_(n)) ) = sigma(theta_0 + bold(theta)_(1:n) dot bold(x)) $ #pause
+  $ f(bold(x), bold(theta)) = sigma(theta_0 + bold(theta)_(1:n)^top bold(x)) $
 ]
 
 #slide[
   // Must be m by n (m rows, n cols)
-  $ f(vec(x_1, dots.v, x_n), mat(theta_(1,0), theta_(2, 0), dots, theta_(n,0); theta_(1,1), theta_(2,1), dots, theta_(n, 1); dots.v, dots.v, dots.down, dots.v; theta_(1, m), theta_(2, m), dots, theta_(m, n)) ) = vec(
-    sigma( theta_(1,0) + sum_(i=1)^n x_i theta_(1,i)  ),
-    sigma( theta_(2,0) + sum_(i=1)^n x_i theta_(2,i)  ),
+  $ f(vec(x_1, x_2, dots.v, x_n), mat(theta_(1,0), theta_(2, 0), dots, theta_(d_x,0); theta_(1,1), theta_(2,1), dots, theta_(d_x, 1); dots.v, dots.v, dots.down, dots.v; theta_(1, d_y), theta_(2, d_y), dots, theta_(d_y, d_x)) ) = vec(
+    sigma( theta_(1,0) + sum_(i=1)^(d_x) x_i theta_(1,i)  ),
+    sigma( theta_(2,0) + sum_(i=1)^(d_x) x_i theta_(2,i)  ),
     dots.v,
-    sigma( theta_(m,0) + sum_(i=1)^n x_i theta_(m,i)  ),
+    sigma( theta_(d_y,0) + sum_(i=1)^(d_x) x_i theta_(d_y,i)  ),
   ) 
   $  
-  Each row in the output corresponds to the output of a single neuron #pause
 
-  This is very confusing to write, but we can rewrite it as matrix multiplication
-]
 
-#slide[
-  $ f(vec(x_1, dots.v, x_n), mat(theta_(1,0), theta_(2, 0), dots, theta_(n,0); theta_(1,1), theta_(2,1), dots, theta_(n, 1); dots.v, dots.v, dots.down, dots.v; theta_(1, m), theta_(2, m), dots, theta_(m, n)) ) = vec(
-    sigma( theta_(1,0) + sum_(i=1)^n x_i theta_(1,i)  ),
-    sigma( theta_(2,0) + sum_(i=1)^n x_i theta_(2,i)  ),
-    dots.v,
-    sigma( theta_(m,0) + sum_(i=1)^n x_i theta_(m,i)  ),
-  ) 
+  $ f(bold(x), bold(theta)) = 
+    sigma(bold(theta)_(dot, 0) + bold(theta)_(dot, 1:d_x bold(x))); quad bold(theta) in bb(R)^( (d_y + 1) times d_x) 
   $ #pause
-
-  $ f(bold(x), bold(theta)) = sigma( bold(theta)_(dot, 0) + bold(theta)_(dot, 1:n) bold(x) ) $ #pause
-
-  $ f(bold(x), (bold(b), bold(W))) = sigma( bold(b) + bold(W) bold(x) ) $
+  $
+    f(bold(x), vec(bold(b), bold(W))) = sigma( bold(b) + bold(W) bold(x) ); quad bold(b) in bb(R)^(d_y), bold(W) in bb(R)^( d_y times d_x ) 
+  $
 ]
 
 #slide[
@@ -889,7 +909,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
   $ bold(z)_1 = f_1(bold(x), bold(theta)) = bold(theta)_(dot, 0) + bold(theta)_(dot, 1:n) bold(x) $ #pause
   $ bold(z)_2 = f_2(bold(z_1), bold(psi)) = bold(psi)_(dot, 0) + bold(psi)_(dot, 1:n) bold(z)_1 $ #pause
   $ dots.v $ #pause
-  $ bold(y) = f_(ell)(bold(x), bold(rho)) = bold(rho)_(dot, 0) + bold(rho)_(dot, 1:n) bold(z)_(ell - 1) $ #pause
+  $ bold(y) = f_(ell)(bold(x), bold(rho)) = bold(rho)_(dot, 0) + bold(rho)_(dot, 1:n) bold(z)_((d_x) - 1) $ #pause
 ]
 
 #slide[
