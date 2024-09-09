@@ -912,20 +912,20 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   // Must be m by n (m rows, n cols)
   #text(size: 24pt)[
   For a wide network:
-  $ f(vec(x_1, x_2, dots.v, x_(d_x)), mat(theta_(1,0), theta_(2, 0), dots, theta_(d_x,0); theta_(1,1), theta_(2,1), dots, theta_(d_x, 1); dots.v, dots.v, dots.down, dots.v; theta_(1, d_y), theta_(2, d_y), dots, theta_(d_y, d_x)) ) = vec(
-    sigma(sum_(i=0)^(d_x) theta_(1,i) overline(x)_i ),
-    sigma(sum_(i=0)^(d_x) theta_(2,i) overline(x)_i ),
+  $ f(vec(x_1, x_2, dots.v, x_(d_x)), mat(theta_(0,1), theta_(0,2), dots, theta_(0,d_y); theta_(1,1), theta_(1,2), dots, theta_(1, d_y); dots.v, dots.v, dots.down, dots.v; theta_(d_x, 1), theta_(d_x, 2), dots, theta_(d_x, d_y)) ) = vec(
+    sigma(sum_(i=0)^(d_x) theta_(i,1) overline(x)_i ),
+    sigma(sum_(i=0)^(d_x) theta_(i,2) overline(x)_i ),
     dots.v,
-    sigma(sum_(i=0)^(d_x) theta_(d_y,i) overline(x)_i ),
+    sigma(sum_(i=0)^(d_x) theta_(i,d_y) overline(x)_i ),
   )
   $  
 
 
   $ f(bold(x), bold(theta)) = 
-    sigma(bold(theta) overline(bold(x))); quad bold(theta) in bb(R)^( (d_y + 1) times d_x) 
+    sigma(bold(theta)^top overline(bold(x))); quad bold(theta)^top in bb(R)^( d_y times (d_x + 1) ) 
   $ #pause
   $
-    f(bold(x), vec(bold(b), bold(W))) = sigma( bold(b) + bold(W) bold(x) ); quad bold(b) in bb(R)^(d_y), bold(W) in bb(R)^( d_y times d_x ) 
+    f(bold(x), vec(bold(b), bold(W))) = sigma( bold(b) + bold(W)^top bold(x) ); quad bold(b) in bb(R)^(d_y), bold(W) in bb(R)^( d_x times d_y ) 
   $
   ]
 ]
@@ -952,17 +952,17 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide[
   A wide network:
 
-  $ f(bold(x), bold(theta)) = bold(theta) overline(bold(x)) $ #pause
+  $ f(bold(x), bold(theta)) = bold(theta)^top overline(bold(x)) $ #pause
 
   A deep network has many internal functions
 
-    $ f_1(bold(x), bold(phi)) = bold(phi) overline(bold(x)) quad
+    $ f_1(bold(x), bold(phi)) = bold(phi)^top overline(bold(x)) quad
 
-    f_2(bold(x), bold(psi)) = bold(psi) overline(bold(x)) quad
+    f_2(bold(x), bold(psi)) = bold(psi)^top overline(bold(x)) quad
 
     dots quad
 
-    f_(ell)(bold(x), bold(xi)) = bold(xi) overline(bold(x)) $ #pause
+    f_(ell)(bold(x), bold(xi)) = bold(xi)^top overline(bold(x)) $ #pause
 
 
   $ f(bold(x), bold(theta)) = f_(ell) (dots f_2(f_1(bold(x), bold(phi)), bold(psi)) dots bold(xi) ) $
@@ -971,10 +971,10 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide[
   Written another way
 
-  $ bold(z)_1 = f_1(bold(x), bold(phi)) = bold(phi) overline(bold(x)) $ #pause
-  $ bold(z)_2 = f_2(bold(z_1), bold(psi)) = bold(psi)overline(bold(z))_1 $ #pause
+  $ bold(z)_1 = f_1(bold(x), bold(phi)) = bold(phi)^top overline(bold(x)) $ #pause
+  $ bold(z)_2 = f_2(bold(z_1), bold(psi)) = bold(psi)^top overline(bold(z))_1 $ #pause
   $ dots.v $ #pause
-  $ bold(y) = f_(ell)(bold(x), bold(xi)) = bold(xi) overline(bold(z))_(ell - 1) $
+  $ bold(y) = f_(ell)(bold(x), bold(xi)) = bold(xi)^top overline(bold(z))_(ell - 1) $
 
   We call each function a *layer* #pause
 
@@ -1001,6 +1001,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 ]
 */
 
+/*
 #slide[
   What functions can we represent using a deep neural network? #pause
 
@@ -1012,15 +1013,19 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
        + & theta_(3, 1) quad dot quad sigma(theta_(1,0) + x_1 theta_(1,1) + x_2 theta_(1,2)) \ 
       + & theta_(3, 2) quad dot quad sigma(theta_(2,0) + x_1 theta_(2,1) + x_2 theta_(2,2))) $
 ]
+*/
 
 #slide[
-  *Proof Sketch:* Approximate a function $g(x)$ using a linear combination of Heaviside functions
+  What functions can we represent using a deep neural network? #pause
+
+  *Proof Sketch:* Approximate a continuous function $g: bb(R) |-> bb(R)$ using a linear combination of Heaviside functions #pause
 
   #only(2)[#cimage("figures/lecture_3/function_noapproximation.svg", height: 50%)]
 
-  #only(3)[#cimage("figures/lecture_3/function_approximation.svg", height: 50%)]
+  #only((3,4))[#cimage("figures/lecture_3/function_approximation.svg", height: 50%)]
 
-  //#only(4)[$ "Roughly, " exists bold(theta) => lim_(n |-> oo) [ theta_(2, 0) + theta_(2, 1) sum_(j = 1)^n sigma(theta_(1, 0) + theta_(1, j) x) ] = g(x); quad forall g $]
+  #only(4)[$exists (bold(theta) in bb(R)^(1 times d_h), bold(phi) in bb(R)^((d_h + 1) times d_1)) "such that" lim_((d_h + 1) |-> oo) [ bold(phi)^top sigma(overline(bold(theta)^top overline(x)))]$
+  ] 
 ]
 
 #slide[
@@ -1030,7 +1035,9 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
   $ | g(bold(x)) - f(bold(x), bold(theta)) | < epsilon $ #pause
 
-  #align(center)[Very powerful finding! The basis of deep learning.]
+  Making the network deeper or wider decreases $epsilon$ #pause
+
+  #align(center)[#underline[Very powerful finding! The basis of deep learning.]] #pause
 
   #side-by-side[*Task:* predict how many #text(fill: color.red)[#sym.suit.heart] a photo gets on social media][#cimage("figures/lecture_1/dog.png", height: 30%)] 
 ]
@@ -1063,7 +1070,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide[
   A *layer* is a linear operation and an activation function
 
-  $ f(bold(x), vec(bold(b), bold(W))) = sigma(bold(b) + bold(W) bold(x)) $
+  $ f(bold(x), vec(bold(b), bold(W))) = sigma(bold(b) + bold(W)^top bold(x)) $
 
   #side-by-side[Many layers makes a deep neural network][
   #text(size: 22pt)[
