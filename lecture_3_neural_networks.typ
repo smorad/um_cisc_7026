@@ -14,7 +14,7 @@
 
 
 // TODO: Deeper neural networks are more efficient
-// FUTURE TODO: Do not do theta_0 + sum, instead add one to x vector: [1, x_1, x_2, dots] to line up with linear regression
+// FUTURE TODO: Label design matrix as X bar instead of X_D in linear regression lectures
 // FUTURE TODO: Should not waste m/n in linear regression, use c for count and d_x, d_y
 // TODO: Fix nn image indices
 // TODO: Implement XOR is transposed
@@ -701,25 +701,25 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide[
   #side-by-side[Maybe we want to vary the activation threshold][#cimage("figures/lecture_3/bio_neuron_activation.png", height: 30%)][#image("figures/lecture_3/heaviside.png", height: 30%)] #pause
 
-  $ f(vec(x_(1), dots.v, x_(d_x)), vec(#redm[$theta_0$], theta_(1),  dots.v, theta_(d_x)) ) = sigma( #redm[$theta_0$] + sum_(j=1)^(d_x) theta_j x_j) $ #pause
+  $ f(vec(#redm[$1$], x_(1), dots.v, x_(d_x)), vec(#redm[$theta_0$], theta_(1),  dots.v, theta_(d_x)) ) = sigma(#redm[$theta_0$] + sum_(j=1)^(d_x) theta_j x_j) = sigma(sum_(#redm[$j=0$])^(d_x) theta_j x_j) $ #pause
 
-  $ f(bold(x), bold(theta)) = #redm[$theta_0$] + bold(theta)_(#redm[$1:d_x$])^top bold(x) $
+  $ overline(bold(x)) = vec(1, bold(x)), quad f(bold(x), bold(theta)) = sigma(bold(theta)^top overline(bold(x))) $
 ]
 
 #slide[
-  $ f(bold(x), bold(theta)) = sigma(theta_0 + bold(theta)_(1:d_x)^top bold(x)) $ #pause
+  $ f(bold(x), bold(theta)) = sigma(bold(theta)^top overline(bold(x))) $ #pause
 
   This is the artificial neuron! #pause
 
   Let us write out the full equation for a neuron #pause
   
-  $ f(bold(x), bold(theta)) = sigma( theta_(d_x) x_(d_x) + theta_(d_x - 1) x_(d_x - 1) + dots + theta_0 ) $ #pause
+  $ f(bold(x), bold(theta)) = sigma( theta_0 1 + theta_1 x_1 + dots + theta_(d_x) x_(d_x) ) $ #pause
 
   *Question:* Does this look familiar to anyone? #pause
 
   *Answer:* Inside $sigma$ is the multivariate linear model!
 
-  $ f(bold(x), bold(theta)) = theta_(d_x) x_(d_x) + theta_(d_x - 1) x_(d_x - 1) + dots + theta_0 $
+  $ f(bold(x), bold(theta)) = theta_(d_x) x_(d_x) + theta_(d_x - 1) x_(d_x - 1) + dots + theta_0 1 $
 ]
 
 #slide[
@@ -728,11 +728,11 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   ][  
   #cimage("figures/lecture_3/neuron.svg", height: 40%)]
 
-  $ f(bold(x), bold(theta)) = theta_0 + bold(theta)_(1:d_x)^top bold(x) $ 
+  $ f(bold(x), bold(theta)) = sigma(bold(theta)^top overline(bold(x))) $ 
 ]
 
 #slide[
-  $ f(bold(x), bold(theta)) = theta_0 + bold(theta)_(1:d_x)^top bold(x) $ #pause
+  $ f(bold(x), bold(theta)) = sigma(bold(theta)^top overline(bold(x))) $ #pause
 
   Sometimes, we will write $bold(theta)$ as a bias and weight $b, bold(w)$ #pause
 
@@ -781,7 +781,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide[
     Implement AND using an artificial neuron #pause
     
-    $ f(mat(x_1, x_2)^top, mat(theta_0, theta_1, theta_2)^top) = sigma(theta_0 + x_1 theta_1 + x_2 theta_2) $ #pause
+    $ f(mat(x_1, x_2)^top, mat(theta_0, theta_1, theta_2)^top) = sigma(theta_0 1 + theta_1 x_1 + theta_2 x_2) $ #pause
       
     $ bold(theta) = mat(theta_0, theta_1, theta_2)^top = mat(-1, 1, 1)^top $ #pause
     
@@ -789,17 +789,17 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
       columns: 5,
       inset: 0.4em,
       $x_1$, $x_2$, $y$, $f(x_1, x_2, bold(theta))$, $hat(y)$,
-      $0$, $0$, $0$, $sigma(-1 + 1 dot 0 + 1 dot 0) = sigma(-1)$, $0$,
-      $0$, $1$, $0$, $sigma(-1 + 1 dot 0 + 1 dot 1) = sigma(0)$, $0$,
-      $1$, $0$, $0$, $sigma(-1 + 1 dot 1 + 1 dot 0) = sigma(0)$, $0$,
-      $1$, $1$, $1$, $sigma(-1 + 1 dot 1 + 1 dot 1) = sigma(1)$, $1$
+      $0$, $0$, $0$, $sigma(-1 dot 1 + 1 dot 0 + 1 dot 0) = sigma(-1)$, $0$,
+      $0$, $1$, $0$, $sigma(-1 dot 1 + 1 dot 0 + 1 dot 1) = sigma(0)$, $0$,
+      $1$, $0$, $0$, $sigma(-1 dot 1 + 1 dot 1 + 1 dot 0) = sigma(0)$, $0$,
+      $1$, $1$, $1$, $sigma(-1 dot 1 + 1 dot 1 + 1 dot 1) = sigma(1)$, $1$
   ))
 ]
 
 #slide[
     Implement OR using an artificial neuron #pause
     
-    $ f(mat(x_1, x_2)^top, mat(theta_0, theta_1, theta_2)^top) = sigma(theta_0 + x_1 theta_1 + x_2 theta_2) $ #pause
+    $ f(mat(x_1, x_2)^top, mat(theta_0, theta_1, theta_2)^top) = sigma(theta_0 1 + theta_1 x_1 + theta_2 x_2) $ #pause
       
     $ bold(theta) = mat(theta_0, theta_1, theta_2)^top = mat(0, 1, 1)^top $ #pause
     
@@ -807,10 +807,10 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
       columns: 5,
       inset: 0.4em,
       $x_1$, $x_2$, $y$, $f(x_1, x_2, bold(theta))$, $hat(y)$,
-      $0$, $0$, $0$, $sigma(0 + 1 dot 0 + 1 dot 0) = sigma(0)$, $0$,
-      $0$, $1$, $0$, $sigma(0 + 1 dot 1 + 1 dot 0) = sigma(1)$, $1$,
-      $1$, $0$, $1$, $sigma(0 + 1 dot 0 + 1 dot 1) = sigma(1)$, $1$,
-      $1$, $1$, $1$, $sigma(1 + 1 dot 1 + 1 dot 1) = sigma(2)$, $1$
+      $0$, $0$, $0$, $sigma(1 dot 0 + 1 dot 0 + 1 dot 0) = sigma(0)$, $0$,
+      $0$, $1$, $0$, $sigma(1 dot 0 + 1 dot 1 + 1 dot 0) = sigma(1)$, $1$,
+      $1$, $0$, $1$, $sigma(1 dot 0 + 1 dot 0 + 1 dot 1) = sigma(1)$, $1$,
+      $1$, $1$, $1$, $sigma(1 dot 0 + 1 dot 1 + 1 dot 1) = sigma(2)$, $1$
   ))
 ]
 
@@ -820,7 +820,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide[
     Implement XOR using an artificial neuron #pause
     
-    $ f(mat(x_1, x_2)^top, mat(theta_0, theta_1, theta_2)^top) = sigma(theta_0 + x_1 theta_1 + x_2 theta_2) $ #pause
+    $ f(mat(x_1, x_2)^top, mat(theta_0, theta_1, theta_2)^top) = sigma(theta_0 1 + theta_1 x_2 + theta_2 x_2) $ #pause
       
     $ bold(theta) = mat(theta_0, theta_1, theta_2)^top = mat(?, ?, ?)^top $ #pause
     
@@ -838,7 +838,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide[
   Why can't we represent XOR using a neuron? #pause
   
-  $ f(mat(x_1, x_2)^top, mat(theta_0, theta_1, theta_2)^top) = sigma(theta_0 + x_1 theta_1 + x_2 theta_2) $ #pause
+  $ f(mat(x_1, x_2)^top, mat(theta_0, theta_1, theta_2)^top) = sigma(1 theta_0 + x_1 theta_1 + x_2 theta_2) $ #pause
 
   We can only represent $sigma("linear function")$ #pause
 
@@ -903,9 +903,9 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide[
   For a single neuron:
   
-  $ f(vec(x_1, dots.v, x_(d_x)), vec(theta_(0),  dots.v, theta_(d_x)) ) = sigma(theta_0 + sum_(i=1)^(d_x) theta_i x_i) $ #pause
+  $ f(vec(x_1, dots.v, x_(d_x)), vec(theta_0,  theta_1, dots.v, theta_(d_x)) ) = sigma(sum_(i=0)^(d_x) theta_i overline(x)_i) $ #pause
 
-  $ f(bold(x), bold(theta)) = sigma(theta_0 + bold(theta)_(1:n)^top bold(x)) $
+  $ f(bold(x), bold(theta)) = sigma(b + bold(w)^top bold(x)) $
 ]
 
 #slide[
@@ -913,16 +913,16 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   #text(size: 24pt)[
   For a wide network:
   $ f(vec(x_1, x_2, dots.v, x_(d_x)), mat(theta_(1,0), theta_(2, 0), dots, theta_(d_x,0); theta_(1,1), theta_(2,1), dots, theta_(d_x, 1); dots.v, dots.v, dots.down, dots.v; theta_(1, d_y), theta_(2, d_y), dots, theta_(d_y, d_x)) ) = vec(
-    sigma( theta_(1,0) + sum_(i=1)^(d_x) x_i theta_(1,i)  ),
-    sigma( theta_(2,0) + sum_(i=1)^(d_x) x_i theta_(2,i)  ),
+    sigma(sum_(i=0)^(d_x) theta_(1,i) overline(x)_i ),
+    sigma(sum_(i=0)^(d_x) theta_(2,i) overline(x)_i ),
     dots.v,
-    sigma( theta_(d_y,0) + sum_(i=1)^(d_x) x_i theta_(d_y,i)  ),
+    sigma(sum_(i=0)^(d_x) theta_(d_y,i) overline(x)_i ),
   )
   $  
 
 
   $ f(bold(x), bold(theta)) = 
-    sigma(bold(theta)_(dot, 0) + bold(theta)_(dot, 1:d_x bold(x))); quad bold(theta) in bb(R)^( (d_y + 1) times d_x) 
+    sigma(bold(theta) overline(bold(x))); quad bold(theta) in bb(R)^( (d_y + 1) times d_x) 
   $ #pause
   $
     f(bold(x), vec(bold(b), bold(W))) = sigma( bold(b) + bold(W) bold(x) ); quad bold(b) in bb(R)^(d_y), bold(W) in bb(R)^( d_y times d_x ) 
@@ -952,19 +952,17 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide[
   A wide network:
 
-  $ f(bold(x), bold(theta)) = bold(theta)_(dot, 0) + bold(theta)_(dot, 1:d_x) bold(x) $ #pause
+  $ f(bold(x), bold(theta)) = bold(theta) overline(bold(x)) $ #pause
 
   A deep network has many internal functions
 
-  #text(size: 22pt)[
-    $ f_1(bold(x), bold(phi)) = bold(phi)_(dot, 0) + bold(phi)_(dot, 1:d_x) bold(x) quad
+    $ f_1(bold(x), bold(phi)) = bold(phi) overline(bold(x)) quad
 
-    f_2(bold(x), bold(psi)) = bold(psi)_(dot, 0) + bold(psi)_(dot, 1:d_h) bold(x) quad
+    f_2(bold(x), bold(psi)) = bold(psi) overline(bold(x)) quad
 
     dots quad
 
-    f_(ell)(bold(x), bold(xi)) = bold(xi)_(dot, 0) + bold(xi)_(dot, 1:d_h) bold(x) $ #pause
-  ] #pause
+    f_(ell)(bold(x), bold(xi)) = bold(xi) overline(bold(x)) $ #pause
 
 
   $ f(bold(x), bold(theta)) = f_(ell) (dots f_2(f_1(bold(x), bold(phi)), bold(psi)) dots bold(xi) ) $
@@ -973,10 +971,10 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide[
   Written another way
 
-  $ bold(z)_1 = f_1(bold(x), bold(phi)) = bold(phi)_(dot, 0) + bold(phi)_(dot, 1:d_x) bold(x) $ #pause
-  $ bold(z)_2 = f_2(bold(z_1), bold(psi)) = bold(psi)_(dot, 0) + bold(psi)_(dot, 1:d_h) bold(z)_1 $ #pause
+  $ bold(z)_1 = f_1(bold(x), bold(phi)) = bold(phi) overline(bold(x)) $ #pause
+  $ bold(z)_2 = f_2(bold(z_1), bold(psi)) = bold(psi)overline(bold(z))_1 $ #pause
   $ dots.v $ #pause
-  $ bold(y) = f_(ell)(bold(x), bold(xi)) = bold(xi)_(dot, 0) + bold(xi)_(dot, 1:d_h) bold(z)_(ell - 1) $
+  $ bold(y) = f_(ell)(bold(x), bold(xi)) = bold(xi) overline(bold(z))_(ell - 1) $
 
   We call each function a *layer* #pause
 
