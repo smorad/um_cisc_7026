@@ -113,9 +113,9 @@
   }
 }
 
-#slide[#agenda(index: none)]
+#slide(title: [Agenda])[#agenda(index: none)]
 
-#slide[#agenda(index: 0)]
+#slide(title: [Agenda])[#agenda(index: 0)]
 
 #slide(title: [Review])[
   Since you are very educated, we focused on how education affects life expectancy #pause
@@ -314,7 +314,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   #agenda(index: 2)
 ]
 
-#slide[
+#slide(title: [Limitations of Linear Regression])[
   Linear models are useful for certain problems #pause
   + Analytical solution #pause
   + Low data requirement #pause
@@ -324,13 +324,13 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   + Polynomials do not generalize well
 ]
 
-#slide[
+#slide(title: [Limitations of Linear Regression])[
   Issues arise with other problems
   + *Poor scalability* 
   + Polynomials do not generalize well
 ]
 
-#slide[
+#slide(title: [Limitations of Linear Regression])[
   So far, we have seen: #pause
 
   #side-by-side[
@@ -353,7 +353,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   Combine them to create multi-dimensional polynomial functions #pause
 ]
 
-#slide[
+#slide(title: [Limitations of Linear Regression])[
   Let us do an example #pause
 
   #side-by-side[*Task:* predict how many #text(fill: color.red)[#sym.suit.heart] a photo gets on social media][#cimage("figures/lecture_1/dog.png", height: 30%)] #pause
@@ -365,19 +365,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   Highly nonlinear task, use a polynomial with order $m=20$ 
 ]
 
-#slide[
-  /*
-  $ 
-  bold(X)_D = mat(
-    x_([1],d_x)^m, dots, x_([1],1)^m, dots, x_([1], d_x)^(m-1), dots, x_([1], 1)^(m-1), dots, dots,  1;
-    dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;
-    x_([n],d_x)^m, dots, x_([n],1)^m, dots, x_([n], d_x)^(m-1), dots, x_([n], 1)^(m-1), dots, dots,  1;
-    x_([1],d_x)^(m), x_([1],d_x)^(m-1) x_([1], d_x - 1), dots, dots, dots, dots, dots, dots, dots,  1;
-    dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;
-  )
-  $ #pause
-  */
-
+#slide(title: [Limitations of Linear Regression])[
   $ bold(X)_D = mat(bold(x)_(D, [1]), dots, bold(x)_(D, [n]))^top $ #pause
 
   $ &bold(x)_(D, [i]) = \ &mat(
@@ -395,21 +383,9 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   *Hint:* $d_x = 2, m = 3$: $x^3 + y^3 + x^2 y + y^2 x + x y + x + y + 1$ #pause
 
   *Answer:* $(d_x)^m = 65536^20 + 1 approx 10^96$
-
-  //*Question:* What is the size of $bold(X)_D^top bold(X)_D$
 ]
 
-#slide[
-  /*
-  To find $bold(theta)$, we must invert $bold(X)^top_D bold(X)_D$ #pause
-
-  $bold(X)^top_D bold(X)_D: 10^96 times 10^96$ #pause
-
-  *Question:* What is the largest matrix ever inverted? #pause
-
-  *Answer:* $10^6 times 10^6$ #pause
-  */
-
+#slide(title: [Limitations of Linear Regression])[
   How big is $10^96$? #pause
 
   *Question:* How many atoms are there in the universe? #pause
@@ -423,19 +399,19 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   Polynomial regression does not scale to large inputs
 ]
 
-#slide[
+#slide(title: [Limitations of Linear Regression])[
   Issues arise with other problems
   + *Poor scalability* 
   + Polynomials do not generalize well
 ]
 
-#slide[
+#slide(title: [Limitations of Linear Regression])[
   Issues arise with other problems
   + Poor scalability
   + *Polynomials do not generalize well*
 ]
 
-#slide[
+#slide(title: [Limitations of Linear Regression])[
   What happens to polynomials outside of the support (dataset)? #pause
 
   Take the limit of polynomials to see their behavior #pause
@@ -447,7 +423,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   #side-by-side[$ lim_(x -> oo) x^m dot lim_(x-> oo) (theta_m + theta_(m-1) / x + dots) $][Split the limit (limit of products)] 
 ]
 
-#slide[
+#slide(title: [Limitations of Linear Regression])[
   #side-by-side[$ lim_(x -> oo) x^m dot lim_(x-> oo) (theta_m + theta_(m-1) / x + dots) $][Split the limit (limit of products)]
   
   #side-by-side[$ (lim_(x -> oo) x^m) dot (theta_m + 0 + dots) $][Evaluate right limit] #pause
@@ -458,7 +434,8 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
   #side-by-side[$ theta_m lim_(x -> oo) x^m = -oo $][If $theta_m < 0$]
 ]
-#slide[
+
+#slide(title: [Limitations of Linear Regression])[
   Polynomials quickly tend towards $-oo, oo$ outside of the support #pause
 
   $ f(x) = x^3-2x^2-x+2 $ #pause
@@ -468,7 +445,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   Remember, to predict new data we want our functions to generalize
 ]
 
-#slide[
+#slide(title: [Limitations of Linear Regression])[
   Linear regression has issues #pause
   + Poor scalability #pause
   + Polynomials do not generalize well
@@ -476,7 +453,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
 // 38:00 fast
 
-#slide[
+#slide(title: [Limitations of Linear Regression])[
   We can use neural networks as an alternative to linear regression #pause
 
   Neural network benefits: #pause
@@ -492,11 +469,11 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   //#cimage("figures/lecture_1/timeline.svg", height: 50%) 
 ]
 // 40:00 fast
-#slide[#agenda(index: 2)]
-#slide[#agenda(index: 3)]
+#slide(title: [Agenda])[#agenda(index: 2)]
+#slide(title: [Agenda])[#agenda(index: 3)]
 
 
-#slide[
+#slide(title: [History of Neural Networks])[
   In 1939-1945, there was a World War #pause
 
   Militaries invested funding for research, and invented the computer #pause
@@ -504,20 +481,20 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   #cimage("figures/lecture_3/turing.jpg", height: 70%)
 ]
 
-#slide[
+#slide(title: [History of Neural Networks])[
   #side-by-side[Meanwhile, a neuroscientist and mathematician (McCullough and Pitts) were trying to understand the human brain][#cimage("figures/lecture_3/mccullough-pitts.png", height: 70%)] #pause
 
   They designed the theory for the first neural network
 ]
 
-#slide[
+#slide(title: [History of Neural Networks])[
   Rosenblatt implemented this neural network theory on a computer a few years later #pause
   #side-by-side[
     At the time, computers were very slow and expensive
 ][#cimage("figures/lecture_3/original_nn.jpg", height: 70%)] 
 ]
 
-#slide[
+#slide(title: [History of Neural Networks])[
   Through advances in theory and hardware, neural networks became slightly better #pause
 
   #cimage("figures/lecture_1/timeline.svg", height: 40%) #pause
@@ -526,7 +503,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 ]
 
 
-#slide[
+#slide(title: [History of Neural Networks])[
   So what is a neural network? #pause
 
   It is a function, inspired by how the brain works #pause
@@ -535,7 +512,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
 ]
 
-#slide[
+#slide(title: [History of Neural Networks])[
   Brains and neural networks rely on *neurons* #pause
 
   *Brain:* Biological neurons $->$ Biological neural network #pause
@@ -547,69 +524,69 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   *Note:* I am not a neuroscientist! I may make simplifications or errors with biology
 ]
 
-#slide[#agenda(index: 3)]
-#slide[#agenda(index: 4)]
+#slide(title: [Agenda])[#agenda(index: 3)]
+#slide(title: [Agenda])[#agenda(index: 4)]
 
-#slide[
+#slide(title: [Biological Neurons])[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   A simplified neuron consists of many parts 
 
 ]
 
 // 47:00 fast
-#slide[
+#slide(title: [Biological Neurons])[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   Neurons send messages based on messages received from other neurons
 ]
 
-#slide[
+#slide(title: [Biological Neurons])[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   Incoming electrical signals travel along dendrites
 ]
 
-#slide[
+#slide(title: [Biological Neurons])[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   Dendrites are not all equal! Different dendrites have different diameters and structures
 ]
 
-#slide[
+#slide(title: [Biological Neurons])[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   Electrical charges collect in the Soma (cell body)
 ]
 
-#slide[
+#slide(title: [Biological Neurons])[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   The axon outputs an electrical signal to other neurons
 ]
 
-#slide[
+#slide(title: [Biological Neurons])[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   The axon terminals will connect to dendrites of other neurons through a synapse
 ]
 
-#slide[
+#slide(title: [Biological Neurons])[
   #cimage("figures/lecture_3/synapse.png", height: 60%)
   The synapse converts electrical signal, to chemical signal, back to electrical signal #pause
 
   Synaptic weight determines how well a signal crosses the gap
 ]
 
-#slide[
+#slide(title: [Biological Neurons])[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   For our purposes, we can model the axon terminals, dendrites, and synapses to be one thing
 ]
 
-#slide[
+#slide(title: [Biological Neurons])[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   The neuron takes many inputs, and produces a single output
 ]
 
-#slide[
+#slide(title: [Biological Neurons])[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   The neuron will only output a signal down the axon ("fire") at certain times
 ]
 
-#slide[
+#slide(title: [Biological Neurons])[
   How does a neuron decide to send an impulse ("fire")? #pause
 
   #side-by-side[Incoming impulses (via dendrites) change the electric potential of the neuron][  #cimage("figures/lecture_3/bio_neuron_activation.png", height: 50%)] #pause
@@ -620,24 +597,24 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   
 ]
 
-#slide[
+#slide(title: [Biological Neurons])[
   #side-by-side[Pain triggers initial nerve impulse, starts a chain reaction into the brain][#cimage("figures/lecture_3/nervous-system.jpg")]
 ]
 
-#slide[
+#slide(title: [Biological Neurons])[
   #side-by-side[When the signal reaches the brain, we will think][#cimage("figures/lecture_3/nervous-system.jpg")]
 ]
 
-#slide[
+#slide(title: [Biological Neurons])[
   #side-by-side[After thinking, we will take action][#cimage("figures/lecture_3/nervous-system.jpg")]
 ]
 
 // 57:00
 
-#slide[#agenda(index: 4)]
-#slide[#agenda(index: 5)]
+#slide(title: [Agenda])[#agenda(index: 4)]
+#slide(title: [Agenda])[#agenda(index: 5)]
 
-#slide[
+#slide(title: [Artificial Neurons])[
   #cimage("figures/lecture_3/neuron_anatomy.jpg", height: 50%) #pause
 
   *Question:* How could we write a neuron as a function? $quad f: "___" |-> "___"$ #pause
@@ -647,7 +624,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   $ f: underbrace(bb(R)^(d_x), "Dendrite voltages") times underbrace(bb(R)^(d_x), "Synaptic weight") |-> underbrace(bb(R), "Axon voltage") $
 ]
 
-#slide[
+#slide(title: [Artificial Neurons])[
   Let us implement an artifical neuron as a function #pause
 
   #side-by-side[#cimage("figures/lecture_3/neuron_anatomy.jpg")][
@@ -698,7 +675,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 ]
 // 1:05
 
-#slide[
+#slide(title: [Artificial Neurons])[
   #side-by-side[Maybe we want to vary the activation threshold][#cimage("figures/lecture_3/bio_neuron_activation.png", height: 30%)][#image("figures/lecture_3/heaviside.png", height: 30%)] #pause
 
   $ f(vec(#redm[$1$], x_(1), dots.v, x_(d_x)), vec(#redm[$theta_0$], theta_(1),  dots.v, theta_(d_x)) ) = sigma(#redm[$theta_0$] + sum_(j=1)^(d_x) theta_j x_j) = sigma(sum_(#redm[$j=0$])^(d_x) theta_j x_j) $ #pause
@@ -706,7 +683,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   $ overline(bold(x)) = vec(1, bold(x)), quad f(bold(x), bold(theta)) = sigma(bold(theta)^top overline(bold(x))) $
 ]
 
-#slide[
+#slide(title: [Artificial Neurons])[
   $ f(bold(x), bold(theta)) = sigma(bold(theta)^top overline(bold(x))) $ #pause
 
   This is the artificial neuron! #pause
@@ -722,7 +699,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   $ f(bold(x), bold(theta)) = theta_(d_x) x_(d_x) + theta_(d_x - 1) x_(d_x - 1) + dots + theta_0 1 $
 ]
 
-#slide[
+#slide(title: [Artificial Neurons])[
   We model a neuron using a linear model and activation function #pause
   #side-by-side(gutter: 4em)[#cimage("figures/lecture_3/neuron_anatomy.jpg", height: 40%)
   ][  
@@ -731,7 +708,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   $ f(bold(x), bold(theta)) = sigma(bold(theta)^top overline(bold(x))) $ 
 ]
 
-#slide[
+#slide(title: [Artificial Neurons])[
   $ f(bold(x), bold(theta)) = sigma(bold(theta)^top overline(bold(x))) $ #pause
 
   Sometimes, we will write $bold(theta)$ as a bias and weight $b, bold(w)$ #pause
@@ -744,7 +721,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 // 1:15
 #focus-slide[Relax]
 
-#slide[
+#slide(title: [Artificial Neurons])[
   #side-by-side[#cimage("figures/lecture_3/neuron.svg") #pause][
     #align(left)[
     
@@ -759,7 +736,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
    ]
 ]
 
-#slide[
+#slide(title: [Artificial Neurons])[
   #side-by-side[#cimage("figures/lecture_3/neuron.png")][
     #align(left)[
     
@@ -778,7 +755,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
    ]
 ]
 
-#slide[
+#slide(title: [Artificial Neurons])[
     Implement AND using an artificial neuron #pause
     
     $ f(mat(x_1, x_2)^top, mat(theta_0, theta_1, theta_2)^top) = sigma(theta_0 1 + theta_1 x_1 + theta_2 x_2) $ #pause
@@ -796,7 +773,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   ))
 ]
 
-#slide[
+#slide(title: [Artificial Neurons])[
     Implement OR using an artificial neuron #pause
     
     $ f(mat(x_1, x_2)^top, mat(theta_0, theta_1, theta_2)^top) = sigma(theta_0 1 + theta_1 x_1 + theta_2 x_2) $ #pause
@@ -817,7 +794,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
 // Approx 1:30
 
-#slide[
+#slide(title: [Artificial Neurons])[
     Implement XOR using an artificial neuron #pause
     
     $ f(mat(x_1, x_2)^top, mat(theta_0, theta_1, theta_2)^top) = sigma(theta_0 1 + theta_1 x_2 + theta_2 x_2) $ #pause
@@ -835,7 +812,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   ))
 ]
 
-#slide[
+#slide(title: [Artificial Neurons])[
   Why can't we represent XOR using a neuron? #pause
   
   $ f(mat(x_1, x_2)^top, mat(theta_0, theta_1, theta_2)^top) = sigma(1 theta_0 + x_1 theta_1 + x_2 theta_2) $ #pause
@@ -849,13 +826,13 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   Let us think back to biology, maybe it has an answer
 ]
 
-#slide[
+#slide(title: [Artificial Neurons])[
   *Brain:* Biological neurons $->$ Biological neural network #pause
 
   *Computer:* Artificial neurons $->$ Artificial neural network
 ]
 
-#slide[
+#slide(title: [Artificial Neurons])[
   Connect artificial neurons into a network
 
   #grid(
@@ -867,7 +844,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   )
 ]
 
-#slide[
+#slide(title: [Artificial Neurons])[
   #side-by-side[
      #cimage("figures/lecture_3/deep_network.png", width: 100%)
   ][
@@ -881,10 +858,10 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   ]
 ]
 
-#slide[#agenda(index: 5)]
-#slide[#agenda(index: 6)]
+#slide(title: [Agenda])[#agenda(index: 5)]
+#slide(title: [Agenda])[#agenda(index: 6)]
 
-#slide[
+#slide(title: [Wide Neural Networks])[
   How do we express a *wide* neural network mathematically? #pause
 
   A single neuron:
@@ -900,7 +877,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   $ Theta in bb(R)^((d_x + 1) times d_y) $
 ]
 
-#slide[
+#slide(title: [Wide Neural Networks])[
   For a single neuron:
   
   $ f(vec(x_1, dots.v, x_(d_x)), vec(theta_0,  theta_1, dots.v, theta_(d_x)) ) = sigma(sum_(i=0)^(d_x) theta_i overline(x)_i) $ #pause
@@ -933,7 +910,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide[#agenda(index: 6)]
 #slide[#agenda(index: 7)]
 
-#slide[
+#slide(title: [Deep Neural Networks])[
   How do we express a *deep* neural network mathematically? #pause
 
   A wide network and deep network have a similar function signature:
@@ -949,7 +926,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   $ bold(theta) = mat(bold(theta)_1, bold(theta)_2, dots, bold(theta)_ell)^top = mat(bold(phi), bold(psi), dots, bold(xi))^top $ 
 ]
 
-#slide[
+#slide(title: [Deep Neural Networks])[
   A wide network:
 
   $ f(bold(x), bold(theta)) = bold(theta)^top overline(bold(x)) $ #pause
@@ -968,7 +945,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   $ f(bold(x), bold(theta)) = f_(ell) (dots f_2(f_1(bold(x), bold(phi)), bold(psi)) dots bold(xi) ) $
 ]
 
-#slide[
+#slide(title: [Deep Neural Networks])[
   Written another way
 
   $ bold(z)_1 = f_1(bold(x), bold(phi)) = bold(phi)^top overline(bold(x)) $ #pause
@@ -1002,7 +979,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 */
 
 /*
-#slide[
+#slide(title: [Deep Neural Networks])[
   What functions can we represent using a deep neural network? #pause
 
   Consider a one-dimensional arbitrary function $g(x) = y$ #pause
@@ -1015,7 +992,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 ]
 */
 
-#slide[
+#slide(title: [Deep Neural Networks])[
   What functions can we represent using a deep neural network? #pause
 
   *Proof Sketch:* Approximate a continuous function $g: bb(R) |-> bb(R)$ using a linear combination of Heaviside functions #pause
@@ -1024,11 +1001,11 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
   #only((3,4))[#cimage("figures/lecture_3/function_approximation.svg", height: 50%)]
 
-  #only(4)[$exists (bold(theta) in bb(R)^(1 times d_h), bold(phi) in bb(R)^((d_h + 1) times d_1)) "such that" lim_((d_h + 1) |-> oo) [ bold(phi)^top sigma(overline(bold(theta)^top overline(x)))]$
+  #only(4)[$exists (bold(theta) in bb(R)^(1 times d_h), bold(phi) in bb(R)^((d_h + 1) times d_1)) "such that" lim_(d_h  |-> oo) [ bold(phi)^top sigma(overline(bold(theta)^top overline(x)))]$
   ] 
 ]
 
-#slide[
+#slide(title: [Deep Neural Networks])[
   A deep neural network is a *universal function approximator* #pause
 
   It can approximate *any* continuous function $g(x)$ to precision $epsilon$ #pause
@@ -1043,11 +1020,11 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 ]
 
 
-#slide[#agenda(index: 7)]
-#slide[#agenda(index: 8)]
+#slide(title: [Agenda])[#agenda(index: 7)]
+#slide(title: [Agenda])[#agenda(index: 8)]
 
 
-#slide[
+#slide(title: [Practical Considerations])[
   We call wide neural networks *perceptrons* #pause
 
   We call deep neural networks *multi-layer perceptrons* (MLP) #pause
@@ -1055,7 +1032,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   #cimage("figures/lecture_3/timeline.svg", width: 85%)
 ]
 
-#slide[
+#slide(title: [Practical Considerations])[
   *All* the models we examine in this course will use MLPs #pause
     - Recurrent neural networks #pause
     - Graph neural networks #pause
@@ -1067,7 +1044,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   I will explain them again very simply 
 ]
 
-#slide[
+#slide(title: [Practical Considerations])[
   A *layer* is a linear operation and an activation function
 
   $ f(bold(x), vec(bold(b), bold(W))) = sigma(bold(b) + bold(W)^top bold(x)) $
@@ -1081,8 +1058,38 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 ]
 
 
-#slide[
+#slide(title: [Practical Considerations])[
   Let us create a wide neural network in colab! https://colab.research.google.com/drive/1bLtf3QY-yROIif_EoQSU1WS7svd0q8j7?usp=sharing
+]
+
+#slide(title: [Practical Considerations])[
+  #side-by-side(align: left + top)[
+    Linear regression: #pause
+
+    $+$ Analytical solution #pause
+
+    $+$ Low data requirement #pause
+
+    $-$ Poor scalability #pause
+
+    $-$ Poor polynomials generalization #pause
+  ][
+  Neural networks: #pause
+
+    $-$ No analytical solution #pause
+
+    $-$ High data requirement #pause
+
+    $+$ Scale to large inputs #pause
+
+    $+$ Slightly better generalization #pause
+
+
+  ]
+
+  Next time, we will find out how to train our neural network #pause
+
+  Unlike linear regression, finding $theta$ is much more difficult for neural networks
 ]
 
 
