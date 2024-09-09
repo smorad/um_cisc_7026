@@ -14,6 +14,7 @@
 
 
 // TODO: Deeper neural networks are more efficient
+// FUTURE TODO: Do not do theta_0 + sum, instead add one to x vector: [1, x_1, x_2, dots] to line up with linear regression
 // FUTURE TODO: Should not waste m/n in linear regression, use c for count and d_x, d_y
 // TODO: Fix nn image indices
 // TODO: Implement XOR is transposed
@@ -81,11 +82,13 @@
 #slide(title: [Notation Change])[
   *Notation change:* Previously $x_i, y_i$ referred to data $i$ #pause
 
-  From now on, we will write $x_[i]$ to refer to data $i$ #pause
+  Moving forward, I will differentiate between *data* indices $x_[i]$ and other indices $x_i$ #pause
 
-  $x_i$ will refer to element $i$ of a vector $bold(x)$ or matrix $bold(X)$ #pause
+  $ bold(X)_D = vec(bold(x)_[1], dots.v, bold(x)_[n]) = mat(x_([1], 1), x_([1], 2), dots; dots.v, dots.v, dots.v; x_([n], 1), x_([n], 2), dots) $ #pause
 
-  $ bold(x) = vec(x_1, x_2, dots.v), quad bold(X) = mat(x_(1,1), dots, x_(1, n); dots.v, dots.down, dots.v; x_(m, 1), dots, x_(m, n)) $
+
+  $ bold(x) = vec(x_1, x_2, dots.v), quad bold(X) = mat(x_(1,1), dots, x_(1, n); dots.v, dots.down, dots.v; x_(m, 1), dots, x_(m, n)) $ 
+
   
 ]
 
@@ -224,13 +227,13 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
   $ f: X times Theta |-> bb(R) $ #pause
 
-  $ Theta in bb(R)^2 => Theta in bb(R)^m $ 
+  $ Theta in bb(R)^2 => Theta in bb(R)^(m+1) $ 
 ]
 
 #slide(title: [Review])[
   Finally, we discussed overfitting #pause
 
-  $ f(x, bold(theta)) = theta_n x^m + theta_(m - 1) x^(m - 1), dots, theta_1 + x^1 + theta_0 $ #pause
+  $ f(x, bold(theta)) = theta_m x^m + theta_(m - 1) x^(m - 1), dots, theta_1 x^1 + theta_0 $ #pause
 
   #grid(
     columns: 3,
@@ -363,6 +366,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 ]
 
 #slide[
+  /*
   $ 
   bold(X)_D = mat(
     x_([1],d_x)^m, dots, x_([1],1)^m, dots, x_([1], d_x)^(m-1), dots, x_([1], 1)^(m-1), dots, dots,  1;
@@ -372,18 +376,31 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
     dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v, dots.v;
   )
   $ #pause
+  */
+
+  $ bold(X)_D = mat(bold(x)_(D, [1]), dots, bold(x)_(D, [n]))^top $ #pause
+
+  $ &bold(x)_(D, [i]) = \ &mat(
+    underbrace(x_([i], d_x)^m x_([i], d_x - 1)^m dots x_([i], 1)^m, (d_x => 1, x^m)),
+    underbrace(x_([i], d_x)^m x_([i], d_x - 1)^m dots x_([i], 2)^m, (d_x => 2, x^m)),
+    dots,
+    underbrace(x_([i], d_x)^(m-1) x_([i], d_x - 1)^(m-1) dots x_([i], 1)^m, (d_x => 1, x^(m-1))),
+    dots,
+  )
+  $
 
 
-  *Question:* How many rows in this matrix? #pause
+  *Question:* How many columns in this matrix? #pause
 
   *Hint:* $d_x = 2, m = 3$: $x^3 + y^3 + x^2 y + y^2 x + x y + x + y + 1$ #pause
 
-  *Answer:* $(d_x)^m + 1 = 65536^20 + 1 approx 10^96$
+  *Answer:* $(d_x)^m = 65536^20 + 1 approx 10^96$
 
   //*Question:* What is the size of $bold(X)_D^top bold(X)_D$
 ]
 
 #slide[
+  /*
   To find $bold(theta)$, we must invert $bold(X)^top_D bold(X)_D$ #pause
 
   $bold(X)^top_D bold(X)_D: 10^96 times 10^96$ #pause
@@ -391,6 +408,15 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   *Question:* What is the largest matrix ever inverted? #pause
 
   *Answer:* $10^6 times 10^6$ #pause
+  */
+
+  How big is $10^96$? #pause
+
+  *Question:* How many atoms are there in the universe? #pause
+
+  *Answer:* $10^82$ #pause
+
+  There is not enough matter in the universe to represent one row #pause
 
   #side-by-side[We cannot predict how many #text(fill: color.red)[#sym.suit.heart] the picture will get][#cimage("figures/lecture_1/dog.png", height: 30%)] #pause
 
@@ -412,7 +438,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide[
   What happens to polynomials outside of the support (dataset)? #pause
 
-  We will evaluate polynomials in the limit #pause
+  Take the limit of polynomials to see their behavior #pause
 
   #side-by-side[$ lim_(x -> oo) theta_m x^m + theta_(m-1) x^(m-1) + dots $][Equation of a polynomial] #pause
 
@@ -581,7 +607,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
   #side-by-side[Incoming impulses (via dendrites) change the electric potential of the neuron][  #cimage("figures/lecture_3/bio_neuron_activation.png", height: 50%)] #pause
 
-  Recall that in a parallel circuit, we can sum voltages together #pause
+  In a parallel circuit, we can sum voltages together #pause
 
   Many active dendrites will add together and trigger an impulse
   
@@ -656,7 +682,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
     ]
     #only((9, 10))[
       
-      $ sigma(x) = #image("figures/lecture_3/heaviside.png", height: 30%) $
+      $ sigma(x)= H(x) = #image("figures/lecture_3/heaviside.png", height: 30%) $
     ]
     #only(10)[
       $ f(vec(x_(1), dots.v, x_(n)), vec(theta_(1),  dots.v, theta_(n)) ) = #redm[$sigma$] (sum_(j=1)^(d_x) theta_j x_(j) ) $
@@ -715,7 +741,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   #side-by-side[#cimage("figures/lecture_3/neuron.svg") #pause][
     #align(left)[
     
-      Recall that in machine learning we deal with functions #pause
+      In machine learning, we represent functions #pause
      
       What kinds of functions can our neuron represent? #pause
 
@@ -730,12 +756,12 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   #side-by-side[#cimage("figures/lecture_3/neuron.png")][
     #align(left)[
     
-      Recall the activation function (Heaviside step) #pause
+      *Review:* Activation function (Heaviside step function) #pause
 
       #cimage("figures/lecture_3/heaviside.png", height: 50%)
 
       $
-        sigma(x) = cases(
+        sigma(x) = H(x) = cases(
           1 "if" x > 0,
           0 "if" x <= 0
         )
@@ -780,6 +806,9 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
       $1$, $1$, $1$, $sigma(1 + 1 dot 1 + 1 dot 1) = sigma(2)$, $1$
   ))
 ]
+
+
+// Approx 1:30
 
 #slide[
     Implement XOR using an artificial neuron #pause
@@ -1045,6 +1074,8 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 ]
 
 
+#slide[#agenda(index: none)]
+
 /*
 #slide[
 
@@ -1109,8 +1140,6 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
     The output of the neuron depends on the activation function $sigma$
   ]
 ]
-
-
 
 #slide[
   #side-by-side[#cimage("figures/neuron.png") #pause][
