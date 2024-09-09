@@ -584,12 +584,19 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
 #slide[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
-  The axon terminals will connect to dendrites of other neurons
+  The axon terminals will connect to dendrites of other neurons through a synapse
+]
+
+#slide[
+  #cimage("figures/lecture_3/synapse.png", height: 60%)
+  The synapse converts electrical signal, to chemical signal, back to electrical signal #pause
+
+  Synaptic weight determines how well a signal crosses the gap
 ]
 
 #slide[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
-  For our purposes, we can consider the axon terminals  and dendrites to be the same thing
+  For our purposes, we can model the axon terminals, dendrites, and synapses to be one thing
 ]
 
 #slide[
@@ -637,7 +644,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
   *Answer*:
 
-  $ f: underbrace(bb(R)^(d_x), "Dendrite voltages") times underbrace(bb(R)^(d_x), "Dendrite size") |-> underbrace(bb(R), "Axon voltage") $
+  $ f: underbrace(bb(R)^(d_x), "Dendrite voltages") times underbrace(bb(R)^(d_x), "Synaptic weight") |-> underbrace(bb(R), "Axon voltage") $
 ]
 
 #slide[
@@ -645,7 +652,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
   #side-by-side[#cimage("figures/lecture_3/neuron_anatomy.jpg")][
     #only((2,3))[
-      Neuron has a structure of dendrites
+      Neuron has a structure of dendrites with synaptic weights
 
     ]
     #only(3)[
