@@ -1083,8 +1083,6 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
     $+$ Scale to large inputs #pause
 
     $+$ Slightly better generalization #pause
-
-
   ]
 
   Next time, we will find out how to train our neural network #pause
@@ -1092,8 +1090,19 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   Unlike linear regression, finding $theta$ is much more difficult for neural networks
 ]
 
-
 #slide[#agenda(index: none)]
+
+#slide(title: [Conclusion])[
+  There might be a quiz next time #pause
+
+  Always bring paper and a pen #pause
+
+  You should be able to write a neural network layer mathematically #pause
+
+  You should also know the shapes of $bold(theta), bold(x), overline(bold(x)), bold(y)$
+]
+
+
 
 /*
 #slide[
