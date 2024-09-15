@@ -49,36 +49,6 @@
   //logo: image("logo.jpg", width: 25%)
 )
 
-/*
-#slide()[
-  + We looked at linear and polynomial $f$
-    + Looked at both classification and regression
-    + They have problems
-      + Input features scale poorly
-      + Bad performance around edges
-    + Neural networks fix many of these problems
-    + What is a neural network?
-      + Draw linear model as neural network
-    + Based on theory of the brain
-        + Invented ages ago
-        + Only recently have we learned to harness them
-    + Neuron theory
-      + Connectivity
-      + Activation function
-    + Parallels between real/artificial neuron
-    + Matrix/graph duality
-    + Single layer perceptron
-    + Issues with one layer
-      + Not universal function approximator
-    + Backprops
-      + Provides a way to train nn
-        + Assigns "fault" for each neuron
-      + Recall closed form for linear model
-        + We use the gradient of the linear model
-      + We use a similar approach
-]
-*/
-
 #slide(title: [Notation Change])[
   *Notation change:* Previously $x_i, y_i$ referred to data $i$ #pause
 
@@ -88,8 +58,6 @@
 
 
   $ bold(x) = vec(x_1, x_2, dots.v), quad bold(X) = mat(x_(1,1), dots, x_(1, n); dots.v, dots.down, dots.v; x_(m, 1), dots, x_(m, n)) $ 
-
-  
 ]
 
 #let agenda(index: none) = {
@@ -530,7 +498,6 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide(title: [Biological Neurons])[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   A simplified neuron consists of many parts 
-
 ]
 
 // 47:00 fast
@@ -542,11 +509,6 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide(title: [Biological Neurons])[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   Incoming electrical signals travel along dendrites
-]
-
-#slide(title: [Biological Neurons])[
-  #cimage("figures/lecture_3/neuron_anatomy.jpg") 
-  Dendrites are not all equal! Different dendrites have different diameters and structures
 ]
 
 #slide(title: [Biological Neurons])[
@@ -852,9 +814,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   
     Adding neurons in *series* creates a *deep* neural network #pause
 
-    Today's powerful neural networks are both *wide* and *deep* #pause
-
-    Let us try to implement XOR using a wide and deep neural network
+    Today's powerful neural networks are both *wide* and *deep*
   ]
 ]
 
@@ -929,17 +889,17 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide(title: [Deep Neural Networks])[
   A wide network:
 
-  $ f(bold(x), bold(theta)) = bold(theta)^top overline(bold(x)) $ #pause
+  $ f(bold(x), bold(theta)) = sigma(bold(theta)^top overline(bold(x))) $ #pause
 
   A deep network has many internal functions
 
-    $ f_1(bold(x), bold(phi)) = bold(phi)^top overline(bold(x)) quad
+    $ f_1(bold(x), bold(phi)) = sigma(bold(phi)^top overline(bold(x))) quad
 
-    f_2(bold(x), bold(psi)) = bold(psi)^top overline(bold(x)) quad
+    f_2(bold(x), bold(psi)) = sigma(bold(psi)^top overline(bold(x))) quad
 
     dots quad
 
-    f_(ell)(bold(x), bold(xi)) = bold(xi)^top overline(bold(x)) $ #pause
+    f_(ell)(bold(x), bold(xi)) = sigma(bold(xi)^top overline(bold(x))) $ #pause
 
 
   $ f(bold(x), bold(theta)) = f_(ell) (dots f_2(f_1(bold(x), bold(phi)), bold(psi)) dots bold(xi) ) $
@@ -948,10 +908,10 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 #slide(title: [Deep Neural Networks])[
   Written another way
 
-  $ bold(z)_1 = f_1(bold(x), bold(phi)) = bold(phi)^top overline(bold(x)) $ #pause
-  $ bold(z)_2 = f_2(bold(z_1), bold(psi)) = bold(psi)^top overline(bold(z))_1 $ #pause
+  $ bold(z)_1 = f_1(bold(x), bold(phi)) = sigma(bold(phi)^top overline(bold(x))) $ #pause
+  $ bold(z)_2 = f_2(bold(z_1), bold(psi)) = sigma(bold(psi)^top overline(bold(z))_1) $ #pause
   $ dots.v $ #pause
-  $ bold(y) = f_(ell)(bold(x), bold(xi)) = bold(xi)^top overline(bold(z))_(ell - 1) $
+  $ bold(y) = f_(ell)(bold(x), bold(xi)) = sigma(bold(xi)^top overline(bold(z))_(ell - 1)) $
 
   We call each function a *layer* #pause
 

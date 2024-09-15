@@ -4,6 +4,7 @@
 #import "common.typ": *
 
 
+// FUTURE TODO: Introduce function notation
 #show: university-theme.with(
   aspect-ratio: "16-9",
   short-title: "CISC 7026: Introduction to Deep Learning",

@@ -35,7 +35,9 @@
   ]
 }
 
-#let red(x) = text(fill: red)[x]
+#let redm(x) = {
+  text(fill: color.red, $#x$)
+}
 
 /*
 #let sections-state = state("polylux-sections", ())
