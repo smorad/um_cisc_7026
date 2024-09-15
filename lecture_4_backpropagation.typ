@@ -5,7 +5,7 @@
 #import "@preview/algorithmic:0.1.0"
 #import algorithmic: algorithm
 
-// TODO: Grad should be elementwise in backprop
+// TODO: Should talk about forward/backward pass
 
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
@@ -20,7 +20,6 @@
     [Backpropagation],
     [Layer gradient],
     [Full gradient],
-    [Autograd],
     [Practical considerations]
   )
   for i in range(ag.len()){
@@ -842,7 +841,7 @@
 
       For(cond: $i in 1 dots t$, {
         Cmt[Compute the gradient of the loss]        
-        Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(x), bold(y), bold(theta))$]
+        Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$]
         Cmt[Update the parameters using the negative gradient]
         Assign[$bold(theta)$][$bold(theta) - alpha bold(J)$]
       })
@@ -880,7 +879,17 @@
 
   We propagate errors from the loss function *backward* through each layer of the neural network #pause
 
-  Let us propagate errors through a deep neural network
+
+  //Let us propagate errors through a deep neural network
+]
+
+#slide[
+  Forward propagation 
+  #cimage("figures/lecture_4/forward.svg", height: 80%)
+]
+#slide[
+  Backward propagation
+  #cimage("figures/lecture_4/backward.svg", height: 80%)
 ]
 
 #slide[
@@ -914,11 +923,11 @@
 #slide[
   $ gradient_(bold(theta)) f(bold(x), bold(theta)) = (partial sigma) / (partial bold(theta))  (bold(theta)^top overline(bold(x))) gradient_(bold(theta)) (bold(theta)^top overline(bold(x))) $ 
 
-  $ "What is " (partial sigma) / (partial x)(z) "?" $ #pause
+  $ "What is " (partial sigma) / (partial z)(z) "?" $ #pause
 
-  #cimage("figures/lecture_4/heaviside.svg")
+  #cimage("figures/lecture_4/heaviside.svg") #pause
 
-  Derivative is zero everywhere and infinity at $x=0$, so the derivative for a layer is either infinity or zero #pause
+  Derivative is zero everywhere and infinity at $x=0$, so the derivative for a layer is either infinity or zero 
 ]
 
 #slide[
@@ -1044,15 +1053,15 @@
 
   //Use the sum rule $d / (d x) (f(x) + g(x)) = f'(x) + g'(x)$
 
-  $ gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i = 1)^n gradient_bold(theta) ( f(bold(x)_[i], bold(theta)) - bold(y)_[i]^2 ) $ #pause
+  $ gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i = 1)^n gradient_bold(theta) ( f(bold(x)_[i], bold(theta)) - bold(y)_[i] )^2 $ #pause
 
-  $ gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i = 1)^n ( f(bold(x)_[i], bold(theta)) - bold(y)_[i]) gradient_bold(theta) f(bold(x)_[i], bold(theta)) $ #pause
+  $ gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i = 1)^n 2 ( f(bold(x)_[i], bold(theta)) - bold(y)_[i]) gradient_bold(theta) f(bold(x)_[i], bold(theta)) $ 
 ]
 
 #slide[
   To summarize: #pause
 
-  $ gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i = 1)^n ( f(bold(x)_[i], bold(theta)) - bold(y)_[i]) #redm[$gradient_bold(theta) f(bold(x)_[i], bold(theta))$] 
+  $ gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i = 1)^n 2 ( f(bold(x)_[i], bold(theta)) - bold(y)_[i]) #redm[$gradient_bold(theta) f(bold(x)_[i], bold(theta))$] 
   $ #pause
    
 
@@ -1078,25 +1087,76 @@
 
       For(cond: $i in 1 dots t$, {
         Cmt[Compute the gradient of the loss]        
-        Assign[$bold(J)$][$partial cal(L)(bold(X), bold(Y), bold(theta)) "/ " partial bold(theta)$]
+        Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$]
         Cmt[Update the parameters using the negative gradient]
         Assign[$bold(theta)$][$bold(theta) - alpha bold(J)$]
       })
-  })
+    }) #pause
+
+    $ bold(theta)_(t + 1) = bold(theta)_t - alpha gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)_t) $ 
 ]
 
+#slide(title: [Agenda])[
+  #agenda(index: 8)
+]
+#slide(title: [Agenda])[
+  #agenda(index: 9)
+]
+
+#slide[
+  How do gradients work in `jax` or `torch`? #pause
+
+  The libraries automatically compute gradients, using *autograd* #pause
+
+  Hard working engineers derived gradients for hundreds of functions #pause
+
+  We can combine the gradients of different functions together using the chain rule #pause
+
+  If you do research, you might have to derive your own analytical gradients like we did today
+]
+
+#slide[
+
+  ```python
+  import jax
+
+  def L(X, Y, theta): 
+    ...
+
+  # Returns a new function that is the gradient of L
+  gradient_L = jax.grad(L, argnums=2)
+  # Evaluate the gradient with our dataset
+  grads = gradient_L(X, Y, theta)
+  # Update parameters
+  alpha = 0.0001
+  theta = theta - alpha * grads
+  ```
+]
+
+#slide[
+  ```python
+  import torch
+  optimizer = torch.optim.SGD(lr=0.0001)
+
+  def L(X, Y, model):
+    ...
+  # Pytorch will construct a graph of all operations
+  loss = L(X, Y, model) # compute gradient
+  # Backward will traverse the graph and compute the full gradient
+  loss.backward()
+  optimizer.step() # Update the parameters
+  optimizer.zero_grad() # Always remember to do this
+
+  ```
+]
+
+/*
 #slide[
   Now that we have the gradient, we can do gradient descent #pause
 
   How do we actually compute this in `torch` or `jax`?
 ]
 
-#slide(title: [Agenda])[
-  #agenda(index: 7)
-]
-#slide(title: [Agenda])[
-  #agenda(index: 8)
-]
 
 #slide[
   Both `jax` and `torch` compute gradients using
@@ -1504,3 +1564,4 @@
   Instead, we use stochastic gradient descent or minibatch gradient descent #pause
 ]
 
+*/
