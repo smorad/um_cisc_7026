@@ -5,7 +5,9 @@
 #import "@preview/algorithmic:0.1.0"
 #import algorithmic: algorithm
 
-// TODO: Should talk about forward/backward pass
+// TODO: Should talk more about forward/backward pass
+// TODO: Add break
+// TODO: Use different brackets for gradient_theta (f(theta)) to differentiate between products and input/arguments to grad function
 
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
@@ -476,7 +478,7 @@
 ]
 
 #slide[
-  #side-by-side(align: left + horizon)[Sum/Difference][$ d / (d x) (f(x) + g(x)) = f'(x) + g'(x) $] #pause
+  #side-by-side(align: left + horizon)[Sum/Difference][$ d / (d x) [f(x) + g(x)] = f'(x) + g'(x) $] #pause
 
   #side-by-side(align: left + horizon)[Product][$ d / (d x) [f(x) g(x)] = f'(x) g(x) + g'(x) f(x) $] #pause
 
@@ -491,11 +493,11 @@
 
   We can write the derivative as
 
-  $ d / (d x) (f(x)) = 2x - 3  $ #pause
+  $ d / (d x) [f(x)] = 2x - 3  $ #pause
 
   We can evaluate the derivative at specific points #pause
 
-  $ (d / (d x)f) (1) = 2 dot 1 - 3 = -1 $
+  $ d / (d x) [f] (1) = 2 dot 1 - 3 = -1 $
 ]
 
 #slide[
@@ -531,7 +533,7 @@
   ) = vec(
     2 x_1 - 3 x_2,
     -3 x_1
-  ) $ #pause
+  ) $ 
 ]
 
 #slide[
@@ -712,6 +714,8 @@
   underbrace((sigma(theta_0 + theta_1 x) - y), "Nonlinear function of" theta) $
 ]
 
+// 70:00
+
 #slide[
   #side-by-side[Linear regression loss function was quadratic with one minima][#cimage("figures/lecture_4/quadratic_parameter_space.png", height: 35%)] #pause
 
@@ -745,7 +749,7 @@
 
   Neural network: no analytical solution for $bold(theta)$ #pause
 
-  So how do to find $bold(theta)$ for a neural network?
+  So how to find $bold(theta)$ for a neural network?
 ]
 
 #slide[
@@ -829,12 +833,12 @@
 ]
 
 #slide[
-  The gradient descent algorithm is as follows:
+  The gradient descent algorithm:
 
   #algorithm({
     import algorithmic: *
 
-    Function("Gradient Descent", args: ($bold(x)$, $bold(y)$, $cal(L)$, $t$, $alpha$), {
+    Function("Gradient Descent", args: ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$), {
 
       Cmt[Randomly initialize parameters]
       Assign[$bold(theta)$][$cal(N)(0, 1)$] 
@@ -850,6 +854,7 @@
     })
   })
 ]
+// 84:00
 
 #slide[
   #cimage("figures/lecture_4/parameter_space.png", height: 100%)
@@ -866,10 +871,10 @@
 ]
 
 #slide(title: [Agenda])[
-  #agenda(index: 4)
+  #agenda(index: 5)
 ]
 #slide(title: [Agenda])[
-  #agenda(index: 5)
+  #agenda(index: 6)
 ]
 
 #slide[
@@ -878,6 +883,8 @@
   We call this process *backpropagation* #pause
 
   We propagate errors from the loss function *backward* through each layer of the neural network #pause
+
+  #cimage("figures/lecture_1/optimizer_nn.png")
 
 
   //Let us propagate errors through a deep neural network
@@ -895,9 +902,11 @@
 #slide[
   Finding the gradient is necessary to use gradient descent! #pause
 
-  We will use the gradient of layers to find the gradient of a deep neural network #pause
+  First, we will find the gradient of a neural network layer #pause
 
-  First, let us compute the gradient of a neural network layer
+  Then, we will find the gradient of a deep neural network #pause
+
+  Finally, we will find the gradient of the loss function
 ]
 
 #slide(title: [Agenda])[
@@ -915,15 +924,15 @@
   Take the gradient of both sides 
   $ gradient_bold(theta) f(bold(x), bold(theta)) = gradient_bold(theta) sigma( bold(theta)^top overline(bold(x)) ) $ #pause
 
-  $ "Chain: " d / (d x) f(g(x)) = f'(g(x)) g'(x) $ #pause
+  $ "Chain: " d / (d x) f(g(x)) = f'(g(x)) dot g'(x) $ #pause
 
-  $ gradient_(bold(theta)) f(bold(x), bold(theta)) = (partial sigma) / (partial bold(theta))  (bold(theta)^top overline(bold(x))) dot gradient_(bold(theta)) (bold(theta)^top overline(bold(x))) $ 
+  $ gradient_(bold(theta)) f(bold(x), bold(theta)) = gradient_bold(theta) [sigma] (bold(theta)^top overline(bold(x))) dot gradient_(bold(theta)) (bold(theta)^top overline(bold(x))) $ 
 ]
 
 #slide[
-  $ gradient_(bold(theta)) f(bold(x), bold(theta)) = (partial sigma) / (partial bold(theta))  (bold(theta)^top overline(bold(x))) gradient_(bold(theta)) (bold(theta)^top overline(bold(x))) $ 
+  $ gradient_(bold(theta)) f(bold(x), bold(theta)) = gradient_bold(theta) [sigma] (bold(theta)^top overline(bold(x))) dot gradient_(bold(theta)) (bold(theta)^top overline(bold(x))) $ 
 
-  $ "What is " (partial sigma) / (partial z)(z) "?" $ #pause
+  $ "What is " gradient_bold(theta) sigma "?" $ #pause
 
   #cimage("figures/lecture_4/heaviside.svg") #pause
 
@@ -949,25 +958,29 @@
 
   $ d / (d z) sigma(z) = sigma(z) dot (1 - sigma(z)) $ #pause
 
-  $ partial / (partial bold(z)) sigma(bold(z)) = sigma(bold(z)) dot.circle (1 - sigma(bold(z))) $ #pause
+  $ gradient_bold(z) sigma(bold(z)) = sigma(bold(z)) dot.circle (1 - sigma(bold(z))) $ 
 ]
+
+// 97:00
 
 #slide[
   Back to our layer #pause
 
-  $ gradient_(bold(theta)) f(bold(x), bold(theta)) = (partial sigma) / (partial bold(theta))  (bold(theta)^top overline(bold(x))) gradient_(bold(theta)) (bold(theta)^top overline(bold(x))) $ #pause
+  $ gradient_(bold(theta)) f(bold(x), bold(theta)) = gradient_bold(theta) [sigma] (bold(theta)^top overline(bold(x))) dot gradient_(bold(theta)) (bold(theta)^top overline(bold(x))) $ #pause
 
-  Plug in the derivative of our new activation function #pause
+  Plug in the gradient of our new activation function 
+  
+  $ gradient_bold(z) sigma(bold(z)) = sigma(bold(z)) dot.circle (1 - sigma(bold(z))) $ #pause
 
-  $ gradient_(bold(theta)) f(bold(x), bold(theta)) = (sigma(bold(theta)^top overline(bold(x))) dot.circle (1 - sigma(bold(theta)^top overline(bold(x))))) (bold(theta)^top overline(bold(x))) gradient_(bold(theta)) (bold(theta)^top overline(bold(x))) $ 
+  $ gradient_(bold(theta)) f(bold(x), bold(theta)) = (sigma(bold(theta)^top overline(bold(x))) dot.circle (1 - sigma(bold(theta)^top overline(bold(x))))) gradient_(bold(theta)) (bold(theta)^top overline(bold(x))) $ #pause
 
   Evalute the final term #pause
 
-  $ gradient_(bold(theta)) f(bold(x), bold(theta)) = (sigma(bold(theta)^top overline(bold(x))) dot.circle (1 - sigma(bold(theta)^top overline(bold(x))))) (bold(theta)^top overline(bold(x))) overline(bold(x))^top $ 
+  $ gradient_(bold(theta)) f(bold(x), bold(theta)) = (sigma(bold(theta)^top overline(bold(x))) dot.circle (1 - sigma(bold(theta)^top overline(bold(x))))) overline(bold(x))^top $ 
 ]
 
 #slide[
-  $ gradient_(bold(theta)) f(bold(x), bold(theta)) = (sigma(bold(theta)^top overline(bold(x))) dot.circle (1 - sigma(bold(theta)^top overline(bold(x))))) (bold(theta)^top overline(bold(x))) overline(bold(x))^top $ #pause
+  $ gradient_(bold(theta)) f(bold(x), bold(theta)) = (sigma(bold(theta)^top overline(bold(x))) dot.circle (1 - sigma(bold(theta)^top overline(bold(x))))) overline(bold(x))^top $ #pause
 
   This is the gradient for the layer of a neural network! #pause
 
@@ -1035,7 +1048,7 @@
 
   Where each layer gradient is 
 
-  $ gradient_(bold(xi)) f_ell (bold(z)_(ell - 1), bold(xi)) = (sigma(bold(xi)^top overline(bold(z))_(ell - 1)) dot.circle (1 - sigma(bold(xi)^top overline(bold(z))_(ell - 1)))) (bold(xi)^top overline(bold(z))_(ell - 1)) overline(bold(z))_(ell - 1)^top $ 
+  $ gradient_(bold(xi)) f_ell (bold(z)_(ell - 1), bold(xi)) = (sigma(bold(xi)^top overline(bold(z))_(ell - 1)) dot.circle (1 - sigma(bold(xi)^top overline(bold(z))_(ell - 1)))) overline(bold(z))_(ell - 1)^top $ 
 ]
 
 #slide[
@@ -1074,11 +1087,11 @@
   ) 
   $ #pause
 
-  $ #redm[$gradient_(bold(xi)) f_ell (bold(z)_(ell - 1), bold(xi))$] = (sigma(bold(xi)^top overline(bold(z))_(ell - 1)) dot.circle (1 - sigma(bold(xi)^top overline(bold(z))_(ell - 1)))) (bold(xi)^top overline(bold(z))_(ell - 1)) overline(bold(z))_(ell - 1)^top $ 
+  $ #redm[$gradient_(bold(xi)) f_ell (bold(z)_(ell - 1), bold(xi))$] = (sigma(bold(xi)^top overline(bold(z))_(ell - 1)) dot.circle (1 - sigma(bold(xi)^top overline(bold(z))_(ell - 1)))) overline(bold(z))_(ell - 1)^top $ 
 ]
 
 #slide[
-  *Question:* Why did we spend all this time computing gradients? #pause
+  *Question:* Why did we spend all this time deriving gradients? #pause
 
   *Answer:* The gradient is necessary for gradient descent #pause
 
@@ -1106,13 +1119,18 @@
 #slide[
   How do gradients work in `jax` or `torch`? #pause
 
-  The libraries automatically compute gradients, using *autograd* #pause
+  The libraries compute the gradients using *autograd* #pause
 
-  Hard working engineers derived gradients for hundreds of functions #pause
 
-  We can combine the gradients of different functions together using the chain rule #pause
+  Autograd differentiates nested functions using the chain rule #pause
 
-  If you do research, you might have to derive your own analytical gradients like we did today
+  $ gradient_bold(theta) f(g(h(x, bold(theta)))) = f'(g(h(x, bold(theta)))) dot g'(h(x, bold(theta))) dot h'(x, bold(theta)) $ #pause
+
+  Engineers derived gradients for hundreds of functions $f, g, h, dots$ #pause
+
+  Researchers derive their own analytical gradients like we did today #pause
+
+  Now, let us look at `jax` and `torch` optimization code
 ]
 
 #slide[
@@ -1120,16 +1138,16 @@
   ```python
   import jax
 
-  def L(X, Y, theta): 
+  def L(X, Y, theta):
     ...
 
   # Returns a new function that is the gradient of L
   gradient_L = jax.grad(L, argnums=2)
   # Evaluate the gradient with our dataset
-  grads = gradient_L(X, Y, theta)
+  J = gradient_L(X, Y, theta)
   # Update parameters
   alpha = 0.0001
-  theta = theta - alpha * grads
+  theta = theta - alpha * J
   ```
 ]
 
@@ -1140,14 +1158,19 @@
 
   def L(X, Y, model):
     ...
-  # Pytorch will construct a graph of all operations
+  # Pytorch will record a graph of all operations
   loss = L(X, Y, model) # compute gradient
-  # Backward will traverse the graph and compute the full gradient
+  # Traverse the graph and compute the full gradient
   loss.backward()
   optimizer.step() # Update the parameters
   optimizer.zero_grad() # Always remember to do this
-
   ```
+]
+
+#slide[
+  Time for some interactive coding
+
+  https://colab.research.google.com/drive/1W8WVZ8n_9yJCcOqkPVURp_wJUx3EQc5w
 ]
 
 /*
@@ -1336,7 +1359,7 @@
     partial / (partial theta_0) (sigma( theta_0 + theta_1 x ) - y )^2,
     partial / (partial theta_1) (sigma( theta_0 + theta_1 x ) - y )^2
   ) $
-]gg/rew
+]
 
 #slide[
   $ cal(L)(x, y, bold(theta)) = vec(partial  / (partial theta_0) cal(L) (x, y, bold(theta)), partial / (partial theta_1) cal(L) (x, y, bold(theta))) = vec(
