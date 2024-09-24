@@ -1,6 +1,6 @@
 #import "@preview/polylux:0.3.1": *
 #import themes.university: *
-#import "@preview/cetz:0.2.2": canvas, draw
+#import "@preview/cetz:0.2.2": canvas, draw, plot
 
 #set text(size: 25pt)
 #set math.vec(delim: "[")
@@ -51,3 +51,36 @@
   ))
 })
 */
+
+// Plots
+#let relu = { 
+    set text(size: 25pt)
+    canvas(length: 1cm, {
+  plot.plot(size: (8, 6),
+    x-tick-step: 2.5,
+    //y-tick-step: 1,
+    y-tick-step: none,
+    y-ticks: (1, 3, 5),
+    y-min: 0,
+    y-max: 5,
+    {
+      plot.add(
+        domain: (-5, 5), 
+        style: (stroke: (thickness: 5pt, paint: red)),
+        label: $ sigma(x) $,
+        line: (type: "linear"),
+        x => calc.max(0, x)
+      )
+      plot.add(
+        domain: (-5, 0), 
+        style: (stroke: (thickness: 3pt, paint: blue)),
+        x => 0,
+      )
+      plot.add(
+        domain: (0, 5), 
+        style: (stroke: (thickness: 3pt, paint: blue)),
+        label: $ gradient sigma(x)$,
+        x => 1,
+      )
+    })
+})}
