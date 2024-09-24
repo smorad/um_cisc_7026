@@ -15,9 +15,10 @@
     [Deeper neural networks],
     [Activation functions],
     [Parameter initialization],
-    [Regularization],
-    [Residual networks],
-    [Adaptive optimization],
+    //[Regularization],
+    //[Residual networks],
+    [Batch optimization],
+    [Modern optimization],
     [Coding]
   )
   for i in range(ag.len()){
@@ -291,6 +292,43 @@
     ]
 ]
 
+#slide(title: [Deeper Neural Networks])[
+    ```python
+    import torch
+    d_x, d_y, d_h = 1, 1, 256
+    net = torch.nn.Sequential([
+        torch.nn.Linear(d_x, d_h),
+        torch.nn.Sigmoid(),
+        torch.nn.Linear(d_h, d_h),
+        torch.nn.Sigmoid(),
+        ...
+        torch.nn.Linear(d_h, d_y),
+    ])
+
+    x = torch.ones((d_x,))
+    y = net(x)
+    ```
+]
+
+#slide(title: [Deeper Neural Networks])[
+    ```python
+    import jax, equinox
+    d_x, d_y, d_h = 1, 1, 256
+    net = equinox.nn.Sequential([
+        equinox.nn.Linear(d_x, d_h),
+        equinox.nn.Lambda(jax.nn.sigmoid), 
+        equinox.nn.Linear(d_h, d_h),
+        equinox.nn.Lambda(jax.nn.sigmoid), 
+        ...
+        equinox.nn.Linear(d_h, d_y),
+    ])
+
+    x = jax.numpy.ones((d_x,))
+    y = net(x)
+    ```
+]
+
+
 #slide(title: [Agenda])[#agenda(index: 3)]
 #slide(title: [Agenda])[#agenda(index: 4)]
 
@@ -393,6 +431,13 @@
 
     I usually use leaky ReLU because it works well enough
 ]
+
+#slide(title: [Activation Functions])[
+    https://pytorch.org/docs/stable/nn.html#non-linear-activations-weighted-sum-nonlinearity
+
+    https://jax.readthedocs.io/en/latest/jax.nn.html#activation-functions
+]
+
 
 #slide(title: [Agenda])[#agenda(index: 4)]
 #slide(title: [Agenda])[#agenda(index: 5)]
@@ -575,8 +620,171 @@
 #slide(title: [Agenda])[#agenda(index: 5)]
 #slide(title: [Agenda])[#agenda(index: 6)]
 
+#slide(title: [Batch Optimization])[
+    Stochastic gradient descent
+]
+
+#slide(title: [Agenda])[#agenda(index: 6)]
+#slide(title: [Agenda])[#agenda(index: 7)]
 
 
+#slide(title: [Modern Optimization])[
+    Gradient descent is a powerful tool, but it has issues #pause
+    + It can be slow to converge #pause
+    + It can get stuck in poor local optima #pause
+
+    Many researchers work on improving gradient descent to converge more quickly, while also preventing premature convergence #pause
+
+    It is hard to teach adaptive optimization through math #pause
+
+    So first, I want to show you a video to prepare you
+
+    https://www.youtube.com/watch?v=MD2fYip6QsQ&t=77s
+]
+
+#slide(title: [Modern Optimization])[
+    The video simulations provide an intuitive understanding of adaptive optimizers #pause
+
+    The key behind modern optimizers is two concepts:
+    - Momentum #pause
+    - Adaptive learning rate #pause
+
+    Let us discuss the algorithms more slowly
+]
+
+#slide(title: [Modern Optimization])[
+
+    Review gradient descent again, because we will be making changes to it #pause
+
+    #algorithm({
+    import algorithmic: *
+
+    Function("Gradient Descent", args: ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$), {
+
+      Cmt[Randomly initialize parameters]
+      Assign[$bold(theta)$][$"Glorot"()$] 
+
+      For(cond: $i in 1 dots t$, {
+        Cmt[Compute the gradient of the loss]        
+        Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$]
+        Cmt[Update the parameters using the negative gradient]
+        Assign[$bold(theta)$][$bold(theta) - alpha bold(J)$]
+      })
+
+    Return[$bold(theta)$]
+    })
+  })
+]
+
+
+#slide(title: [Modern Optimization])[
+    Introduce *momentum* first #pause
+
+    #algorithm({
+    import algorithmic: *
+
+    Function(redm[$"Momentum"$] + " Gradient Descent", args: ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$, redm[$beta$]), {
+
+      Assign[$bold(theta)$][$"Glorot"()$] 
+      Assign[#redm[$bold(M)$]][#redm[$bold(0)$] #text(fill:red)[\# Init momentum]]
+
+      For(cond: $i in 1 dots t$, {
+        Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$ #text(fill: red)[\# Represents acceleration]]
+        Assign[#redm[$bold(M)$]][#redm[$beta dot bold(M) + (1 - beta) dot bold(J)$] #text(fill: red)[\# Momentum and acceleration]]
+        Assign[$bold(theta)$][$bold(theta) - alpha #redm[$bold(M)$]$]
+      })
+
+    Return[$bold(theta)$]
+    })
+  })
+]
+
+#slide(title: [Modern Optimization])[
+    Now *adaptive learning rate* #pause
+
+    #algorithm({
+    import algorithmic: *
+
+    Function(redm[$"RMSProp"$], args: ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$, $beta$, redm[$epsilon$]), {
+
+      Assign[$bold(theta)$][$"Glorot"()$] 
+      Assign[#redm[$bold(V)$]][#redm[$bold(0)$] #text(fill: red)[\# Init variance]] 
+
+      For(cond: $i in 1 dots t$, {
+        Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$ \# Represents acceleration]
+        Assign[#redm[$bold(V)$]][#redm[$beta dot bold(V) + (1 - beta) dot bold(J) dot.circle bold(J) $] #text(fill: red)[\# Magnitude]]
+        Assign[$bold(theta)$][$bold(theta) - alpha #redm[$bold(J) ⊘ root(dot.circle, bold(V) + epsilon)$]$ #text(fill: red)[\# Rescale grad by prev updates]]
+      })
+
+    Return[$bold(theta)$]
+    })
+  })
+]
+
+
+#slide(title: [Adaptive Optimization])[
+    Combine *momentum* and *adaptive learning rate* to create *Adam* #pause
+
+  #algorithm({
+    import algorithmic: *
+
+    Function("Adaptive Moment Estimation", args: ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$, greenm[$beta_1$], bluem[$beta_2$], bluem[$epsilon$]), {
+      Assign[$bold(theta)$][$"Glorot"()$] 
+      Assign[$#greenm[$bold(M)$], #bluem[$bold(V)$]$][$bold(0)$] 
+
+      For(cond: $i in 1 dots t$, {
+        Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$]
+        Assign[#greenm[$bold(M)$]][#greenm[$beta_1 bold(M) + (1 - beta_1) bold(J)$] \# Compute momentum]
+        Assign[#bluem[$bold(V)$]][#bluem[$beta_2 dot bold(V) + (1 - beta_2) dot bold(J) dot.circle bold(J)$] \# Magnitude]
+        //Assign[$hat(bold(M))$][$bold(M)  "/" (1 - beta_1)$ \# Bias correction]
+        //Assign[$hat(bold(V))$][$bold(V) "/" (1 - beta_2)$ \# Bias correction]
+
+        Assign[$bold(theta)$][$bold(theta) - alpha #greenm[$bold(M)$] #bluem[$⊘ root(dot.circle, bold(V) + epsilon)$]$ \# Adaptive param update]
+      })
+
+    Return[$bold(theta)$ \# Note, we use biased $bold(M), bold(V)$ for clarity]
+    })
+  }) 
+]
+
+#slide(title: [Adaptive Optimization])[
+    ```python
+    import torch
+    betas = (0.9, 0.999)
+    net = ...
+    theta = net.parameters()
+
+    sgd = torch.optim.SGD(theta, lr=alpha)
+    momentum = torch.optim.SGD(
+        theta, lr=alpha, momentum=betas[0]) 
+    rmsprop = torch.optim.RMSprop(
+        theta, lr=alpha, momentum=betas[1])
+    adam = torch.optim.Adam(theta, lr=alpha, betas=betas)
+    ...
+    sgd.step(), momentum.step(), rmsprop.step(), adam.step()
+    ```
+]
+
+#slide(title: [Adaptive Optimization])[
+    ```python
+    import optax
+    betas = (0.9, 0.999)
+    theta = ...
+
+    sgd = optax.sgd(lr=alpha)
+    momentum = optax.sgd(lr=alpha, momentum=betas[0]) 
+    rmsprop = optax.rmsprop(lr=alpha, decay=betas[1])
+    adam = optax.adam(lr=alpha, b1=betas[0], b2=betas[1])
+
+    v = rmsprop.init(theta)
+    theta, v = rmsprop.update(J, v, theta)
+    mv = adam.init(theta) # contains M and V
+    theta, mv = mv.update(J, mv, theta)
+    ```
+]
+
+#slide(title: [Agenda])[#agenda(index: 7)]
+#slide(title: [Agenda])[#agenda(index: 8)]
 
 
 // First requirement: break symmetry (explain why)

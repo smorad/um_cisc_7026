@@ -39,6 +39,14 @@
   text(fill: color.red, $#x$)
 }
 
+#let bluem(x) = {
+  text(fill: color.blue, $#x$)
+}
+
+#let greenm(x) = {
+  text(fill: color.green, $#x$)
+}
+
 /*
 #let sections-state = state("polylux-sections", ())
 #let bold-outline(enum-args: (:), padding: 0pt) = locate( loc => {
