@@ -795,18 +795,19 @@
 #slide(title: [Agenda])[#agenda(index: 6)]
 #slide(title: [Agenda])[#agenda(index: 7)]
 
-#slide(title: [Classification])[
-  You have everything you need to solve any deep learning task!
+#slide(title: [Coding])[
+  You have everything you need to solve deep learning tasks!
   + Regression #pause
   + Classification #pause
 
   Every interesting task (chatbot, self driving car, etc): #pause
-  + Train a deep neural network #pause
-  + Using a regression or classification loss function #pause
-  + That we optimize with gradient descent #pause
+  + Construct a deep neural network #pause
+  + Compute regression or classification loss #pause
+  + Optimize with gradient descent #pause
 
   The rest of this course will examine neural network architectures 
 ]
 
-#slide(title: [Classification])[
+#slide(title: [Coding])[
+  https://colab.research.google.com/drive/1BGMIE2CjlLJOH-D2r9AariPDVgxjWlqG?usp=sharing
 ]
