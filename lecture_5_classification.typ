@@ -793,6 +793,7 @@
 ]
 
 #slide(title: [Agenda])[#agenda(index: 6)]
+#focus-slide[Relax]
 #slide(title: [Agenda])[#agenda(index: 7)]
 
 #slide(title: [Coding])[
