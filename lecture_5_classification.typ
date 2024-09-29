@@ -60,6 +60,10 @@
 
   The scores were very good, with a mean of approximately 90/100 #pause
 
+  Homework 3 is released, you have two weeks to complete it #pause
+
+  https://colab.research.google.com/drive/1LainS20p6c3YVRFM4XgHRBODh6dvAaT2?usp=sharing#scrollTo=q8pJST5xFt-p #pause
+  
   I am still grading quiz 2, but I had a look at the responses to question 4
 ]
 
@@ -77,6 +81,11 @@
 
   There are conflicting student needs
 ]
+
+#slide(title: [Admin])[
+  https://github.com/smorad/um_cisc_7026
+]
+
 //11:30
 
 #slide[#agenda(index: none)]

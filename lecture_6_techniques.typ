@@ -5,6 +5,9 @@
 #import "@preview/algorithmic:0.1.0"
 #import algorithmic: algorithm
 
+
+// FUTURE TODO: Swap order, modern techniques -> classification
+
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
 #let agenda(index: none) = {
@@ -17,7 +20,7 @@
     [Parameter initialization],
     //[Regularization],
     //[Residual networks],
-    [Batch optimization],
+    [Stochastic gradient descent],
     [Modern optimization],
     [Coding]
   )
@@ -134,6 +137,7 @@
 
 #slide(title: [Agenda])[#agenda(index: none)]
 #slide(title: [Agenda])[#agenda(index: 0)]
+// 4:30
 // TODO: Review
 #slide(title: [Agenda])[#agenda(index: 0)]
 #slide(title: [Agenda])[#agenda(index: 1)]
@@ -147,7 +151,7 @@
 
     There is no widely-accepted theory for why deep neural networks are so effective #pause
 
-    In modern deep learning, we progress using trial and error more often than theory #pause
+    In modern deep learning, we progress using trial and error #pause
 
     Today we experiment, and maybe tomorrow we discover the theory 
 ]
@@ -170,7 +174,7 @@
     However, there is a second part: #pause
         + Find theory #pause
         + Find counterexample #pause
-        + Publish counterexample
+        + Publish counterexample #pause
         + Falsify theory
 
     Deep learning is new, so much of part 2 has not happened yet!
@@ -180,9 +184,9 @@
 #slide(title: [Dirty Secret of Deep Learning])[
     For many concepts, the *observations* are stronger than the *theory* #pause
 
-    Researchers observed that this concept improves many types of neural networks #pause
+    Observe that a concept improves many types of neural networks #pause
 
-    Then, they try to create a theory #pause
+    Then, try to create a theory #pause
 
     Often, these theories are incomplete #pause
 
@@ -190,9 +194,7 @@
 
     Even if we do not agree on *why* a concept works, if we *observe* that it helps, we can still use it #pause
 
-    This is how medicine works (e.g., Anasthetics)!
-
-    //In practice, these concepts usually result in more powerful networks, even if we do not agree on *why* #pause
+    This is how medicine works (e.g., Anesthetics)!
 ]
 
 #slide(title: [Agenda])[#agenda(index: 1)]
@@ -201,7 +203,7 @@
 #slide(title: [Optimization is Hard])[
     A 2-layer neural network can represent *any* continuous function to arbitrary precision #pause
 
-    $ | f(x, bold(theta)) - g(x) | < epsilon $ #pause
+    $ | f(bold(x), bold(theta)) - g(bold(x)) | < epsilon $ #pause
 
     $ lim_(d_h -> oo) epsilon = 0 $ #pause
 
@@ -620,9 +622,143 @@
 #slide(title: [Agenda])[#agenda(index: 5)]
 #slide(title: [Agenda])[#agenda(index: 6)]
 
-#slide(title: [Batch Optimization])[
-    Stochastic gradient descent
+// Now, let us talk a little bit more about optimization
+// We computed the gradient over the entire training dataset
+// This works with the datasets we have examined so far
+// However, some datasets are much larger
+// >700 TB Datasets for Large Language Models: A Comprehensive Survey
+// We cannot fit this dataset into the memory on colab, so what do we do?
+// We introduce stochastic gradient Descent
+// Rather than compute the gradient over the dataset
+// We approximate the gradient in a stochastic manner
+// algorithm
+
+
+
+
+
+
+// Really hard problems can have many local optima
+// They can also have very large datasets
+// We do not like getting stuck in local minima
+
+#slide(title: [Stochastic Gradient Descent])[
+    #algorithm({
+    import algorithmic: *
+
+    Function("Gradient Descent", args: ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$), {
+
+      Cmt[Randomly initialize parameters]
+      Assign[$bold(theta)$][$"Glorot"()$] 
+
+      For(cond: $i in 1 dots t$, {
+        Cmt[Compute the gradient of the loss]        
+        Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$]
+        Cmt[Update the parameters using the negative gradient]
+        Assign[$bold(theta)$][$bold(theta) - alpha bold(J)$]
+      })
+
+    Return[$bold(theta)$]
+    })
+  }) #pause
+
+  Gradient descent computes $gradient cal(L)$ over all $bold(X)$
 ]
+
+#slide(title: [Stochastic Gradient Descent])[
+    This works for our small datasets, where $n = 1000$ #pause
+
+    *Question:* How many GB are the LLM datasets? #pause
+
+    *Answer:* About 774,000 GB according to _Datasets for Large Language Models: A Comprehensive Survey_ #pause
+
+    This is just the dataset size, the gradient is orders of magnitude larger 
+
+    $ gradient_bold(theta) cal(L)(bold(x)_[i], bold(y)_[i], bold(theta)) = mat(
+        (partial f_1) / (partial x_1), dots, (partial f_ell) / (partial x_1);
+        dots.v, dots.down, dots.v;
+        (partial f_n) / (partial x_1), dots, (partial f_ell) / (partial x_1);
+    )_[i]
+    $
+]
+
+#slide(title: [Stochastic Gradient Descent])[
+    *Question:* We do not have enough memory to compute the gradient #pause
+
+    *Answer:* What can we do? #pause
+
+    We approximate the gradient using a subset of the data #pause
+
+]
+
+#slide(title: [Stochastic Gradient Descent])[
+
+    First, we sample random datapoint indices 
+    
+    $ i, j, k, dots tilde cal(U)[1, n] $ #pause
+
+    Then construct a *batch* of training data
+
+    $ vec(bold(x)_[i], bold(x)_[j], bold(x)_[k], dots.v); quad vec(bold(y)_[i], bold(y)_[j], bold(y)_[k], dots.v) $ #pause
+
+    We call this *stochastic gradient descent*
+]
+
+#slide(title: [Stochastic Gradient Descent])[
+    #algorithm({
+    import algorithmic: *
+
+    Function("Stochastic Gradient Descent", args: ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$), {
+
+      Assign[$bold(theta)$][$"Glorot"()$] 
+
+      For(cond: $i in 1 dots t$, {
+        Assign[$bold(X), bold(Y)$][$"Shuffle"(bold(X)), "Shuffle"(bold(Y))$]
+        For(cond: $j in 0 dots n / B - 1$, {
+        Assign[$bold(X)_j$][$mat(bold(x)_[ j B], bold(x)_[ j B + 1], dots, bold(x)_[ (j + 1) B])$]
+        Assign[$bold(Y)_j$][$mat(bold(y)_[ j B], bold(y)_[ j B + 1], dots, bold(y)_[ (j + 1) B])$]
+        Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X)_j, bold(Y)_j, bold(theta))$]
+        Assign[$bold(theta)$][$bold(theta) - alpha bold(J)$]
+        })
+      })
+
+    Return[$bold(theta)$]
+    })
+  })
+]
+
+
+#slide(title: [Stochastic Gradient Descent])[
+    Stochastic gradient descent (SGD) is useful for saving memory #pause
+
+    But it can also improve performance #pause
+
+    Since the "dataset" changes every update, so does the loss manifold #pause
+
+    This makes it less likely we get stuck in bad optima
+
+    #cimage("figures/lecture_5/saddle.png")
+]
+
+#slide(title: [Stochastic Gradient Descent])[
+    There is `torch.utils.data.DataLoader` to help #pause
+
+    ```python
+    import torch
+    dataloader = torch.utils.data.DataLoader(
+        training_data,
+        batch_size=32, # How many datapoints to sample
+        shuffle=True, # Randomly shuffle each epoch
+    )
+    for epoch in number_of_epochs:
+        for batch in dataloader:
+            X_j, Y_j = batch
+            loss = L(X_j, Y_j, theta)
+            ...
+    ```
+]
+
+
 
 #slide(title: [Agenda])[#agenda(index: 6)]
 #slide(title: [Agenda])[#agenda(index: 7)]
