@@ -5,6 +5,8 @@
 #import "@preview/algorithmic:0.1.0"
 #import algorithmic: algorithm
 
+// FUTURE TODO: Remove event space, only sample space
+
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
 #let agenda(index: none) = {
@@ -16,11 +18,6 @@
     [Define model $f$],
     [Define loss function $cal(L)$],
     [Find $bold(theta)$ that minimize $cal(L)$],
-    //[Parameter initialization],
-    //[Regularization],
-    //[Residual networks],
-    //[Adaptive optimization],
-    //[Activation functions],
     [Coding]
   )
   for i in range(ag.len()){
@@ -60,10 +57,6 @@
 
   The scores were very good, with a mean of approximately 90/100 #pause
 
-  Homework 3 is released, you have two weeks to complete it #pause
-
-  https://colab.research.google.com/drive/1LainS20p6c3YVRFM4XgHRBODh6dvAaT2?usp=sharing#scrollTo=q8pJST5xFt-p #pause
-  
   I am still grading quiz 2, but I had a look at the responses to question 4
 ]
 
@@ -274,12 +267,12 @@
   ```
 ]
 
-#slide[#agenda(index: 0)]
-#slide[#agenda(index: 1)]
+#slide(title: [Agenda])[#agenda(index: 0)]
+#slide(title: [Agenda])[#agenda(index: 1)]
 
 // 30:00
 
-#slide[
+#slide(title: [Torch Optimization Coding])[
   First, a video of one application of gradient descent 
 
   https://youtu.be/kGDO2e_qiyI?si=ZopZKy-6WQ4B0csX #pause
@@ -338,7 +331,7 @@
   #side-by-side[Experiment][Outcome] #pause
   #side-by-side[Flip a coin][Heads] #pause
   #side-by-side[Walk outside][Rain] #pause
-  #side-by-side[Grab clothing from closest][Coat] #pause
+  #side-by-side[Grab clothing from closest][Coat] 
   
 
 ]
@@ -357,9 +350,9 @@
 ]
 
 #slide[
-  The *event space* $E$ is a specific subset of the sample space #pause
+  An *event* $E$ is a specific subset of the sample space #pause
 
-  #side-by-side[Experiment][Sample Space][Event]
+  #side-by-side[Experiment][Sample Space][Event] #pause
 
   #side-by-side[Flip a coin][$ S = {"heads", "tails"} $][$ E = {"heads"} $] #pause
 
@@ -377,7 +370,7 @@
 
   The probability must be between 0 (never occurs) and 1 (always occurs) #pause
 
-  $ 0 <= P(A) <= 1; quad forall A in S $ #pause
+  $ 0 <= P(E) <= 1 $ #pause
   
   #side-by-side[Experiment][Probabilities] #pause
 
@@ -394,9 +387,9 @@
 
   $ P: E |-> (0, 1) $ #pause
 
-  The probabilities (distribution) must sum to one #pause
+  The probabilities (distribution) over the sample space $S$ must sum to one #pause
 
-  $ sum_(x in E) P(x) = 1 $  #pause
+  $ sum_(x in S) P(x) = 1 $  #pause
 
   #side-by-side[Flip a coin][$ {P("heads") = 0.5, P("tails") = 0.5} $] #pause
 
@@ -418,8 +411,8 @@
 ]
 
 #slide[
-  Two events $A, B$ are *disjoint* if either $A$ or $B$ occurs #pause
-  
+  Two events $A, B$ are *disjoint* if either $A$ occurs or $B$ occurs, *but not both* #pause
+
   With disjoint events, $P(A sect B) = 0$ #pause
 
   #side-by-side[Flip a coin][
@@ -435,100 +428,23 @@
   ]
 ]
 
-/*
 #slide[
-  Two events $A, B$ are independent events if the occurence of $A$ does not affect the occurence of $B$ #pause
+  If $A, B$ are not disjoint, they are *conditionally dependent* #pause
 
-  With independent events, $P(A union B) = P(A) dot P(B)$ #pause
+  // Event $A$ is *conditionally dependent* on $B$ if $B$ occuring tells us about the probability of $A$ #pause
 
-  #side-by-side[Flip two coins][
-    $ P("C1 Heads") = 0.5, P("C2 Tails") = 0.5 $
-    $ P("Heads" union "Tails") = 0.25 dot 0.25 = 0.125 $
-  ] 
-]
-*/
+  $ P("cloud") = 0.2, P("rain") = 0.1 $ #pause
 
-#slide[
-  Events $A$ is *conditionally dependent* on $B$ if $B$ occuring tells us about the probability of $A$ #pause
-
-  $ P("cloud") = 0.2, P("rain") = 0.05 $ #pause
-
-  $ P("rain" | "cloud") = 0.7 $ #pause
+  $ P("rain" | "cloud") = 0.5 $ #pause
 
   $ P(A | B) = P(A sect B) / P(B) $ #pause
 
-  /*
-  #side-by-side[Flip a coin][
-    $P("Heads" sect "Tails") = 0 \ 
-    P("Tails")=0.5$
-    $P("Heads" | "Tails") = 0 / 0.5 = 0$
-  ] #pause
-  */
-
   #side-by-side[Walk outside][
-    $P("Rain" sect "Cloud") = 0.2 \ 
-    P("Cloud") = 0.4$
-    $P("Rain" | "Cloud") = 0.2 / 0.4 = 0.5$
+    $P("Rain" sect "Cloud") = 0.1 \ 
+    P("Cloud") = 0.2$
+    $P("Rain" | "Cloud") = 0.1 / 0.2 = 0.5$
   ]
 ]
-
-/*
-#slide[
-  For *mutually exclusive* events, we can sum together probabilities #pause
-
-  $ P(A union B) = P(A) + P(B) $ #pause
-
-  #v(1em)
-
-  #side-by-side[Take clothing from closet][
-    $ P("Shirt") = 0.1, P("Bag") = 0.05$
-    $ P("Shirt" union "Bag") = 0.15 $
-  ] #pause
-
-  Be careful! Events must be mutually exclusive #pause
-
-  #side-by-side[Walk outside][
-    $P("Rain") = 0.05, P("Sun") = 0.4$
-    $P("Rain" union "Sun") != 0.45$
-  ]
-]
-
-
-
-#slide[
-  If events are not mutually exclusive, but they are *independent*, then we can multiply their probabilities #pause
-
-  $ P(A sect B) = P(A) dot P(B) $ #pause
-
-  Be careful! Not all events are independent #pause
-
-  #side-by-side[Flip a coin][
-    $P("Heads") = 0.5, P("Tails")=0.5$
-    $P("Heads" sect "Tails") != 0.25$
-  ] #pause
-
-  Such events are *dependent*
-]
-
-#slide[
-  Events that are not independent are *conditionally dependent* 
-  $ P(A | B) = P(A sect B) / P(B) $ #pause
-
-  #side-by-side[Flip a coin][
-    $P("Heads" sect "Tails") = 0 \ 
-    P("Tails")=0.5$
-    $P("Heads" | "Tails") = 0 / 0.5 = 0$
-  ] #pause
-
-  #v(1em)
-
-  #side-by-side[Walk outside][
-    $P("Rain" sect "Cloud") = 0.2 \ 
-    P("Cloud") = 0.4$
-    $P("Rain" | "Cloud") = 0.2 / 0.4 = 0.5$
-  ]
-]
-*/
 
 #slide[
   *Task:* Given a picture of clothes, predict the text description #pause
@@ -549,9 +465,9 @@
 #slide[
   We will again start with a multivariate linear model #pause
   
-  $ f(bold(x), bold(theta)) = bold(theta)^top bold(x) $ #pause
+  $ f(bold(x), bold(theta)) = bold(theta)^top overline(bold(x)) $ #pause
 
-  We want our model to predict the probability of each item class #pause
+  We want our model to predict the probability of each outcome #pause
 
   *Question:* What is the function signature of $f$? #pause
 
@@ -559,7 +475,7 @@
 
   *Question:* Can we use this model to predict probabilities? #pause
 
-  *Answer:* No! Because probabilities must sum to one 
+  *Answer:* No! Because probabilities must be $in (0, 1)$ and sum to one 
 
   //*Question:* What is the range/co-domain of $f$? #pause
 
@@ -573,11 +489,11 @@
 ]
 
 #slide[
-  How can we represent a distribution as a vector? #pause
+  How can we represent a probability distribution for a neural network? #pause
 
-  $ bold(v) = { vec(v_1, dots.v, v_(d_y)) mid(|) quad sum_(i=1)^(d_y) v_i = 1 } $ #pause
+  $ bold(v) = { vec(v_1, dots.v, v_(d_y)) mid(|) quad sum_(i=1)^(d_y) v_i = 1; quad v_i in (0, 1) } $ #pause
 
-  There is special notation for a vector that sums to one called the *simplex* #pause
+  There is special notation for this vector, called the *simplex* #pause
 
   $ Delta^(d_y - 1) $
 
@@ -589,20 +505,32 @@
   #cimage("figures/lecture_5/simplex.svg", height: 70%)
 
   It has only $k - 1$ free variables, because $x_(k) = 1 - sum_(i=1)^(k - 1) x_i$ 
+]
 
+// 96:00
 
+#slide[
+  $ f: bb(R)^(d_x) times Theta |-> bb(R)^(d_y) $ #pause
+
+  So we need a function that maps to the simplex #pause
+
+  $ g: bb(R)^(d_y) |-> Delta^(d_y - 1) $ #pause
+
+  Then, we can combine $f$ and $g$
+
+  $ g(f): bb(R)^(d_x) times Theta |-> Delta^(d_y - 1) $ 
 ]
 
 #slide[
-  So we need a function that maps to the simplex #pause
+  We need a function $g$
 
-  $ f: bb(R)^(d_y) times Theta |-> Delta^(d_y - 1) $ #pause
+  $ g: bb(R)^(d_y) |-> Delta^(d_y - 1) $ #pause
 
   There are many functions that can do this #pause
 
   One example is dividing by the $L_1$ norm: 
   
-  $ f(bold(x)) = bold(x) / (sum_(i=1)^(d_y) x_i) $ #pause
+  $ g(bold(x)) = bold(x) / (sum_(i=1)^(d_y) x_i) $ #pause
 
   In deep learning we often use the *softmax* function. When combined with the classification loss the gradient is linear, making learning faster
 ]
@@ -617,7 +545,7 @@
     e^(x_2) / (e^(x_1) + e^(x_2) + dots e^(x_k)),
     dots.v,
     e^(x_k) / (e^(x_1) + e^(x_2) + dots e^(x_k)),
-  ) $
+  ) $ #pause
 
   If we attach it to our linear model, we can output probabilities!
 
@@ -628,10 +556,10 @@
   And naturally, we can use the same method for a deep neural network
 
   $ 
-  f_1(bold(x), bold(phi)) = sigma(bold(phi)^top bold(x)) \
+  f_1(bold(x), bold(phi)) = sigma(bold(phi)^top overline(bold(x))) \
   dots.v \
 
-  f_ell (bold(x), bold(xi)) = "softmax"(bold(xi)^top bold(x)) $ #pause
+  f_ell (bold(x), bold(xi)) = "softmax"(bold(xi)^top overline(bold(x))) $ #pause
 
   Now, our neural network can output probabilities
 
@@ -639,7 +567,7 @@
     P("Ankle boot" | #image("figures/lecture_5/shirt.png", height: 10%)),
     P("Bag" | #image("figures/lecture_5/shirt.png", height: 10%)),
     dots.v
-  )
+  ) = vec(0.25, 0.08, dots.v)
   $
 ]
 
@@ -649,16 +577,15 @@
   $ f(bold(x), bold(theta)) = vec(
     P("Shirt" | #image("figures/lecture_5/shirt.png", height: 10%)),
     P("Bag" | #image("figures/lecture_5/shirt.png", height: 10%)),
-  )
-  $
-
-  $ f(bold(x), bold(theta)) = vec(
+    dots.v
+  ) = vec(0.25, 0.08, dots.v); quad f(bold(x), bold(theta)) = vec(
     1,
-    0
+    0,
+    dots.v
   )
-  $
+  $ #pause
 
-  *Answer 1:* Outputting probabilities results in differentiable functions 
+  *Answer 1:* Outputting probabilities results in differentiable functions #pause
   
   *Answer 2:* We report uncertainty, which is useful in many applications 
 ]
@@ -677,9 +604,9 @@
   $ f(bold(x)_[i], bold(theta)) = vec(
     P("Shirt" | #image("figures/lecture_5/shirt.png", height: 10%)),
     P("Bag" | #image("figures/lecture_5/shirt.png", height: 10%))
-  ) = vec(0.6, 0.4) $ #pause
+  ) = vec(0.6, 0.4) ; quad
 
-  $ bold(y)_[i] = vec(
+  bold(y)_[i] = vec(
     P("Shirt" | #image("figures/lecture_5/shirt.png", height: 10%)),
     P("Bag" | #image("figures/lecture_5/shirt.png", height: 10%))
   ) = vec(1, 0) $ #pause
@@ -689,7 +616,7 @@
 ]
 
 #slide[
-  $ f(bold(x)_i, bold(theta)) = vec(0.6, 0.4), bold(y)_i = vec(1, 0) $ #pause
+  $ f(bold(x)_[i], bold(theta)) = vec(0.6, 0.4); quad bold(y)_[i] = vec(1, 0) $ #pause
 
   We could use the square error like linear regression #pause
 
@@ -734,7 +661,7 @@
 
  Rewrite the logarithm using the sum rule of logarithms
 
- $ "KL"(P(bold(y) | bold(x)), f(bold(x), bold(theta))) = sum_(i=1)^(d_y) P(y_i | bold(x)) (log P(y_i | bold(x)) - log f(bold(x), bold(theta))_i ) $ #pause
+ $ "KL"(P(bold(y) | bold(x)), f(bold(x), bold(theta))) = sum_(i=1)^(d_y) P(y_i | bold(x)) (log P(y_i | bold(x)) - log f(bold(x), bold(theta))_i ) $ 
 ]
 
 #slide[
@@ -756,25 +683,50 @@
   This is the loss for a classification task! We call this the *cross-entropy* loss function
 ]
 
+// 114:00
+
+#slide[
+  *Example:*  #pause
+
+  $ cal(L)(bold(x), bold(y), bold(theta))= - sum_(i=1)^(d_y) P(y_i | bold(x)) log f(bold(x), bold(theta))_i; quad
+
+  f(bold(x), bold(theta)) = vec(0.6, 0.4); quad bold(y) = vec(1, 0) $ #pause
+
+  $ = - [ 
+    P(y_1 | bold(x)) log f(bold(x), bold(theta))_1
+    + P(y_2 | bold(x)) log f(bold(x), bold(theta))_2
+  ] $ #pause
+
+  $ = - [ 
+    1 dot log 0.6 +
+    0 dot log 0.4 
+  ] $ #pause
+
+  $ = - [ -0.22 ] $ #pause
+
+  $ = 0.22 $
+]
+
+
 #slide[
   $ cal(L)(bold(x), bold(y), bold(theta)) = - sum_(i=1)^(d_y) P(y_i | bold(x)) log f(bold(x), bold(theta))_i $
 
-  By minimizing the loss, we make $f(bold(x), bold(theta)) =  bold(y)$ #pause
+  By minimizing the loss, we make $f(bold(x), bold(theta)) =  P(bold(y) | bold(x))$ #pause
 
-  $ min_theta cal(L)(bold(x), bold(y), bold(theta)) = min_theta [- sum_(i=1)^(d_y) P(y_i | bold(x)) log f(bold(x), bold(theta))_i ] $ #pause
+  $ argmin_theta cal(L)(bold(x), bold(y), bold(theta)) = argmin_theta [- sum_(i=1)^(d_y) P(y_i | bold(x)) log f(bold(x), bold(theta))_i ] $ #pause
 
-  $ f(bold(x), bold(theta)) = P(bold(y) mid(|) bold(x)) =
+  $ f(bold(x), bold(theta)) = P(bold(y) | bold(x)) =
   P(vec("boot", "dress", dots.v) mid(|) #image("figures/lecture_5/shirt.png", height: 20%)) $ 
 ]
 
 #slide[
   Our loss was just for a single image #pause
   
-  $ min_theta cal(L)(bold(x), bold(y), bold(theta)) = min_theta [- sum_(i=1)^(d_y) P(y_i | bold(x)) log f(bold(x), bold(theta))_i ] $ #pause
+  $ argmin_theta cal(L)(bold(x), bold(y), bold(theta)) = argmin_theta [- sum_(i=1)^(d_y) P(y_i | bold(x)) log f(bold(x), bold(theta))_i ] $ #pause
 
   Find $bold(theta)$ that minimize the loss over the whole dataset #pause
 
-  $ min_theta cal(L)(bold(x), bold(y), bold(theta)) = min_theta [- sum_(j=1)^n sum_(i=1)^(d_y) P(y_([j], i) | bold(x)_[j]) log f(bold(x)_[j], bold(theta))_i ] $ #pause
+  $ argmin_theta cal(L)(bold(x), bold(y), bold(theta)) = argmin_theta [- sum_(j=1)^n sum_(i=1)^(d_y) P(y_([j], i) | bold(x)_[j]) log f(bold(x)_[j], bold(theta))_i ] $ 
 ]
 
 #slide(title: [Agenda])[#agenda(index: 5)]
@@ -785,7 +737,7 @@
 
   The gradients are the same as before except the last layer #pause
 
-  I will not derive any more gradients, but the softmax gradient nearly identical to the sigmoid function #pause
+  I will not derive any more gradients, but the softmax gradient nearly identical to the sigmoid function gradient #pause
 
   $ gradient_bold(theta) "softmax"(bold(z)) = "softmax"(bold(z)) dot.circle (1 - "softmax"(bold(z))) $ #pause
 
@@ -793,6 +745,8 @@
 ]
 
 #slide(title: [Agenda])[#agenda(index: 6)]
+
+// 120:00
 #focus-slide[Relax]
 #slide(title: [Agenda])[#agenda(index: 7)]
 
@@ -811,4 +765,10 @@
 
 #slide(title: [Coding])[
   https://colab.research.google.com/drive/1BGMIE2CjlLJOH-D2r9AariPDVgxjWlqG?usp=sharing
+]
+
+#slide(title: [Admin])[
+  Homework 3 is released, you have two weeks to complete it #pause
+
+  https://colab.research.google.com/drive/1LainS20p6c3YVRFM4XgHRBODh6dvAaT2?usp=sharing#scrollTo=q8pJST5xFt-p 
 ]

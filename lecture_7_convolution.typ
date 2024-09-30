@@ -382,6 +382,7 @@ draw_filter(0, 0, image_values)
     [Signal Processing], 
     [Convolution],
     [2D Convolution],
+    [Downsampling],
     [Coding]
   )
   for i in range(ag.len()){
@@ -791,8 +792,57 @@ draw_filter(0, 0, image_values)
   Convolution is *shift invariant*, if $bold(theta)_1, bold(theta)_2$ detect "hello", it does not matter whether "hello" occurs at $x(0), x(1)$ or $x(100), x(101)$
 ]
 
+#slide(title: [Convolution])[
+  // TODO: Applications of 1D convolution
+]
+
+#slide(title: [Convolution])[
+  ```python
+  import jax, equinox
+  # Assume a sequence of length m
+  # Each timestep has dimension d_x
+  x = stock_data # Shape (d_x, time)
+  conv_layer = equinox.nn.Conv1d(
+    in_channels=d_x,
+    out_channels=d_y,
+    kernel_size=k # Size of filter in timesteps/parameters,
+    key=jax.random.key(0)
+  )
+
+  y_prediction = jax.nn.leaky_relu(conv_layer(x)) 
+  ```
+]
+
+#slide(title: [Convolution])[
+  ```python
+  import torch
+  # Assume a sequence of length m
+  # Each timestep has dimension d_x
+  # Torch requires 3 dims! Be careful!
+  x = stock_data # Shape (batch, d_x, time)
+  conv_layer = torch.nn.Conv1d(
+    in_channels=d_x,
+    out_channels=d_y,
+    kernel_size=k # Size of filter in timesteps/parameters,
+  )
+
+  y_prediction = jax.nn.leaky_relu(conv_layer(x)) 
+  ```
+]
+
 #slide(title: [Agenda])[#agenda(index: 2)]
 #slide(title: [Agenda])[#agenda(index: 3)]
 
 #slide(title: [2D Convolution])[
+  We defined convolution over one variable $t$ #pause
+
+  For images, we often have two variables denoting width and height $u, v$
+
+  $ x(u, v) $ #pause
+
+  We can also do convolutions over two dimensions #pause
+
+  Most image-based neural networks use convolutions
 ]
+
+// TODO: Alexnet etc changing ml
