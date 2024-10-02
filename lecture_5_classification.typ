@@ -423,8 +423,8 @@
   Be careful!
 
   #side-by-side[Walk outside][
-    $P("Rain") = 0.05, P("Sun") = 0.4$
-    $P("Rain" sect "Sun") != 0$
+    $P("Rain") = 0.1, P("Cloud") = 0.2$
+    $P("Rain" sect "Cloud") != 0$
   ]
 ]
 
@@ -496,7 +496,6 @@
   There is special notation for this vector, called the *simplex* #pause
 
   $ Delta^(d_y - 1) $
-
 ]
 
 #slide[
@@ -599,20 +598,21 @@
 #slide(title: [Agenda])[#agenda(index: 5)]
 
 #slide[
-  Consider the following prediction and truth
+  We consider the label $bold(y)_[i]$ as a conditional distribution
 
-  $ f(bold(x)_[i], bold(theta)) = vec(
-    P("Shirt" | #image("figures/lecture_5/shirt.png", height: 10%)),
-    P("Bag" | #image("figures/lecture_5/shirt.png", height: 10%))
-  ) = vec(0.6, 0.4) ; quad
-
-  bold(y)_[i] = vec(
+  $ P(bold(y)_[i] | bold(x)_[i]) = vec(
     P("Shirt" | #image("figures/lecture_5/shirt.png", height: 10%)),
     P("Bag" | #image("figures/lecture_5/shirt.png", height: 10%))
   ) = vec(1, 0) $ #pause
 
-  What loss function should we use for classification?
+  Our neural network also outputs some distribution
 
+  $ f(bold(x)_[i], bold(theta)) = vec(
+    P("Shirt" | #image("figures/lecture_5/shirt.png", height: 10%)),
+    P("Bag" | #image("figures/lecture_5/shirt.png", height: 10%))
+  ) = vec(0.6, 0.4) $ #pause
+
+  What loss function should we use for classification?
 ]
 
 #slide[
@@ -722,11 +722,11 @@
 #slide[
   Our loss was just for a single image #pause
   
-  $ argmin_theta cal(L)(bold(x), bold(y), bold(theta)) = argmin_theta [- sum_(i=1)^(d_y) P(y_i | bold(x)) log f(bold(x), bold(theta))_i ] $ #pause
+  $ cal(L)(bold(x), bold(y), bold(theta)) = [- sum_(i=1)^(d_y) P(y_i | bold(x)) log f(bold(x), bold(theta))_i ] $ #pause
 
   Find $bold(theta)$ that minimize the loss over the whole dataset #pause
 
-  $ argmin_theta cal(L)(bold(x), bold(y), bold(theta)) = argmin_theta [- sum_(j=1)^n sum_(i=1)^(d_y) P(y_([j], i) | bold(x)_[j]) log f(bold(x)_[j], bold(theta))_i ] $ 
+  $ cal(L)(bold(x), bold(y), bold(theta)) = [- sum_(j=1)^n sum_(i=1)^(d_y) P(y_([j], i) | bold(x)_[j]) log f(bold(x)_[j], bold(theta))_i ] $ 
 ]
 
 #slide(title: [Agenda])[#agenda(index: 5)]

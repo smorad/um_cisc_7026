@@ -10,117 +10,20 @@
 
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
-#let agenda(index: none) = {
-  let ag = (
-    [Review],
-    [Dirty secret of deep learning], 
-    [Optimization is hard],
-    [Deeper neural networks],
-    [Activation functions],
-    [Parameter initialization],
-    //[Regularization],
-    //[Residual networks],
-    [Stochastic gradient descent],
-    [Modern optimization],
-    [Coding]
-  )
-  for i in range(ag.len()){
-    if index == i {
-      enum.item(i + 1)[#text(weight: "bold", ag.at(i))]
-    } else {
-      enum.item(i + 1)[#ag.at(i)]
-    }
-  }
-}
 
-#let sigmoid = { 
-    set text(size: 25pt)
-    canvas(length: 1cm, {
-  plot.plot(size: (8, 6),
-    x-tick-step: 2,
-    y-tick-step: none,
-    y-ticks: (0, 1),
-    y-min: 0,
-    y-max: 1,
-    {
-      plot.add(
-        domain: (-5, 5), 
-        style: (stroke: (thickness: 5pt, paint: red)),
-        label: $ sigma(x) $,
-        x => 1 / (1 + calc.pow(2.718, -x)),
-      )
-      plot.add(
-        domain: (-5, 5), 
-        style: (stroke: (thickness: 3pt, paint: blue)),
-        label: $ gradient sigma(x)$,
-        x => (1 / (1 + calc.pow(2.718, -x))) * (1 - 1 / (1 + calc.pow(2.718, -x))),
-      )
-    })
-})}
-
-#let relu = { 
-    set text(size: 25pt)
-    canvas(length: 1cm, {
-  plot.plot(size: (8, 6),
-    x-tick-step: 2.5,
-    //y-tick-step: 1,
-    y-tick-step: none,
-    y-ticks: (1, 3, 5),
-    y-min: 0,
-    y-max: 5,
-    {
-      plot.add(
-        domain: (-5, 5), 
-        style: (stroke: (thickness: 5pt, paint: red)),
-        label: $ sigma(x) $,
-        line: (type: "linear"),
-        x => calc.max(0, x)
-      )
-      plot.add(
-        domain: (-5, 0), 
-        style: (stroke: (thickness: 3pt, paint: blue)),
-        x => 0,
-      )
-      plot.add(
-        domain: (0, 5), 
-        style: (stroke: (thickness: 3pt, paint: blue)),
-        label: $ gradient sigma(x)$,
-        x => 1,
-      )
-    })
-})}
-
-#let lrelu = { 
-    set text(size: 25pt)
-    canvas(length: 1cm, {
-  plot.plot(size: (8, 6),
-    x-tick-step: 2.5,
-    //y-tick-step: 1,
-    y-tick-step: none,
-    y-ticks: (-0.1, 3, 5),
-    y-min: -1,
-    y-max: 5,
-    {
-      plot.add(
-        domain: (-5, 5), 
-        style: (stroke: (thickness: 5pt, paint: red)),
-        label: $ sigma(x) $,
-        line: (type: "linear"),
-        x => calc.max(0.1 * x, x)
-      )
-      plot.add(
-        domain: (-5, 0), 
-        style: (stroke: (thickness: 3pt, paint: blue)),
-        x => -0.1,
-      )
-      plot.add(
-        domain: (0, 5), 
-        style: (stroke: (thickness: 3pt, paint: blue)),
-        label: $ gradient sigma(x)$,
-        x => 1,
-      )
-    })
-})}
+#let ag = (
+  [Review],
+  [Dirty secret of deep learning], 
+  [Optimization is hard],
+  [Deeper neural networks],
+  [Activation functions],
+  [Parameter initialization],
+  //[Regularization],
+  //[Residual networks],
+  [Stochastic gradient descent],
+  [Modern optimization],
+  [Coding]
+)
 
 #show: university-theme.with(
   aspect-ratio: "16-9",
@@ -135,14 +38,153 @@
   institution-name: "University of Macau",
 )
 
-#slide(title: [Agenda])[#agenda(index: none)]
-#slide(title: [Agenda])[#agenda(index: 0)]
-// 4:30
-// TODO: Review
-#slide(title: [Agenda])[#agenda(index: 0)]
-#slide(title: [Agenda])[#agenda(index: 1)]
 
-#slide(title: [Dirty Secret of Deep Learning])[
+#aslide(ag, none)
+#aslide(ag, 0)
+// 4:30
+
+#sslide[
+  Many problems in ML can be reduced to *regression* or *classification* #pause
+
+  *Regression* asks how many #pause
+  - How long will I live? #pause
+  - How much rain will there be tomorrow? #pause
+  - How far away is this object? #pause
+
+  *Classification* asks which one #pause
+  - Is this a dog or muffin? #pause
+  - Will it rain tomorrow? Yes or no? #pause
+  - What color is this object? #pause
+  
+  So far, we only looked at regression. Now, let us look at classification
+]
+
+#sslide[
+  *Task:* Given a picture of clothes, predict the text description #pause
+
+  $X: bb(Z)_(0,255)^(32 times 32) #image("figures/lecture_5/classify_input.svg", width: 80%)$ #pause
+
+  $Y : & {"T-shirt, Trouser, Pullover, Dress, Coat,"\ 
+    & "Sandal, Shirt, Sneaker, Bag, Ankle boot"}$ #pause
+
+  *Approach:* Learn $bold(theta)$ that produce *conditional probabilities*  #pause
+
+  $ f(bold(x), bold(theta)) = P(bold(y) | bold(x)) = P(vec("T-Shirt", "Trouser", dots.v) mid(|) #image("figures/lecture_5/shirt.png", height: 20%)) = vec(0.2, 0.01, dots.v) $
+]
+
+#sslide[
+  If events $A, B$ are not disjoint, they are *conditionally dependent* #pause
+
+  $ P("cloud") = 0.2, P("rain") = 0.1 $ #pause
+
+  $ P("rain" | "cloud") = 0.5 $ #pause
+
+  $ P(A | B) = P(A sect B) / P(B) $ #pause
+
+  #side-by-side[Walk outside][
+    $P("Rain" sect "Cloud") = 0.1 \ 
+    P("Cloud") = 0.2$
+    $P("Rain" | "Cloud") = 0.1 / 0.2 = 0.5$
+  ]
+]
+
+#sslide[
+  How can we represent a probability distribution for a neural network? #pause
+
+  $ bold(v) = { vec(v_1, dots.v, v_(d_y)) mid(|) quad sum_(i=1)^(d_y) v_i = 1; quad v_i in (0, 1) } $ #pause
+
+  There is special notation for this vector, called the *simplex* #pause
+
+  $ Delta^(d_y - 1) $
+]
+
+#sslide[
+  The simplex $Delta^k$ is an $k - 1$-dimensional triangle in $k$-dimensional space #pause
+
+  #cimage("figures/lecture_5/simplex.svg", height: 70%)
+
+  It has only $k - 1$ free variables, because $x_(k) = 1 - sum_(i=1)^(k - 1) x_i$ 
+]
+
+#sslide[
+  The softmax function maps real numbers to the simplex (probabilities)
+
+  $ "softmax": bb(R)^k |-> Delta^(k - 1) $ #pause
+
+  $ "softmax"(vec(x_1, dots.v, x_k)) = (e^(bold(x))) / (sum_(i=1)^k e^(x_i)) = vec(
+    e^(x_1) / (e^(x_1) + e^(x_2) + dots e^(x_k)),
+    e^(x_2) / (e^(x_1) + e^(x_2) + dots e^(x_k)),
+    dots.v,
+    e^(x_k) / (e^(x_1) + e^(x_2) + dots e^(x_k)),
+  ) $ #pause
+
+  If we attach it to our linear model, we can output probabilities!
+
+  $ f(bold(x), bold(theta)) = "softmax"(bold(theta)^top bold(x)) $
+]
+
+#sslide[
+  *Question:* Why do we output probabilities instead of a binary values
+
+  $ f(bold(x), bold(theta)) = vec(
+    P("Shirt" | #image("figures/lecture_5/shirt.png", height: 10%)),
+    P("Bag" | #image("figures/lecture_5/shirt.png", height: 10%)),
+    dots.v
+  ) = vec(0.25, 0.08, dots.v); quad f(bold(x), bold(theta)) = vec(
+    1,
+    0,
+    dots.v
+  )
+  $ #pause
+
+  *Answer 1:* Outputting probabilities results in differentiable functions #pause
+  
+  *Answer 2:* We report uncertainty, which is useful in many applications 
+]
+
+#sslide[
+    #cimage("figures/lecture_5/fashion_mnist_probs.png", height: 80%)
+]
+
+#sslide[
+  We consider the label $bold(y)_[i]$ as a conditional distribution
+
+  $ P(bold(y)_[i] | bold(x)_[i]) = vec(
+    P("Shirt" | #image("figures/lecture_5/shirt.png", height: 10%)),
+    P("Bag" | #image("figures/lecture_5/shirt.png", height: 10%))
+  ) = vec(1, 0) $ #pause
+
+  What loss function should we use for classification?
+]
+
+
+#sslide[
+  Since $f(bold(x), bold(theta))$ and $P(bold(y) | bold(x))$ are both distributions, we want to measure the difference between distributions #pause
+
+  One measurement is the *Kullback-Leibler Divergence (KL)* #pause
+
+  #cimage("figures/lecture_5/forwardkl.png", height: 50%)
+]
+
+#sslide[
+  From the KL divergence, we derived the *cross-entropy loss* function, which we use for classification #pause
+
+  $ = - sum_(i=1)^(d_y) P(y_i | bold(x)) log f(bold(x), bold(theta))_i $ #pause
+
+  $ cal(L)(bold(x), bold(y), bold(theta)) = [- sum_(j=1)^n sum_(i=1)^(d_y) P(y_([j], i) | bold(x)_[j]) log f(bold(x)_[j], bold(theta))_i ] $ 
+
+]
+
+#sslide[
+  Finish coding exercise
+
+  https://colab.research.google.com/drive/1BGMIE2CjlLJOH-D2r9AariPDVgxjWlqG#scrollTo=AnHP-PHVhpW_
+]
+
+#aslide(ag, 0)
+#aslide(ag, 1)
+
+#sslide[
     So far, I gave you the impression that deep learning is rigorous #pause
 
     Biological inspiration, theoretical bounds and mathematical guarantees #pause
@@ -156,7 +198,7 @@
     Today we experiment, and maybe tomorrow we discover the theory 
 ]
 
-#slide(title: [Dirty Secret of Deep Learning])[
+#sslide[
     Similar to using neural networks for 40 years without knowing how to train them #pause
 
     #cimage("figures/lecture_1/timeline.svg", width: 90%) #pause
@@ -164,7 +206,7 @@
     Are modern networks are too complex for humans to understand?
 ]
 
-#slide(title: [Dirty Secret of Deep Learning])[
+#sslide[
     Scientific method: #pause
         + Collect observations #pause
         + Form hypothesis #pause
@@ -181,7 +223,7 @@
 
 ]
 
-#slide(title: [Dirty Secret of Deep Learning])[
+#sslide[
     For many concepts, the *observations* are stronger than the *theory* #pause
 
     Observe that a concept improves many types of neural networks #pause
@@ -197,10 +239,10 @@
     This is how medicine works (e.g., Anesthetics)!
 ]
 
-#slide(title: [Agenda])[#agenda(index: 1)]
-#slide(title: [Agenda])[#agenda(index: 2)]
+#aslide(ag, 1)
+#aslide(ag, 2)
 
-#slide(title: [Optimization is Hard])[
+#sslide[
     A 2-layer neural network can represent *any* continuous function to arbitrary precision #pause
 
     $ | f(bold(x), bold(theta)) - g(bold(x)) | < epsilon $ #pause
@@ -210,19 +252,19 @@
     However, finding such $bold(theta)$ is a much harder problem
 ]
 
-#slide(title: [Optimization is Hard])[
+#sslide[
     Gradient descent only guarantees convergence to a *local* optima #pause
 
     #cimage("figures/lecture_6/poor_minima.png", height: 80%)
 ]
 
-#slide(title: [Optimization is Hard])[
+#sslide[
     #cimage("figures/lecture_6/poor_minima.png", height: 75%) #pause
 
     Harder tasks can have millions of local optima, and many of the local optima are not very good!
 ]
 
-#slide(title: [Optimization is Hard])[
+#sslide[
     Many of the concepts today create a *flat* loss landscape #pause
 
     #cimage("figures/lecture_6/skip_connection_img.png", height: 70%)
@@ -230,10 +272,10 @@
     Gradient descent reaches a better optimum more quickly in these cases 
 ]
 
-#slide(title: [Agenda])[#agenda(index: 2)]
-#slide(title: [Agenda])[#agenda(index: 3)]
+#aslide(ag, 2)
+#aslide(ag, 3)
 
-#slide(title: [Deeper Neural Networks])[
+#sslide[
     A two-layer neural network is sufficient to approximate any continuous function to arbitrary precision #pause
 
     But only with infinite width $d_h -> oo$ #pause
@@ -247,7 +289,7 @@
     We need more layers for harder problems 
 ]
 
-#slide(title: [Deeper Neural Networks])[
+#sslide[
     In fact, we do not just need *deeper* networks, but also *wider* networks #pause
 
     The number of neurons in a deep neural network affects the quality of local optima #pause
@@ -259,7 +301,7 @@
     - "The probability of finding a “bad” (high value) local minimum is non-zero for small-size networks and decreases quickly with network size"
 ]
 
-#slide(title: [Deeper Neural Networks])[
+#sslide[
     To summarize, deeper and wider neural networks tend to produce better results #pause
 
     Add more layers to your network #pause
@@ -267,7 +309,7 @@
     Increase the width of each layer
 ]
 
-#slide(title: [Deeper Neural Networks])[
+#sslide[
     #side-by-side(align: top)[
     ```python
     # Deep neural network
@@ -294,7 +336,7 @@
     ]
 ]
 
-#slide(title: [Deeper Neural Networks])[
+#sslide[
     ```python
     import torch
     d_x, d_y, d_h = 1, 1, 256
@@ -312,7 +354,7 @@
     ```
 ]
 
-#slide(title: [Deeper Neural Networks])[
+#sslide[
     ```python
     import jax, equinox
     d_x, d_y, d_h = 1, 1, 256
@@ -331,10 +373,10 @@
 ]
 
 
-#slide(title: [Agenda])[#agenda(index: 3)]
-#slide(title: [Agenda])[#agenda(index: 4)]
+#aslide(ag, 3)
+#aslide(ag, 4)
 
-#slide(title: [Activation Functions])[
+#sslide[
     The sigmoid function was the standard activation function until \~ 2012 #pause
 
     #cimage("figures/lecture_1/timeline.svg", width: 90%) #pause
@@ -342,7 +384,7 @@
     In 2012, people realized that ReLU activation performed much better
 ]
 
-#slide(title: [Activation Functions])[
+#sslide[
     #side-by-side[#sigmoid #pause][
         The sigmoid function can result in a *vanishing gradient* #pause
         
@@ -377,7 +419,7 @@
 
 ]
 
-#slide(title: [Activation Functions])[
+#sslide[
     #only((1,2))[To fix the vanishing gradient, researchers use the *rectified linear unit (ReLU)*]
     #side-by-side[$ sigma(x) = max(0, x) \ gradient sigma(x) = cases(0 "if" x < 0, 1 "if" x >= 0) $ #pause][#relu #pause]
 
@@ -398,7 +440,7 @@
     #only((10))[These neurons cannot recover, they are *dead neurons*]
 ]
 
-#slide(title: [Activation Functions])[
+#sslide[
     #side-by-side[$ sigma(x) = max(0, x) \ gradient sigma(x) = cases(0 "if" x < 0, 1 "if" x >= 0) $ ][#relu]
 
     These neurons cannot recover, they are *dead neurons* #pause
@@ -408,7 +450,7 @@
     Dead neurons hurt your network!
 ]
 
-#slide(title: [Activation Functions])[
+#sslide[
     To fix dying neurons, use *leaky ReLU* #pause
 
     #side-by-side[$ sigma(x) = max(0.1 x, x) \ gradient sigma(x) = cases(0.1 "if" x < 0, 1 "if" x >= 0) $ #pause][#lrelu #pause]
@@ -417,7 +459,7 @@
 ]
 
 
-#slide(title: [Activation Functions])[
+#sslide[
     #side-by-side[
     There are other activation functions that are better than leaky ReLU #pause
     - Mish #pause
@@ -434,17 +476,17 @@
     I usually use leaky ReLU because it works well enough
 ]
 
-#slide(title: [Activation Functions])[
+#sslide[
     https://pytorch.org/docs/stable/nn.html#non-linear-activations-weighted-sum-nonlinearity
 
     https://jax.readthedocs.io/en/latest/jax.nn.html#activation-functions
 ]
 
 
-#slide(title: [Agenda])[#agenda(index: 4)]
-#slide(title: [Agenda])[#agenda(index: 5)]
+#aslide(ag, 4)
+#aslide(ag, 5)
 
-#slide(title: [Parameter Initialization])[
+#sslide[
   Recall the gradient descent algorithm
 
   #algorithm({
@@ -467,7 +509,7 @@
   })
 ]
 
-#slide(title: [Parameter Initialization])[
+#sslide[
     Initial $bold(theta)$ is starting position for gradient descent #pause
 
     #cimage("figures/lecture_6/poor_minima.png", height: 70%) #pause
@@ -475,7 +517,7 @@
     Pick $bold(theta)$ that results in good local minima
 ]
 
-#slide(title: [Parameter Initialization])[
+#sslide[
     Start simple, initialize all parameters to 0
 
     $ bold(theta) = mat(
@@ -497,7 +539,7 @@
     $ gradient_bold(theta)_1 f = sigma(bold(0)^top sigma( bold(theta)_1^top overline(bold(x)))) space sigma( bold(theta)_1^top overline(bold(x))) space  overline(bold(x)) = 0 $
 ]
 
-#slide(title: [Parameter Initialization])[
+#sslide[
     Ok, so initialize $bold(theta) = bold(1)$ #pause
 
     $ bold(theta) = mat(
@@ -517,7 +559,7 @@
     $ z_i = sigma(sum_(j=1)^d_x theta_j dot overline(x)_j)  = sigma(sum_(j=1)^d_x overline(x)_j) $
 ]
 
-#slide(title: [Parameter Initialization])[
+#sslide[
     $bold(theta)$ must be randomly initialized for neurons
 
     $ bold(theta) = mat(
@@ -537,7 +579,7 @@
         - Maybe there are better options?
 ]
 
-#slide(title: [Parameter Initialization])[
+#sslide[
     Here is the magic equation, given the input and output size of the layer is $d_h$
 
     $ bold(theta) tilde cal(U)[ - sqrt(6) / sqrt(2 d_h), sqrt(6) / sqrt(2 d_h)] $ #pause
@@ -547,14 +589,14 @@
     $ bold(theta) tilde cal(U)[ - sqrt(6) / sqrt(d_x + d_y), sqrt(6) / sqrt(d_x + d_y)] $
 ]
 
-#slide(title: [Parameter Initialization])[
+#sslide[
     These equations are designed for ReLU and similar activation functions #pause
 
     They prevent vanishing or exploding gradients
 ]
 
 
-#slide(title: [Parameter Initialization])[
+#sslide[
     Usually `torch` and `jax/equinox` will automatically use this initialization when you create `nn.Linear`
 
     ```python
@@ -566,7 +608,7 @@
     For JAX it is https://jax.readthedocs.io/en/latest/jax.nn.initializers.html
 ]
 
-#slide(title: [Parameter Initialization])[
+#sslide[
     ```python
 
     import torch
@@ -585,7 +627,7 @@
     ```
 ]
 
-#slide(title: [Parameter Initialization])[
+#sslide[
     ```python
     import jax
     d_h = 10
@@ -597,7 +639,7 @@
 
 
 
-#slide(title: [Parameter Initialization])[
+#sslide[
     ```python
     import jax, equinox
     d_h = 10
@@ -614,13 +656,13 @@
     ```
 ]
 
-#slide(title: [Parameter Initialization])[
+#sslide[
     Remember, in `equinox` and `torch`, `nn.Linear` will already be initialized correctly! 
 ]
 
 
-#slide(title: [Agenda])[#agenda(index: 5)]
-#slide(title: [Agenda])[#agenda(index: 6)]
+#aslide(ag, 5)
+#aslide(ag, 6)
 
 // Now, let us talk a little bit more about optimization
 // We computed the gradient over the entire training dataset
@@ -642,7 +684,7 @@
 // They can also have very large datasets
 // We do not like getting stuck in local minima
 
-#slide(title: [Stochastic Gradient Descent])[
+#sslide[
     #algorithm({
     import algorithmic: *
 
@@ -665,7 +707,7 @@
   Gradient descent computes $gradient cal(L)$ over all $bold(X)$
 ]
 
-#slide(title: [Stochastic Gradient Descent])[
+#sslide[
     This works for our small datasets, where $n = 1000$ #pause
 
     *Question:* How many GB are the LLM datasets? #pause
@@ -682,16 +724,14 @@
     $
 ]
 
-#slide(title: [Stochastic Gradient Descent])[
-    *Question:* We do not have enough memory to compute the gradient #pause
+#sslide[
+    *Question:* We do not have enough memory to compute the gradient. What can we do? #pause
 
-    *Answer:* What can we do? #pause
-
-    We approximate the gradient using a subset of the data #pause
+    *Answer:*  We approximate the gradient using a subset of the data 
 
 ]
 
-#slide(title: [Stochastic Gradient Descent])[
+#sslide[
 
     First, we sample random datapoint indices 
     
@@ -704,7 +744,7 @@
     We call this *stochastic gradient descent*
 ]
 
-#slide(title: [Stochastic Gradient Descent])[
+#sslide[
     #algorithm({
     import algorithmic: *
 
@@ -728,7 +768,7 @@
 ]
 
 
-#slide(title: [Stochastic Gradient Descent])[
+#sslide[
     Stochastic gradient descent (SGD) is useful for saving memory #pause
 
     But it can also improve performance #pause
@@ -740,7 +780,7 @@
     #cimage("figures/lecture_5/saddle.png")
 ]
 
-#slide(title: [Stochastic Gradient Descent])[
+#sslide[
     There is `torch.utils.data.DataLoader` to help #pause
 
     ```python
@@ -760,11 +800,11 @@
 
 
 
-#slide(title: [Agenda])[#agenda(index: 6)]
-#slide(title: [Agenda])[#agenda(index: 7)]
+#aslide(ag, 6)
+#aslide(ag, 7)
 
 
-#slide(title: [Modern Optimization])[
+#sslide[
     Gradient descent is a powerful tool, but it has issues #pause
     + It can be slow to converge #pause
     + It can get stuck in poor local optima #pause
@@ -778,7 +818,7 @@
     https://www.youtube.com/watch?v=MD2fYip6QsQ&t=77s
 ]
 
-#slide(title: [Modern Optimization])[
+#sslide[
     The video simulations provide an intuitive understanding of adaptive optimizers #pause
 
     The key behind modern optimizers is two concepts:
@@ -788,7 +828,7 @@
     Let us discuss the algorithms more slowly
 ]
 
-#slide(title: [Modern Optimization])[
+#sslide[
 
     Review gradient descent again, because we will be making changes to it #pause
 
@@ -813,7 +853,7 @@
 ]
 
 
-#slide(title: [Modern Optimization])[
+#sslide[
     Introduce *momentum* first #pause
 
     #algorithm({
@@ -835,7 +875,7 @@
   })
 ]
 
-#slide(title: [Modern Optimization])[
+#sslide[
     Now *adaptive learning rate* #pause
 
     #algorithm({
@@ -858,7 +898,7 @@
 ]
 
 
-#slide(title: [Adaptive Optimization])[
+#sslide[
     Combine *momentum* and *adaptive learning rate* to create *Adam* #pause
 
   #algorithm({
@@ -883,7 +923,7 @@
   }) 
 ]
 
-#slide(title: [Adaptive Optimization])[
+#sslide[
     ```python
     import torch
     betas = (0.9, 0.999)
@@ -901,7 +941,7 @@
     ```
 ]
 
-#slide(title: [Adaptive Optimization])[
+#sslide[
     ```python
     import optax
     betas = (0.9, 0.999)
@@ -919,9 +959,9 @@
     ```
 ]
 
-#slide(title: [Agenda])[#agenda(index: 7)]
-#slide(title: [Agenda])[#agenda(index: 8)]
+#aslide(ag, 7)
+#aslide(ag, 8)
 
-
-// First requirement: break symmetry (explain why)
-// Second requirement: normalized/scaled activation/gradients (explain why)
+#sslide[
+  https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD#scrollTo=YVkCyz78x4Rp
+]
