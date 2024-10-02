@@ -13,15 +13,15 @@
 
 #let ag = (
   [Review],
-  [Dirty secret of deep learning], 
-  [Optimization is hard],
-  [Deeper neural networks],
-  [Activation functions],
-  [Parameter initialization],
+  [Dirty Secret of Deep Learning], 
+  [Optimization is Hard],
+  [Deeper Neural Networks],
+  [Activation Functions],
+  [Parameter Initialization],
   //[Regularization],
   //[Residual networks],
-  [Stochastic gradient descent],
-  [Modern optimization],
+  [Stochastic Gradient Descent],
+  [Modern Optimization],
   [Coding]
 )
 

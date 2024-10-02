@@ -170,6 +170,34 @@
     })
 })}
 
+#let implot_color = { 
+    set text(size: 25pt)
+    canvas(length: 1cm, {
+  plot.plot(size: (7, 7),
+    x-tick-step: 64,
+    y-tick-step: 64,
+    y-min: 0,
+    y-max: 256,
+    x-min: 0,
+    x-max: 256,
+    x-label: [$u$ (Pixels)],
+    y-label: [$v$ (Pixels)],
+    {
+      plot.add(
+        label: $ x(u, v) $,
+        domain: (0, 1), 
+        style: (stroke: (thickness: 0pt, paint: red)),
+        t => 1000 * (
+          calc.sin(calc.pi * 1320 * t)
+        )
+      )
+      plot.annotate({
+        import cetz.draw: *
+        content((128, 128), image("figures/lecture_1/dog.png", width: 7cm))
+      })
+    })
+})}
+
 #let implot_left = { 
     set text(size: 25pt)
     canvas(length: 1cm, {
@@ -332,10 +360,13 @@
   for i in range(cells.len()) {
     for j in range(cells.at(i).len()) {
       if (colors != none)  {
-        rect((i, j), (i + 1, j + 1), fill: red)
-        content((x + i + 0.4, y + j + 0.6), (i, j), str(cells.at(cells.at(i).len() - j - 1).at(i)))
+        let cell_color = colors.at(cells.at(i).len() - j - 1).at(i)
+        if (cell_color != none){
+          rect((i, j), (i + 1, j + 1), fill: cell_color)
+        }
+        content((x + i + 0.4, y + j + 0.6), (i, j), cells.at(cells.at(i).len() - j - 1).at(i))
 
-      } else{
+      } else {
         content((x + i + 0.4, y + j + 0.6), (i, j), str(cells.at(cells.at(i).len() - j - 1).at(i)))
       }
 
@@ -360,12 +391,14 @@ let image_values = (
   (4, 0, 0, 4),
   (4, 0, 0, 4),
 )
+/*
 let colors = (
   red, red, red, red,
   red, red, red, red,
   red, red, red, red,
   red, red, red, red,
 )
+*/
 draw_filter(0, 0, image_values)
 //content((2, 2), image("figures/lecture_7/ghost_dog_bw.svg", width: 4cm))
 })
@@ -376,24 +409,14 @@ draw_filter(0, 0, image_values)
 // Introduce convolution (continuous)
 
 
-#let agenda(index: none) = {
-  let ag = (
-    [Review],
-    [Signal Processing], 
-    [Convolution],
-    [2D Convolution],
-    [Downsampling],
-    [Coding]
-  )
-  for i in range(ag.len()){
-    if index == i {
-      enum.item(i + 1)[#text(weight: "bold", ag.at(i))]
-    } else {
-      enum.item(i + 1)[#ag.at(i)]
-    }
-  }
-}
-
+#let ag = (
+  [Review],
+  [Signal Processing], 
+  [Convolution],
+  [Convolutional Neural Networks],
+  [Additional Dimensions],
+  [Coding]
+)
 
 
 #show: university-theme.with(
@@ -409,15 +432,15 @@ draw_filter(0, 0, image_values)
   institution-name: "University of Macau",
 )
 
-#slide(title: [Agenda])[#agenda(index: none)]
-#slide(title: [Agenda])[#agenda(index: 0)]
+#aslide(ag, none)
+#aslide(ag, 0)
 
 #slide(title: [Review])[
 
 ]
 
-#slide(title: [Agenda])[#agenda(index: 0)]
-#slide(title: [Agenda])[#agenda(index: 1)]
+#aslide(ag, 0)
+#aslide(ag, 1)
 
 
 
@@ -426,11 +449,11 @@ draw_filter(0, 0, image_values)
 
   We treat images as a vector, with no relationship between neighboring pixels #pause
 
-  Neurons $i$ in layer $ell$ has no relationship to neuron $j$ #pause
+  Neurons $i$ in layer $ell$ has no relationship to neuron $j$ in layer $ell$ #pause
 
   However, there is structure inherent in the real world #pause
 
-  By representing this structure within neural networks, we can make neural networks that are more efficient and generalize better #pause
+  By representing this structure, we can make more efficient neural networks that generalize better #pause
 
   To do so, we must think of the world as a collection of signals
 ]
@@ -443,6 +466,8 @@ draw_filter(0, 0, image_values)
   $ x(t) = dots $ 
 
   $ x(u, v) = dots $ #pause
+
+  $x(t), x(u, v)$ are some physical processes that we may or may not know #pause
 
   *Signal processing* is a field of research that focuses on analyzing the meaning of signals #pause
 
@@ -461,6 +486,8 @@ draw_filter(0, 0, image_values)
 
   #align(center, stonks) #pause
 
+  There is an underlying structure that we do not fully understand #pause
+
   *Structure:* Tomorrow's stock price will be close to today's stock price
 
 ]
@@ -470,7 +497,9 @@ draw_filter(0, 0, image_values)
 
   #align(center, waveform) #pause
 
-  *Structure:* Nearby waves form syllables
+  *Structure:* Nearby waves form syllables #pause
+
+  *Structure:* Nearby syllables combine to create meaning 
 
 ]
 
@@ -479,13 +508,13 @@ draw_filter(0, 0, image_values)
   
   #align(center, implot) #pause
 
-  *Structure:* Repeated components (eyes, nostrils, etc)
+  *Structure:* Repeated components (circles, symmetry, eyes, nostrils, etc)
 ]
 
 #slide(title: [Signal Processing])[
   In signal processing, we often consider: #pause
   - Locality #pause
-  - Translation invariance
+  - Translation equivariance 
 ]
 
 #slide(title: [Signal Processing])[
@@ -497,7 +526,7 @@ draw_filter(0, 0, image_values)
 ]
 
 #slide(title: [Signal Processing])[
-  *Translation Invariance:* Signal does not change when shifted in space/time #pause
+  *Translation Equivariance:* Shift in signal results in shift in output #pause
 
   #side-by-side[#waveform_left][#waveform_right] #pause
 
@@ -505,7 +534,7 @@ draw_filter(0, 0, image_values)
 ]
 
 #slide(title: [Signal Processing])[
-  *Translation Invariance:* Signal does not change when shifted #pause
+  *Translation Equivariance:* Shift in signal results in shift in output #pause
 
   #side-by-side[#implot_left][#implot_right]
 
@@ -513,7 +542,7 @@ draw_filter(0, 0, image_values)
 ]
 
 #slide(title: [Signal Processing])[
-  Perceptrons are not local or translation invariant, each pixel is an independent neuron #pause
+  Perceptrons are not local or translation equivariant, each pixel is an independent neuron #pause
 
   #align(center, cetz.canvas({
     import cetz.draw: *
@@ -533,12 +562,70 @@ draw_filter(0, 0, image_values)
   content((2, 2), image("figures/lecture_7/ghost_dog_bw.svg", width: 4cm))
   content((6, 6), image("figures/lecture_7/ghost_dog_bw.svg", width: 4cm))
   })) #pause
-
-  How can we get these properties in neural networks?
 ]
 
-#slide(title: [Agenda])[#agenda(index: 1)]
-#slide(title: [Agenda])[#agenda(index: 2)]
+#slide(title: [Signal Processing])[
+  A more realistic scenario of locality and translation equivariance #pause
+
+  #align(center, cetz.canvas({
+    import cetz.draw: *
+
+
+  let image_values = (
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+  )
+  content((4, 4), image("figures/lecture_7/flowers.jpg", width: 8cm))
+  draw_filter(0, 0, image_values)
+  })) #pause
+
+  //How can we represent these properties in neural networks?
+]
+
+#slide(title: [Signal Processing])[
+  A more realistic scenario of locality and translation equivariance 
+
+  #align(center, cetz.canvas({
+    import cetz.draw: *
+
+
+  let image_values = (
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+  )
+  let image_colors = (
+    (white, white, white, white, white, white, white, white),
+    (white, white, white, white, white, none, none, none),
+    (white, white, white, white, white, none, none, none),
+    (white, white, white, white, white, none, none, none),
+    (white, white, none, none, white, white, white, white),
+    (white, white, none, none, white, white, white, white),
+    (white, white, none, none, white, white, white, white),
+    (white, white, white, white, white, white, white, white),
+  )
+  content((4, 4), image("figures/lecture_7/flowers.jpg", width: 8cm))
+  draw_filter(0, 0, image_values, colors: image_colors)
+  })) #pause
+
+  //How can we represent these properties in neural networks?
+]
+
+
+
+#aslide(ag, 1)
+#aslide(ag, 2)
 
 
 #slide(title: [Convolution])[
@@ -546,22 +633,24 @@ draw_filter(0, 0, image_values)
 
   #side-by-side[#waveform_left][#hello] #pause
 
-  A standard way to transform signals is *convolution*
+  A standard way to transform signals is *convolution* #pause
+
+  Convolution is translation equivariant and can be local
 ]
 
 
 #slide(title: [Convolution])[
   Convolution is the sum of products of a signal $x(t)$ and a *filter* $g(t)$ #pause
 
-  If time and space is continuous, we write convolution as
+  If the t is continuous in $x(t)$
 
   $ x(t) * g(t) = integral_(-oo)^(oo) x(t - tau) g(tau) d tau $ #pause
 
-  If $x, g$ are discrete time or space, we use a sum instead of integral
+  If the t is discrete in $x(t)$
 
   $ x(t) * g(t) = sum_(tau=-oo)^(oo) x(t - tau) g(tau) $ #pause
 
-  We slide the filter across the signal, taking the product as we go #pause
+  We slide the filter $g(t)$ across the signal $x(t)$
 ]
 
 
@@ -589,13 +678,21 @@ draw_filter(0, 0, image_values)
 
   Convolution is *local* to the filter $g(t)$ #pause
 
-  Convolution is also *invariant* to time/space shifts
+  Convolution is also *equivariant* to time/space shifts
 ]
 
 #slide(title: [Convolution])[
   Often, we use continuous time/space convolution for analog signals #pause
+  - Physics #pause
+  - Control theory #pause
+  - Electrical engineering #pause
 
-  For digital signals, we use discrete time/space
+  Almost all deep learning occurs on digital hardware (discrete time/space)
+  - Images #pause
+  - Quantized audio #pause
+  - Anything stored as bits instead of a function #pause
+
+  But it is good to know both! Continuous variables for theory. Discrete variables for software 
 ]
 
 #slide(title: [Convolution])[
@@ -736,11 +833,560 @@ draw_filter(0, 0, image_values)
 
   *Question:* How does convolution differ from a neuron? #pause
 
-  *Answer:* In a neuron, each input $x_i$ has a different parameter $theta_i$. In convolution, we reuse $theta_i$ on $x_j, x_k, dots$
+  *Answer:* In a neuron, each input $x_i$ has a different parameter $theta_i$. In convolution, we reuse (slide) $theta_i$ over $x_1, x_2, dots$
+]
+
+#aslide(ag, 2)
+#aslide(ag, 3)
+
+#sslide[
+  Convolutional neural networks (CNNs) use convolutional layers #pause
+
+  Their translation equivariance and locality make them very efficient #pause
+
+  They also scale to variable-length sequences #pause
+
+  Efficiently expands neural networks to images, videos, sounds, etc 
+]
+
+#sslide[
+  CNNs have been around since the 1970's #pause
+
+  #cimage("figures/lecture_1/timeline.svg") #pause
+
+  2012: GPU and CNN efficiency resulted in breakthroughs
+]
+
+#sslide[
+  So how does a convolutional neural network work? #pause
+
+  Like before, we will start with linear functions and derive a convolutional layer
+]
+
+#sslide[
+  Recall the neuron #pause
+  #side-by-side[Neuron for single $x$:][$ f(x, bold(theta)) = sigma(theta_1 x + theta_0) $] #pause
+
+  #side-by-side[#waveform #pause][
+  $ f(vec(x(0.1), x(0.2), dots.v), bold(theta)) = \ sigma(theta_0 + theta_1 x(0.1) + theta_2 x(0.2) + dots) $
+  ]
+]
+
+#sslide[
+  #side-by-side[#waveform][
+  $ f(vec(x(0.1), x(0.2), dots.v), bold(theta)) = \ theta_0 + theta_1 x(0.1) + theta_2 x(0.2) + dots $
+  ] #pause
+
+  *Question:* Any problems besides locality/equivariance? #pause
+
+  *Answer 1:* Parameters scale with sequence length #pause
+
+  *Answer 2:* Parameters only for exactly 1 second waveforms
+]
+
+#sslide[
+  To fix problems, each timestep cannot use different parameters #pause
+
+  $ f(vec(x(0.1), x(0.2), dots.v), vec(theta_0, theta_1, dots.v)) \
+  = sigma(theta_0 + theta_1 x(0.1) + theta_2 x(0.2) + theta_3 x(0.3) + theta_4 x(0.4) + theta_5 x(0.5) + dots) $
+  #pause
+
+  $ f(vec(x(0.1), x(0.2), dots.v), vec(theta_0, theta_1, theta_2)) = 
+  vec(
+    sigma(theta_0 + theta_1 x(0.1) + theta_2 x(0.2)),
+    sigma(theta_0 + theta_1 x(0.2) + theta_2 x(0.3)),
+    sigma(theta_0 + theta_1 x(0.3) + theta_2 x(0.4)),
+    dots.v
+  ) $
+]
+
+
+#sslide[
+  $ f(vec(x(0.1), x(0.2), dots.v), vec(theta_0, theta_1, theta_2)) = 
+  vec(
+    sigma(theta_0 + theta_1 x(0.1) + theta_2 x(0.2)),
+    sigma(theta_0 + theta_1 x(0.2) + theta_2 x(0.3)),
+    sigma(theta_0 + theta_1 x(0.3) + theta_2 x(0.4)),
+    dots.v
+  ) $
+
+  This is a convolutional layer! #pause
+    - Local, only considers two inputs at a time #pause
+    - Translation equivariant, each output corresponds to input #pause
+
+]
+
+#sslide[
+  We can write both the neuron and convolution in vector form
+
+  #side-by-side[$ f(x(t), bold(theta)) = sigma(bold(theta)^top vec(1, x(0.1), x(0.2), dots.v)) $ #pause][
+  $ f(x(t), bold(theta)) = vec(
+    sigma(bold(theta)^top vec(1, x(0.1), x(0.2))),
+    sigma(bold(theta)^top vec(1, x(0.2), x(0.3))),
+    dots.v
+  ) $
+  ]
+
+  A convolution layer applies a "mini" perceptron to every few timesteps
+]
+
+#sslide[
+  #side-by-side[ $ f(x(t), bold(theta)) = vec(
+    sigma(bold(theta)^top vec(1, x(0.1), x(0.2))),
+    sigma(bold(theta)^top vec(1, x(0.2), x(0.3))),
+    dots.v
+  ) $ #pause ][
+    *Question:* What is the shape of the results? #pause
+  ]
+
+  *Answer 1:* Depends on sampling rate and filter size! #pause
+
+  *Answer 2:* $T - k$, where $T$ is sequence length and $k$ filter length 
+]
+
+#sslide[
+  If we want a single output, we should *pool* #pause
+
+  $ z(t) = f(x(t), bold(theta)) = mat(
+    sigma(bold(theta)^top vec(1, x(0.1), x(0.2))),
+    sigma(bold(theta)^top vec(1, x(0.2), x(0.3))),
+    dots
+  )^top $ #pause 
+
+  $ "SumPool"(z(t)) = sigma(bold(theta)^top vec(1, x(0.1), x(0.2))) + sigma(bold(theta)^top vec(1, x(0.2), x(0.3))) + dots
+  $ #pause
+
+  $ "MeanPool"(z(t)) = 1 / T "SumPool"(z(t))
+  $
+]
+
+#sslide[
+  *Question:* $x(t)$ is a function, what is the function signature? #pause
+
+  *Answer:* 
+
+  $ x: bb(R)_+ |-> bb(R) $ #pause
+
+  So far, we have considered: #pause
+  - 1 dimensional variable $t$ #pause
+  - 1 dimensional input/channel $x(t)$ #pause
+  - 1 filter #pause
+
+  We must consider a more general case #pause
+
+  Things will get more complicated, but the core idea is exactly the same
+]
+
+#aslide(ag, 3)
+#aslide(ag, 4)
+
+#sslide[
+  #side-by-side[#implot][
+    *Question:* How many input dimensions for $x$? #pause
+
+    *Answer:* 2, $u, v$
+
+    *Question:* How many output dimensions for $x$? #pause
+
+    *Answer:* 1, black/white value
+    ]
+
+    $ x: underbrace(bb(Z)_(0, 255), "width") times underbrace(bb(Z)_(0, 255), "height") |-> underbrace(bb(Z)_(0, 255), "Color values") $
+]
+
+#sslide[
+  #let c = cetz.canvas({
+    import cetz.draw: *
+
+    content((4, 4), image("figures/lecture_7/ghost_dog_bw.svg", width: 8cm))
+    
+    draw_filter(
+      0, 0,
+      (
+        (0, 1, 1, 1, 1, 1, 0, 1),
+        (0, 1, 1, 1, 1, 1, 1, 1),
+        (1, 0, 0, 1, 1, 0, 0, 1),
+        (1, 0, 0, 1, 1, 0, 0, 1),
+        (1, 1, 0, 0, 0, 1, 1, 1),
+        (1, 1, 0, 0, 0, 1, 1, 1),
+        (0, 1, 0, 0, 0, 1, 1, 0),
+        (1, 0, 1, 1, 1, 1, 1, 1),
+      )
+    )
+
+  content((4, -1), text(size: 40pt)[$*$])
+
+  draw_filter(
+    3, -4,
+    (
+      (1, 0),
+      (0, 1)
+    )
+  )
+  
+  })
+  #c
+
+]
+
+#sslide[
+  #side-by-side[#implot_color][
+    *Question:* How many input dimensions for $x$? #pause
+
+    *Answer:* 2, $u, v$
+
+    *Question:* How many output dimensions for $x$? #pause
+
+    *Answer:* 3 -- red, green, and blue channels
+    ]
+
+    $ x: underbrace(bb(Z)_(0, 255), "width") times underbrace(bb(Z)_(0, 255), "height") |-> underbrace([0, 1]^3, "Color values") $
+]
+
+#sslide[
+  #cimage("figures/lecture_7/ghost_dog_rgb.png") #pause
+
+  Computers represent 3 color channels each with 256 integer values #pause
+
+  But we usually convert the colors to be in $[0, 1]$ for scale reasons #pause
+
+  $ mat(R / 255, G / 255, B / 255) $
+]
+
+#sslide[
+
+  Each pixel contains 3 colors (channels) #pause
+
+  And the pixels extend in 2 directions (variable) #pause
+
+  $ bold(x)(u, v) = 
+    mat(
+      underbrace(mat(
+        130, 140, 120, 103;
+        80, 140, 120, 105;
+        130, 140, 75, 165;
+        210, 140, 90, 150;
+      ), "red"), 
+      underbrace(mat(
+        130, 140, 75, 165;
+        210, 140, 90, 150;
+        130, 140, 120, 103;
+        80, 140, 120, 105;
+      ), "green"), 
+      underbrace(mat(
+        210, 140, 90, 150;
+        130, 140, 75, 165;
+        110, 140, 120, 103;
+        80, 140, 120, 105;
+      ), "blue"), 
+    )^top
+  $ #pause
+
+  This form is called $C H W$ (channel, height, width) format
+
+  Convolutional filter must process this data!
+]
+
+#sslide[
+  #let c = cetz.canvas({
+    import cetz.draw: *
+
+    content((4, 4), image("figures/lecture_7/dog_r.png", width: 8cm))
+    
+    draw_filter(
+      0, 0,
+      (
+        (0, 1, 1, 1, 1, 1, 0, 1),
+        (0, 1, 1, 1, 1, 1, 1, 1),
+        (1, 0, 0, 1, 1, 0, 0, 1),
+        (1, 0, 0, 1, 1, 0, 0, 1),
+        (1, 1, 0, 0, 0, 1, 1, 1),
+        (1, 1, 0, 0, 0, 1, 1, 1),
+        (0, 1, 0, 0, 0, 1, 1, 0),
+        (1, 0, 1, 1, 1, 1, 1, 1),
+      )
+    )
+
+    content((13, 4), image("figures/lecture_7/dog_g.png", width: 8cm))
+    draw_filter(
+      9, 0,
+      (
+        (0, 1, 1, 1, 1, 1, 0, 1),
+        (0, 1, 1, 1, 1, 1, 1, 1),
+        (1, 0, 0, 1, 1, 0, 0, 1),
+        (1, 0, 0, 1, 1, 0, 0, 1),
+        (1, 1, 0, 0, 0, 1, 1, 1),
+        (1, 1, 0, 0, 0, 1, 1, 1),
+        (0, 1, 0, 0, 0, 1, 1, 0),
+        (1, 0, 1, 1, 1, 1, 1, 1),
+      )
+    )  
+
+    content((22, 4), image("figures/lecture_7/dog_b.png", width: 8cm))
+    draw_filter(
+      18, 0,
+      (
+        (0, 1, 1, 1, 1, 1, 0, 1),
+        (0, 1, 1, 1, 1, 1, 1, 1),
+        (1, 0, 0, 1, 1, 0, 0, 1),
+        (1, 0, 0, 1, 1, 0, 0, 1),
+        (1, 1, 0, 0, 0, 1, 1, 1),
+        (1, 1, 0, 0, 0, 1, 1, 1),
+        (0, 1, 0, 0, 0, 1, 1, 0),
+        (1, 0, 1, 1, 1, 1, 1, 1),
+      )
+    )
+
+  content((4, -1), text(size: 40pt)[$*$])
+
+  draw_filter(
+    3, -4,
+    (
+      (1, 0),
+      (0, 1)
+    )
+  )
+  
+  content((8.5, -3), text(size: 40pt)[$+$])
+  content((13, -1), text(size: 40pt)[$*$])
+
+  draw_filter(
+    12, -4,
+    (
+      (1, 1),
+      (0, 1)
+    )
+  )
+
+  content((17.5, -3), text(size: 40pt)[$+$])
+  content((22, -1), text(size: 40pt)[$*$])
+  draw_filter(
+    21, -4,
+    (
+      (1, 0),
+      (0, 0)
+    )
+  )
+  })
+  #c
+]
+
+#sslide[
+  I will not bore you with the full equations #pause
+
+  *Question:* What is the shape of $bold(theta)$ for a single layer? #pause
+
+  *Answer:* 
+
+  //$ bold(theta) in bb(R)^(overbrace((k + 1), "Filter" u) times overbrace(k, "Filter" v) times overbrace(d_x, "Input channels") times overbrace(d_y, "Output channels")) $
+
+  $ bold(theta) in bb(R)^(c_x times c_y times (k + 1) times k) $
+  
+  - Input channels: $c_x$
+  - Output channels: $c_y$
+  - Filter $u$ (height): $k + 1$
+  - Filter $v$ (width): $k$
+]
+
+#sslide[
+  ```python
+  import torch
+  c_x = 3 # Number of colors
+  c_y = 32
+  k = 2 # Filter size
+  h, w = 128, 128 # Image size
+
+  conv1 = torch.nn.Conv2d(
+    in_channels=c_x, 
+    out_channels=c_y,
+    kernel_size=2
+  )
+  image = torch.rand((1, c_x, h, w)) # Torch requires BCHW
+  out = conv1(image) # Shape(1, c_y, h - k, w - k)
+  ```
+]
+
+#sslide[
+  #side-by-side[
+    One last thing, stride allows you to "skip" cells during convolution #pause
+
+    This can decrease the size of image without pooling #pause
+  ][
+  #let c = cetz.canvas({
+    import cetz.draw: *
+
+    content((4, 4), image("figures/lecture_7/ghost_dog_bw.svg", width: 8cm))
+    
+    draw_filter(
+      0, 0,
+      (
+        (0, 1, 1, 1, 1, 1, 0, 1),
+        (0, 1, 1, 1, 1, 1, 1, 1),
+        (1, 0, 0, 1, 1, 0, 0, 1),
+        (1, 0, 0, 1, 1, 0, 0, 1),
+        (1, 1, 0, 0, 0, 1, 1, 1),
+        (1, 1, 0, 0, 0, 1, 1, 1),
+        (0, 1, 0, 0, 0, 1, 1, 0),
+        (1, 0, 1, 1, 1, 1, 1, 1),
+      )
+    )
+
+  content((4, -1), text(size: 40pt)[$*$])
+
+  draw_filter(
+    3, -4,
+    (
+      (1, 0),
+      (0, 1)
+    )
+  )
+  
+  })
+  #c
+  ]
+]
+
+#aslide(ag, 4)
+#aslide(ag, 5)
+
+#sslide[
+  ```python
+  import jax, equinox
+  c_x = 3 # Number of colors
+  c_y = 32
+  k = 2 # Filter size
+  h, w = 128, 128 # Image size
+  conv1 = equinox.nn.Conv2d(
+    in_channels=c_x, 
+    out_channels=c_y,
+    kernel_size=2,
+    key=jax.random.key(0)
+  )
+  image = jax.random.uniform(jax.random.key(1), (c_x, h, w)) 
+  out = conv1(image) # Shape(c_y, h - k, w - k)
+  ```
+]
+
+#sslide[
+  ```python
+  import torch
+  conv1 = torch.nn.Conv2d(3, c_h, 2)
+  pool1 = torch.nn.AdaptivePool2d((a, a))
+  conv2 = torch.nn.Conv2d(c_h, c_y, 2)
+  pool2 = torch.nn.AdaptivePool2d((b, b))
+  linear = torch.nn.Linear(c_y * b * b)
+  z_1 = conv1(image)
+  z_1 = torch.nn.functional.leaky_relu(z_1)
+  z_1 = pool(z_1) # Shape(1, c_h, a, a)
+  z_2 = conv1(z1) 
+  z_2 = torch.nn.functional.leaky_relu(z_2)
+  z_2 = pool(z_2) # Shape(1, c_y, b, b)
+  z_3 = linear(z_2.flatten())
+  ```
+]
+
+#sslide[
+  ```python
+  import jax, equinox
+  conv1 = equinox.nn.Conv2d(3, c_h, 2)
+  pool1 = equinox.nn.AdaptivePool2d((a, a))
+  conv2 = equinox.nn.Conv2d(c_h, c_y, 2)
+  pool2 = equinox.nn.AdaptivePool2d((b, b))
+  linear = equinox.nn.Linear(c_y * b * b)
+  z_1 = conv1(image,(3, h, w))
+  z_1 = jax.nn.leaky_relu(z_1)
+  z_1 = pool(z_1) # Shape(c_h, a, a)
+  z_2 = conv1(z1) 
+  z_2 = jax.nn.leaky_relu(z_2)
+  z_2 = pool(z_2) # Shape(c_y, b, b)
+  z_3 = linear(z_2.flatten())
+  ```
+]
+
+#sslide[
+  Single channel, single filter, single variable, $bold(theta) in bb(R)^(k + 1), k = 2 $ #pause
+
+  $ f(x(t), bold(theta)) = mat(
+    sigma(bold(theta)^top vec(1, x(1), x(2))),
+    sigma(bold(theta)^top vec(1, x(2), x(3))),
+    dots
+  )^top $
+
+  Single channel, single filter, *two variables*, $bold(theta) in bb(R)^(2 k + 1), k = 2 $ #pause
+
+  $ f(x(t), bold(theta)) = mat(
+    sigma(bold(theta)^top mat(
+      1, 0, 0; 
+      x(1, 1), x(1, 2), x(1, 3);
+      x(2, 1), x(2, 2), x(2, 3)
+    )),
+    sigma(bold(theta)^top mat(
+      1, 0, 0; 
+      x(2, 1), x(2, 2), x(2, 3);
+      x(3, 1), x(3, 2), x(3, 3)
+    )),
+  )^top $
+
+  /*
+  Three input channels, single filter, $bold(theta) in bb(R)^(d_x  times (k + 1)), d_x = 3, k = 2$ #pause
+
+  $ f(x(u, v), bold(theta)) = mat(
+    sigma(bold(theta)^top mat(
+      1, 1, 1; 
+      x_1(1), x_2(1), x_3(1);
+      x_1(2), x_2(2), x_3(2)
+    )),
+    sigma(bold(theta)^top mat(
+      1, 1, 1; 
+      x_1(2), x_2(2), x_3(2);
+      x_1(3), x_2(3), x_3(3)
+    )),
+    dots
+  )^top $
+  */
+]
+
+#sslide[
+  *Three channels*, single filter, two variables, $bold(theta) in bb(R)^(2 k + 1), k = 2 $ 
+
+  $ f_r (x(t), bold(theta)) = mat(
+    sigma(bold(theta)_r^top mat(
+      1, 0, 0; 
+      x(1, 1), x(1, 2), x(1, 3);
+      x(2, 1), x(2, 2), x(2, 3)
+    )),
+    sigma(bold(theta)_r^top mat(
+      1, 0, 0; 
+      x(2, 1), x(2, 2), x(2, 3);
+      x(3, 1), x(3, 2), x(3, 3)
+    )),
+  )^top $ #pause
+
+]
+
+  
+#sslide[
+  We only considered one filter #pause
+
+  In a perceptron, many parallel neurons makes a wide neural network #pause
+
+  In a CNN, many parallel filters makes a wide CNN #pause
+
+  $ bold(z)(t) = f(x(t), bold(theta)) = mat(
+    sigma(bold(theta)^top vec(1, x(0.1), x(0.2))),
+    sigma(bold(theta)^top vec(1, x(0.2), x(0.3))),
+    dots
+  )^top $ #pause 
 ]
 
 #slide(title: [Convolution])[
-  #side-by-side[Neuron:][$ bold(theta)^top overline(bold(x)) = sum_(i=0)^d_x theta_i overline(x)_i $] #pause
+  Neuron:
+    $ sigma(bold(theta)_1^top overline(bold(x))(1) 
+    + bold(theta)_2^top overline(bold(x))(2) + dots) 
+    
+    = sigma(sum_(i=0)^d_x theta_(1,i) overline(x)_i +
+    sum_(i=0)^d_x theta_(2,i) overline(x)_i + 
+    dots) $ #pause
 
   Convolution: 
   $ bold(theta)_1^top overline(bold(x))(t) + bold(theta)_2^top overline(bold(x))(t + 1) = (sum_(i=0)^d_x theta_(1, i) overline(x)_i (t)) + (sum_(i=0)^d_x theta_(2, i) overline(x)_i (t + 1)) $ #pause
@@ -789,7 +1435,7 @@ draw_filter(0, 0, image_values)
 #slide(title: [Convolution])[
   Convolution is *local*, in this example, we only consider two consecutive timesteps #pause
 
-  Convolution is *shift invariant*, if $bold(theta)_1, bold(theta)_2$ detect "hello", it does not matter whether "hello" occurs at $x(0), x(1)$ or $x(100), x(101)$
+  Convolution is *shift equivariant*, if $bold(theta)_1, bold(theta)_2$ detect "hello", it does not matter whether "hello" occurs at $x(0), x(1)$ or $x(100), x(101)$
 ]
 
 #slide(title: [Convolution])[
@@ -809,7 +1455,7 @@ draw_filter(0, 0, image_values)
     key=jax.random.key(0)
   )
 
-  y_prediction = jax.nn.leaky_relu(conv_layer(x)) 
+  z = jax.nn.leaky_relu(conv_layer(x)) 
   ```
 ]
 
@@ -826,12 +1472,12 @@ draw_filter(0, 0, image_values)
     kernel_size=k # Size of filter in timesteps/parameters,
   )
 
-  y_prediction = jax.nn.leaky_relu(conv_layer(x)) 
+  z = jax.nn.leaky_relu(conv_layer(x)) 
   ```
 ]
 
-#slide(title: [Agenda])[#agenda(index: 2)]
-#slide(title: [Agenda])[#agenda(index: 3)]
+#aslide(ag, 2)
+#aslide(ag, 3)
 
 #slide(title: [2D Convolution])[
   We defined convolution over one variable $t$ #pause

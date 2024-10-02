@@ -73,20 +73,6 @@
   ]
 }
 
-
-/*
-#let sections-state = state("polylux-sections", ())
-#let bold-outline(enum-args: (:), padding: 0pt) = locate( loc => {
-  let sections = sections-state.final(loc)
-  pad(padding, enum(
-    ..enum-args,
-    ..sections.map(section => {
-      link(section.loc, section.body))
-      }
-  ))
-})
-*/
-
 // Plots of activation functions
 #let sigmoid = { 
     set text(size: 25pt)
