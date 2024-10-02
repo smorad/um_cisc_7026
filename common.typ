@@ -42,7 +42,7 @@
 
 // Agenda
 #let slide_state = state("current_section", none)
-#let agenda(ag, index) = context {
+#let agenda(ag, index) = {
   /*
   ag should be list of sections
   ([Review], [Intro])
@@ -51,7 +51,7 @@
   for i in range(ag.len()){
     if index == i {
       enum.item(i + 1)[#text(weight: "bold", ag.at(i))]
-      slide_state.update(ag.at(i))
+      {context slide_state.update(ag.at(i))}
     } else {
       enum.item(i + 1)[#ag.at(i)]
     }
@@ -59,16 +59,17 @@
 }
 
 // Slide with preset section
-#let sslide(content) = context { 
-  slide(title: slide_state.get())[
+#let sslide(content) = { 
+  let title = {context slide_state.get()}
+  slide(title: [#title])[
     #content
   ]
 }
 
 // Agenda slide
-#let aslide(ag, index) = context { 
+#let aslide(ag, index) = { 
   slide(title: [Agenda])[
-    #agenda(ag, index)
+    #{ context agenda(ag, index) }
   ]
 }
 
