@@ -9,8 +9,7 @@
 
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
-#let agenda(index: none) = {
-  let ag = (
+#let ag = (
     [Review],
     [Torch optimization coding],
     [Classification task],
@@ -20,20 +19,6 @@
     [Find $bold(theta)$ that minimize $cal(L)$],
     [Coding]
   )
-  for i in range(ag.len()){
-    if index == i {
-      enum.item(i + 1)[#text(weight: "bold", ag.at(i))]
-    } else {
-      enum.item(i + 1)[#ag.at(i)]
-    }
-  }
-}
-
-// classification
-// other activation functions
-// weight regularization and dropout
-// weight initialization
-// adam
 
 #show: university-theme.with(
   aspect-ratio: "16-9",
@@ -81,10 +66,10 @@
 
 //11:30
 
-#slide[#agenda(index: none)]
-#slide[#agenda(index: 0)]
+#aslide(ag, none)
+#aslide(ag, 0)
 
-#slide(title: [Review])[
+#sslide[
   Last time, we reviewed derivatives #pause
 
   $ f'(x) = d / (d x) f = (d f) / (d x) = lim_(h -> 0) (f(x + h) - f(x)) / h $ #pause
@@ -94,7 +79,7 @@
   $ gradient_(bold(x)) f(mat(x_1, x_2, dots, x_n)^top) = mat((partial f) / (partial x_1), (partial f) / (partial x_2), dots, (partial f) / (partial x_n))^top $
 ]
 
-#slide(title: [Review])[
+#sslide[
   Gradients are important in deep learning for two reasons: #pause
 
   $ bold("Reason 1:") f(bold(x)) "has critical points at" gradient_bold(x) f(bold(x)) = 0 $ #pause
@@ -104,7 +89,7 @@
   With optimization, we attempt to find minima of loss functions
 ]
 
-#slide(title: [Review])[
+#sslide[
   Gradients are important in deep learning for two reasons: #pause
 
   *Reason 2:* For problems without analytical solutions, the gradient (slope) is necessary for gradient descent #pause
@@ -112,7 +97,7 @@
   #cimage("figures/lecture_4/gradient_descent_3d.png", height: 60%)
 ]
 
-#slide(title: [Review])[ 
+#sslide[ 
   First, we derived the solution to linear regression #pause
 
   $ cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i=1)^n ( f(bold(x)_[i], bold(theta)) - bold(y)_[i] )^2 $ #pause
@@ -124,11 +109,11 @@
   underbrace(( bold(Y) - bold(X)_D bold(theta) ), "Linear function of " theta), "Quadratic function of " theta) $
 ]
 
-#slide(title: [Review])[ 
+#sslide[ 
   #side-by-side[A quadratic function has a single critical point, which must be a global minimum][#cimage("figures/lecture_4/quadratic_parameter_space.png", height: 100%)]
 ]
 
-#slide(title: [Review])[ 
+#sslide[ 
   We found the analytical solution for linear regression by finding where the gradient was zero and solving for $bold(theta)$ #pause
   
   $ gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = 0 $ #pause
@@ -140,7 +125,7 @@
 ]
 
 
-#slide(title: [Review])[ 
+#sslide[ 
   For neural networks, the square error loss is no longer quadratic #pause
 
   #side-by-side[$ cal(L)(x, y, bold(theta)) = (f(x, bold(theta)) - y)^2 $][Loss function] #pause
@@ -157,7 +142,7 @@
   There is no analytical solution for $bold(theta)$
 ]  
 
-#slide(title: [Review])[ 
+#sslide[ 
   Instead, we found the parameters of a neural network through gradient descent #pause
 
   Gradient descent is an optimization method for differentiable functions #pause
@@ -165,7 +150,7 @@
   We went over both the intuition and mathematical definitions
 ]
 
-#slide(title: [Review])[ 
+#sslide[ 
   #side-by-side[
     #cimage("figures/lecture_4/lightning.jpg", height: 100%) #pause
    ][
@@ -173,11 +158,11 @@
    ] 
 ]
 
-#slide(title: [Review])[ 
+#sslide[ 
   #cimage("figures/lecture_4/parameter_space.png", height: 100%)
 ]
 
-#slide(title: [Review])[ 
+#sslide[ 
   The gradient descent algorithm: 
   #algorithm({
     import algorithmic: *
@@ -200,7 +185,7 @@
 ]
 
 
-#slide(title: [Review])[ 
+#sslide[ 
   We derived the $gradient_bold(theta) cal(L)$ for deep neural networks using the chain rule #pause
 
   $ gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i = 1)^n 2 ( f(bold(x)_[i], bold(theta)) - bold(y)_[i]) #redm[$gradient_bold(theta) f(bold(x)_[i], bold(theta))$] 
@@ -220,7 +205,7 @@
 ]
 
 
-#slide(title: [Review])[
+#sslide[
   We ran into issues computing the gradient of a layer because of the Heaviside step function #pause
 
   We replaced it with a differentiable (soft) approximation called the sigmoid function #pause
@@ -229,7 +214,7 @@
 ]
 
 
-#slide(title: [Review])[
+#sslide[
   In `jax`, we compute the gradient using the `jax.grad` function #pause
 
   ```python
@@ -248,7 +233,7 @@
 ]
 
 
-#slide(title: [Review])[ 
+#sslide[ 
   In `torch`, we backpropagate through a graph of operations
   
   ```python
@@ -267,12 +252,12 @@
   ```
 ]
 
-#slide(title: [Agenda])[#agenda(index: 0)]
-#slide(title: [Agenda])[#agenda(index: 1)]
+#aslide(ag, 1)
+#aslide(ag, 2)
 
 // 30:00
 
-#slide(title: [Torch Optimization Coding])[
+#sslide[
   First, a video of one application of gradient descent 
 
   https://youtu.be/kGDO2e_qiyI?si=ZopZKy-6WQ4B0csX #pause
@@ -285,10 +270,10 @@
 
 // ~60:00
 
-#slide[#agenda(index: 1)]
-#slide[#agenda(index: 2)]
+#aslide(ag, 1)
+#aslide(ag, 2)
 
-#slide(title: [Classification])[
+#sslide[
   Many problems in ML can be reduced to *regression* or *classification* #pause
 
   *Regression* asks how many #pause
@@ -317,8 +302,8 @@
   $ f(bold(x), bold(theta)) = P(bold(y) | bold(x)) = P(vec("T-Shirt", "Trouser", dots.v) mid(|) #image("figures/lecture_5/shirt.png", height: 20%)) = vec(0.2, 0.01, dots.v) $
 ]
 
-#slide(title: [Agenda])[#agenda(index: 2)]
-#slide(title: [Agenda])[#agenda(index: 3)]
+#aslide(ag, 2)
+#aslide(ag, 3)
 
 
 #slide[
@@ -459,8 +444,8 @@
   $ f(bold(x), bold(theta)) = P(bold(y) | bold(x)) = P(vec("T-Shirt", "Trouser", dots.v) mid(|) #image("figures/lecture_5/shirt.png", height: 20%)) = vec(0.2, 0.01, dots.v) $
 ]
 
-#slide(title: [Agenda])[#agenda(index: 3)]
-#slide(title: [Agenda])[#agenda(index: 4)]
+#aslide(ag, 3)
+#aslide(ag, 4)
 
 #slide[
   We will again start with a multivariate linear model #pause
@@ -594,8 +579,8 @@
 ]
 
 
-#slide(title: [Agenda])[#agenda(index: 4)]
-#slide(title: [Agenda])[#agenda(index: 5)]
+#aslide(ag, 4)
+#aslide(ag, 5)
 
 #slide[
   We consider the label $bold(y)_[i]$ as a conditional distribution
@@ -729,10 +714,10 @@
   $ cal(L)(bold(x), bold(y), bold(theta)) = [- sum_(j=1)^n sum_(i=1)^(d_y) P(y_([j], i) | bold(x)_[j]) log f(bold(x)_[j], bold(theta))_i ] $ 
 ]
 
-#slide(title: [Agenda])[#agenda(index: 5)]
-#slide(title: [Agenda])[#agenda(index: 6)]
+#aslide(ag, 5)
+#aslide(ag, 6)
 
-#slide(title: [Classification])[
+#sslide[
   Find $bold(theta)$ just like before, using gradient descent #pause
 
   The gradients are the same as before except the last layer #pause
@@ -744,13 +729,13 @@
   This is because softmax is a multi-class generalization of the sigmoid function
 ]
 
-#slide(title: [Agenda])[#agenda(index: 6)]
+#aslide(ag, 5)
 
 // 120:00
 #focus-slide[Relax]
-#slide(title: [Agenda])[#agenda(index: 7)]
+#aslide(ag, 6)
 
-#slide(title: [Coding])[
+#sslide[
   You have everything you need to solve deep learning tasks!
   + Regression #pause
   + Classification #pause
@@ -763,11 +748,11 @@
   The rest of this course will examine neural network architectures 
 ]
 
-#slide(title: [Coding])[
+#sslide[
   https://colab.research.google.com/drive/1BGMIE2CjlLJOH-D2r9AariPDVgxjWlqG?usp=sharing
 ]
 
-#slide(title: [Admin])[
+#sslide[
   Homework 3 is released, you have two weeks to complete it #pause
 
   https://colab.research.google.com/drive/1LainS20p6c3YVRFM4XgHRBODh6dvAaT2?usp=sharing#scrollTo=q8pJST5xFt-p 

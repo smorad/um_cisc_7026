@@ -11,25 +11,17 @@
 
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
-#let agenda(index: none) = {
-  let ag = (
-    [Review],
-    [Quiz],
-    [Optimization],
-    [Calculus review],
-    [Deriving linear regression],
-    [Gradient descent],
-    [Backpropagation],
-    [Coding]
-  )
-  for i in range(ag.len()){
-    if index == i {
-      enum.item(i + 1)[#text(weight: "bold", ag.at(i))]
-    } else {
-      enum.item(i + 1)[#ag.at(i)]
-    }
-  }
-}
+#let ag = (
+  [Review],
+  [Quiz],
+  [Optimization],
+  [Calculus review],
+  [Deriving linear regression],
+  [Gradient descent],
+  [Backpropagation],
+  [Coding]
+)
+
 #let local_optima_plot = canvas(length: 1cm, {
   plot.plot(size: (8, 6),
     x-tick-step: 2,
@@ -61,7 +53,7 @@
   //logo: image("logo.jpg", width: 25%)
 )
 
-#slide(title: [Previous Quiz])[
+#slide(title: [Admin])[
   Quiz 1 grades are on moodle (mean 2.75 / 4) #pause
 
   When I have a function called $g$ that maps some inputs $a in A, b in B, c in C$ to outputs $d in D, e in E$ I would write
@@ -77,7 +69,7 @@
   $ d, e = g(a, b, c) $
 ]
 
-#slide(title: [Previous Quiz])[
+#slide(title: [Admin])[
   $bb(R)$ is the set of real numbers #pause
 
   $5, pi, e, -3.2, 3 / 2, 1.3333...$ are all real numbers #pause
@@ -106,7 +98,7 @@
 ]
 
 /*
-#slide(title: [Discussion])[
+#sslide[
 
   I have two types of students in this class #pause
 
@@ -127,14 +119,10 @@
 
 // 4:00
 
-#slide(title: [Agenda])[
-  #agenda(index: none)
-]
-#slide(title: [Agenda])[
-  #agenda(index: 0)
-]
+#aslide(ag, none)
+#aslide(ag, 0)
 
-#slide(title: [Review])[
+#sslide[
   In lecture 1, we assumed a single-input system #pause
 
   Years of education: $X in bb(R)$ #pause
@@ -146,7 +134,7 @@
   We can solve these problems using linear regression too
 ]
 
-#slide(title: [Review])[
+#sslide[
   For multivariate problems, we will define the input dimension as $d_x$ #pause
 
   $ bold(x) in X; quad X in bb(R)^(d_x) $ #pause
@@ -161,7 +149,7 @@
   ) $
 ]
 
-#slide(title: [Review])[
+#sslide[
   The design matrix for a *multivariate* linear system is
 
   $ bold(X)_D = mat(
@@ -176,7 +164,7 @@
   $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ 
 ]
 
-#slide(title: [Review])[
+#sslide[
   We combined *polynomial* and *multivariate* design matrices: #pause
 
   #side-by-side[
@@ -197,7 +185,7 @@
   ]
 ]
 
-#slide(title: [Review])[
+#sslide[
   $ bold(X)_D = mat(bold(x)_(D, [1]), dots, bold(x)_(D, [n]))^top $ #pause
 
   $ &bold(x)_(D, [i]) = \ &mat(
@@ -214,7 +202,7 @@
   We introduced neural networks because they scale to larger problems
 ]
 
-#slide(title: [Review])[
+#sslide[
   Brains and neural networks rely on *neurons* #pause
 
   *Brain:* Biological neurons $->$ Biological neural network #pause
@@ -222,27 +210,27 @@
   *Computer:* Artificial neurons $->$ Artificial neural network 
 ]
 
-#slide(title: [Review])[
+#sslide[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   Neurons send messages based on messages received from other neurons
 ]
 
-#slide(title: [Review])[
+#sslide[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   Incoming electrical signals travel along dendrites
 ]
 
-#slide(title: [Review])[
+#sslide[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   Electrical charges collect in the Soma (cell body)
 ]
 
-#slide(title: [Review])[
+#sslide[
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
   The axon outputs an electrical signal to other neurons
 ]
 
-#slide(title: [Review])[
+#sslide[
   How does a neuron decide to send an impulse ("fire")? #pause
 
   Dendrites form a parallel circuit #pause
@@ -255,7 +243,7 @@
   Many active dendrites will add together and trigger an impulse
 ]
 
-#slide(title: [Review])[
+#sslide[
   We model the neuron "firing" using an activation function $sigma$ #pause
 
   Last time, we used the heaviside step function as the activation function
@@ -265,7 +253,7 @@
   #cimage("figures/lecture_4/heaviside.svg", height: 50%)
 ]
 
-#slide(title: [Review])[
+#sslide[
   We modeled a neuron mathematically, creating an artificial neuron #pause
 
   $ f(bold(x), bold(theta)) = sigma(bold(theta)^top overline(bold(x))); quad overline(bold(x)) = vec(1, bold(x)) $ #pause
@@ -277,7 +265,7 @@
   $ f(bold(x), bold(theta)) = sigma( underbrace(theta_0 1 + theta_1 x_1 + dots + theta_(d_x) x_(d_x), "Linear model") ) $ 
 ]
 
-#slide(title: [Review])[
+#sslide[
   We can represent AND and OR boolean operators using a neuron #pause
 
   But a neuron cannot represent many other functions #pause
@@ -287,7 +275,7 @@
   We discussed *wide* neural networks and *deep* neural networks
 ]
 
-#slide(title: [Review])[
+#sslide[
   How do we express a *wide* neural network mathematically? #pause
 
   A single neuron:
@@ -303,7 +291,7 @@
   $ Theta in bb(R)^((d_x + 1) times d_y) $
 ]
 
-#slide(title: [Review])[
+#sslide[
   // Must be m by n (m rows, n cols)
   #text(size: 24pt)[
   For a wide network (also called a layer):
@@ -325,7 +313,7 @@
   ]
 ]
 
-#slide(title: [Review])[
+#sslide[
   A *wide* neural network is also called a *layer* #pause
 
   A layer is a linear operation and an activation function
@@ -342,13 +330,9 @@
 
 
 // 18:00
-#slide(title: [Agenda])[
-  #agenda(index: 0)
-]
-#slide(title: [Agenda])[
-  #agenda(index: 1)
-]
-#slide(title: [Quiz])[
+#aslide(ag, 0)
+#aslide(ag, 1)
+#sslide[
   Put away your phones and laptops #pause
 
   Take out a paper and pen, write your name and student ID #pause
@@ -361,13 +345,9 @@
   After I explain the questions, you will have 15 minutes to finish the quiz
 ]
 
-#slide(title: [Agenda])[
-  #agenda(index: 1)
-]
-#slide(title: [Agenda])[
-  #agenda(index: 2)
-]
-#slide(title: [Optimization])[
+#aslide(ag, 1)
+#aslide(ag, 2)
+#sslide[
   We previously introduced neural networks as universal function approximators #pause
 
   A deep neural network $f$ can approximate *any* continuous function $g$ to infinite precision #pause
@@ -384,7 +364,7 @@
 ]
 
 
-#slide(title: [Optimization])[
+#sslide[
   When we search for $bold(theta)$, we call it *optimization* or *training* #pause
   
   We optimize a loss function by computing
@@ -395,7 +375,7 @@
 
 ]
 
-#slide(title: [Optimization])[
+#sslide[
   #cimage("figures/lecture_1/timeline.svg", height: 60%)
 
   Neural networks were discovered in 1943, but we could not train them until 1982! #pause
@@ -404,7 +384,7 @@
 ]
 
 
-#slide(title: [Optimization])[
+#sslide[
   Recall how we found $bold(theta)$ in the linear regression problem #pause
 
   We define the square error loss function #pause
@@ -420,7 +400,7 @@
 
 //22:00 + 15:00 quiz = 37:00
 
-#slide(title: [Optimization])[
+#sslide[
   The solution for linear regression and neural networks comes from *calculus* #pause
 
   The solution for neural networks also comes from calculus #pause
@@ -428,14 +408,10 @@
   Let us review basic calculus concepts
 ]
 
-#slide(title: [Agenda])[
-  #agenda(index: 2)
-]
-#slide(title: [Agenda])[
-  #agenda(index: 3)
-]
+#aslide(ag, 2)
+#aslide(ag, 3)
 
-#slide(title: [Calculus Review])[
+#sslide[
   We write the *derivative* of a function $f$ with respect to an input $x$ as 
 
   $ f'(x) = d / (d x) f = (d f) / (d x) = lim_(h -> 0) (f(x + h) - f(x)) / h $ #pause
@@ -448,7 +424,7 @@
 ]
 
 //26:00 + 15 == 41:00
-#slide(title: [Calculus Review])[
+#sslide[
   It is easiest if you treat the derivative as a *function of functions* #pause
 
   $ "derivative"(f) = f' $ #pause
@@ -460,7 +436,7 @@
   $ d / (d x): [f: X |-> Y] |-> [f': X |-> Y] $
 ]
 
-#slide(title: [Calculus Review])[
+#sslide[
   There are formulas for computing the derivative of various operations #pause
 
   #side-by-side(align: left + horizon)[Constant][$ d / (d x) c = 0 $] #pause
@@ -468,7 +444,7 @@
   #side-by-side(align: left + horizon)[Power][$ d / (d x) x^n = n x^(n-1) $] 
 ]
 
-#slide(title: [Calculus Review])[
+#sslide[
   #side-by-side(align: left + horizon)[Sum/Difference][$ d / (d x) [f(x) + g(x)] = f'(x) + g'(x) $] #pause
 
   #side-by-side(align: left + horizon)[Product][$ d / (d x) [f(x) g(x)] = f'(x) g(x) + g'(x) f(x) $] #pause
@@ -476,7 +452,7 @@
   #side-by-side(align: left + horizon)[Chain][$ d / (d x) [f (g (x))] = f'(g(x)) g'(x) $]
 ]
 
-#slide(title: [Calculus Review])[
+#sslide[
   For example, consider the function
 
   $ f(x) = x^2 - 3x $ #pause
@@ -490,7 +466,7 @@
   $ d / (d x) [f] (1) = 2 dot 1 - 3 = -1 $
 ]
 
-#slide(title: [Calculus Review])[
+#sslide[
   #side-by-side[#cimage("figures/lecture_4/quadratic.png", height: 35%)][$ f(x) = x^2 - 3x $] #pause
   
   #side-by-side[#cimage("figures/lecture_4/quadratic_with_derivative.png", height: 35%)][$ (d f) / (d x) = 2x - 3 $] #pause
@@ -498,7 +474,7 @@
   $ 0 = 2x - 3 quad => quad x = 3 / 2 $
 ]
 
-#slide(title: [Calculus Review])[
+#sslide[
   We can expand the definition of derivative to multivariate functions. We call this the *gradient*
 
   $ gradient_(bold(x)) f(mat(x_1, x_2, dots, x_n)^top) = mat((partial f) / (partial x_1), (partial f) / (partial x_2), dots, (partial f) / (partial x_n))^top $ #pause
@@ -510,7 +486,7 @@
   When computing $partial / (partial x_i) f(x_1, dots, x_n)$, we treat $x_1, dots, x_(i-1), x_(i+1), dots, x_n$ as constant
 ]
 
-#slide(title: [Calculus Review])[
+#sslide[
   For example, consider the function
   $ f(x_1, x_2) = x_1^2 - 3 x_1 x_2 $ #pause
 
@@ -526,7 +502,7 @@
   ) $ 
 ]
 
-#slide(title: [Calculus Review])[
+#sslide[
   $ gradient_bold(x) f(bold(x)) = 
     gradient_(x_1, x_2) f(vec(x_1, x_2)) =
    vec(
@@ -550,7 +526,7 @@
   ) = vec(-1, -3) $ 
 ]
 // 54:00 with quiz
-#slide(title: [Calculus Review])[
+#sslide[
   In calculus, we can find the local extrema of a function $f(x)$ by finding where the derivative is zero
   
   $ f'(x) = d / (d x) f (x)= 0 $ #pause
@@ -562,21 +538,17 @@
   $ gradient_bold(x) f(bold(x)) = mat((partial f) / (partial x_1), (partial f) / (partial x_2), dots, (partial f) / (partial x_n))^top = mat(0, 0, dots, 0)^top $
 ]
 
-#slide(title: [Agenda])[
-  #agenda(index: 3)
-]
-#slide(title: [Agenda])[
-  #agenda(index: 4)
-]
+#aslide(ag, 3)
+#aslide(ag, 4)
 
-#slide(title: [Deriving Linear Regression])[
+#sslide[
   Now that we remember calculus, let us revisit linear regression #pause
 
   If we can derive the solution for linear regression, maybe we can apply it to deep neural networks
 ]
 
 
-#slide(title: [Deriving Linear Regression])[
+#sslide[
   In linear regression, our loss function is 
 
   $ cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i=1)^n ( f(bold(x)_[i], bold(theta)) - bold(y)_[i] )^2 $ #pause
@@ -590,7 +562,7 @@
   underbrace(( bold(Y) - bold(X)_D bold(theta) ), "Linear function of " theta), "Quadratic function of " theta)  $ 
 ]
 
-#slide(title: [Deriving Linear Regression])[
+#sslide[
   $ cal(L)(bold(X), bold(Y), bold(theta)) = 
   underbrace(underbrace(( bold(Y) - bold(X)_D bold(theta) )^top, "Linear function of " theta quad)
   underbrace(( bold(Y) - bold(X)_D bold(theta) ), "Linear function of " theta), "Quadratic function of " theta)  $ #pause
@@ -598,7 +570,7 @@
   #side-by-side[A quadratic function has a single minima! The minima must be at $gradient_bold(theta) cal(L) = 0$][#cimage("figures/lecture_4/quadratic_parameter_space.png", height: 65%)]
 ]
 
-#slide(title: [Deriving Linear Regression])[
+#sslide[
   Therefore, we know that the $bold(theta)$ that solves
 
   $ gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = 0 $ #pause
@@ -609,7 +581,7 @@
 
 ]
 
-#slide(title: [Deriving Linear Regression])[
+#sslide[
   Using calculus, let us derive the solution to linear regression #pause
 
   $ cal(L)(bold(X), bold(Y), bold(theta)) = ( bold(Y) - bold(X)_D bold(theta) )^top ( bold(Y) - bold(X)_D bold(theta) ) $ #pause
@@ -620,7 +592,7 @@
 
   $ = bold(0) - bold(Y)^top bold(X)_D bold(I) - (bold(X)_D bold(I))^top bold(Y) + (bold(X)_D bold(I))^top bold(X)_D bold(theta) + (bold(X)_D bold(theta))^top bold(X)_D bold(I) $
 ]
-#slide(title: [Deriving Linear Regression])[
+#sslide[
   $ = bold(0) - bold(Y)^top bold(X)_D bold(I) - (bold(X)_D bold(I))^top bold(Y) + (bold(X)_D bold(I))^top bold(X)_D bold(theta) + (bold(X)_D bold(theta))^top bold(X)_D bold(I) $ #pause
 
   $ = - bold(Y)^top bold(X)_D - bold(X)_D^top bold(Y) + bold(X)_D^top bold(X)_D bold(theta) + (bold(X)_D bold(theta))^top bold(X)_D $ #pause
@@ -635,7 +607,7 @@
 
   $ gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = - 2 bold(X)_D^top bold(Y) + 2 bold(X)_D^top bold(X)_D bold(theta) $
 ]
-#slide(title: [Deriving Linear Regression])[
+#sslide[
   $ gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = - 2 bold(X)_D^top bold(Y) + 2 bold(X)_D^top bold(X)_D bold(theta) $ #pause
 
   We want to find the $bold(theta)$ that makes the gradient of the loss zero #pause
@@ -649,7 +621,7 @@
   $ (bold(X)_D^top bold(X)_D)^(-1) bold(X)_D^top bold(Y) = bold(theta) $
 ]
 
-#slide(title: [Deriving Linear Regression])[
+#sslide[
   $ (bold(X)_D^top bold(X)_D)^(-1) bold(X)_D^top bold(Y) = bold(theta) $ #pause
 
   This was the "magic" solution I gave you for linear regression #pause
@@ -659,7 +631,7 @@
 
 // 68:00 with quiz
 
-#slide(title: [Deriving Linear Regression])[
+#sslide[
   Great! We derived the solution to linear regression #pause
 
   Now, we will do the same approach for neural networks #pause
@@ -671,7 +643,7 @@
   *Step 1*: Write the loss function for a neural network
 ]
 
-#slide(title: [Deriving Linear Regression])[
+#sslide[
   Like linear regression, we can use square error for a neural network #pause
 
   $ cal(L)(x, y, bold(theta)) = (f(x, bold(theta)) - y)^2 $ #pause
@@ -683,7 +655,7 @@
   #side-by-side[Perceptron:][$ f(x, y, bold(theta)) = sigma(theta_0 + theta_1 x) $] 
 ]
 
-#slide(title: [Deriving Linear Regression])[
+#sslide[
   #side-by-side[$ cal(L)(x, y, bold(theta)) = (f(x, bold(theta)) - y)^2 $][Loss function] #pause
   #side-by-side[$ f(x, bold(theta)) = sigma(theta_0 + theta_1 x) $][Neural network model] #pause
 
@@ -700,7 +672,7 @@
 
 // 70:00
 
-#slide(title: [Deriving Linear Regression])[
+#sslide[
   #side-by-side[Linear regression loss function was quadratic with one minima][#cimage("figures/lecture_4/quadratic_parameter_space.png", height: 35%)] #pause
 
   With a neural network, this is our loss function
@@ -714,7 +686,7 @@
   *Answer:* We do not know
 ]
 
-#slide(title: [Deriving Linear Regression])[
+#sslide[
   The nonlinearity/activation function $sigma$ in the neural network means we cannot find an analytical solution #pause
 
   $ f(x, bold(theta)) = sigma(theta_0 + theta_1 x) $ #pause
@@ -728,7 +700,7 @@
   Activation functions make the neural network powerful 
 ]
 
-#slide(title: [Deriving Linear Regression])[
+#sslide[
   Linear regression: analytical solution for $bold(theta)$ #pause
 
   Neural network: no analytical solution for $bold(theta)$ #pause
@@ -736,14 +708,10 @@
   So how to find $bold(theta)$ for a neural network?
 ]
 
-#slide(title: [Agenda])[
-  #agenda(index:4)
-]
-#slide(title: [Agenda])[
-  #agenda(index:5)
-]
+#aslide(ag, 4)
+#aslide(ag, 5)
 
-#slide(title: [Gradient Descent])[
+#sslide[
   To find $bold(theta)$ for a neural network, we use *gradient descent* #pause
 
   Gradient descent optimizes *differentiable* functions #pause
@@ -753,7 +721,7 @@
   How does gradient descent work?
 ]
 
-#slide(title: [Gradient Descent])[
+#sslide[
   #side-by-side[A differentiable loss function produces a manifold][#cimage("figures/lecture_4/parameter_space.png", height: 70%)] #pause
   
   Our goal is to find the lowest point on this manifold #pause
@@ -761,7 +729,7 @@
   The lowest point solves $argmin_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$
 ]
 
-#slide(title: [Gradient Descent])[
+#sslide[
   *Note:* Gradient descent provides a *local* optima, not necessarily a *global* optima #pause
 
   #align(center, local_optima_plot) #pause
@@ -771,7 +739,7 @@
 
 #focus-slide[Relax]
 
-#slide(title: [Gradient Descent])[
+#sslide[
   Let us define gradient descent without math #pause
 
   You are on the top of a mountain and there is lightning storm #pause
@@ -781,7 +749,7 @@
   For safety, you should walk down the mountain to escape the lightning
 ]
 
-#slide(title: [Gradient Descent])[
+#sslide[
   But you do not know the path down! #pause
 
   #cimage("figures/lecture_4/hiking_slope.jpg", height: 70%)
@@ -789,12 +757,12 @@
   You see this, which way do you walk next?
 ]
 
-#slide(title: [Gradient Descent])[
+#sslide[
   #cimage("figures/lecture_4/hiking_slope.jpg", height: 80%)
   This is gradient descent
 ]
 
-#slide(title: [Gradient Descent])[
+#sslide[
   In gradient descent, we look at the *slope* of the loss function #pause
 
   And we walk in the steepest direction #pause
@@ -805,7 +773,7 @@
 ]
 
 
-#slide(title: [Gradient Descent])[
+#sslide[
   #cimage("figures/lecture_4/gradient_descent_3d.png", height: 70%) #pause
 
   We find the gradient $gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$ #pause
@@ -813,19 +781,19 @@
   And update $bold(theta)$ in the steepest direction
 ]
 
-#slide(title: [Gradient Descent])[
+#sslide[
   #cimage("figures/lecture_4/gradient_descent_3d.png", height: 70%)
 
   Eventually, we arrive at the bottom
 ]
 
-#slide(title: [Gradient Descent])[
+#sslide[
   With gradient descent, the loss function must be differentiable #pause
 
   If we cannot compute the derivative/gradient, then we do not know which way to walk!
 ]
 
-#slide(title: [Gradient Descent])[
+#sslide[
   The gradient descent algorithm:
 
   #algorithm({
@@ -849,11 +817,11 @@
 ]
 // 84:00
 
-#slide(title: [Gradient Descent])[
+#sslide[
   #cimage("figures/lecture_4/parameter_space.png", height: 100%)
 ]
 
-#slide(title: [Gradient Descent])[
+#sslide[
   Two main steps in gradient descent: #pause
 
   Step 1: Compute the gradient of the loss #pause
@@ -863,14 +831,10 @@
   Let us start with step 1
 ]
 
-#slide(title: [Agenda])[
-  #agenda(index: 5)
-]
-#slide(title: [Agenda])[
-  #agenda(index: 6)
-]
+#aslide(ag, 5)
+#aslide(ag, 6)
 
-#slide(title: [Backpropagation])[
+#sslide[
   *Goal:* Compute the gradient of the loss $gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$ #pause
 
   We call this process *backpropagation* #pause
@@ -883,16 +847,16 @@
   //Let us propagate errors through a deep neural network
 ]
 
-#slide(title: [Backpropagation])[
+#sslide[
   Forward propagation 
   #cimage("figures/lecture_4/forward.svg", height: 80%)
 ]
-#slide(title: [Backpropagation])[
+#sslide[
   Backward propagation
   #cimage("figures/lecture_4/backward.svg", height: 80%)
 ]
 
-#slide(title: [Backpropagation])[
+#sslide[
   Finding the gradient is necessary to use gradient descent! #pause
 
   First, we will find the gradient of a neural network layer #pause
@@ -902,7 +866,7 @@
   Finally, we will find the gradient of the loss function
 ]
 
-#slide(title: [Backpropagation])[
+#sslide[
   Start with the equation of a neural network layer 
 
   $ f(bold(x), bold(theta)) = sigma( bold(theta)^top overline(bold(x)) ) $ #pause
@@ -915,7 +879,7 @@
   $ gradient_(bold(theta)) f(bold(x), bold(theta)) = gradient_bold(theta) [sigma] (bold(theta)^top overline(bold(x))) dot gradient_(bold(theta)) (bold(theta)^top overline(bold(x))) $ 
 ]
 
-#slide(title: [Backpropagation])[
+#sslide[
   $ gradient_(bold(theta)) f(bold(x), bold(theta)) = gradient_bold(theta) [sigma] (bold(theta)^top overline(bold(x))) dot gradient_(bold(theta)) (bold(theta)^top overline(bold(x))) $ 
 
   $ "What is " gradient_bold(theta) sigma "?" $ #pause
@@ -925,7 +889,7 @@
   Derivative is zero everywhere and infinity at $x=0$, so the derivative for a layer is either infinity or zero 
 ]
 
-#slide(title: [Backpropagation])[
+#sslide[
   We use a differentiable approximation of the heaviside step function #pause
 
   $ sigma(z) = 1 / (1 + e^(-z)) $ #pause
@@ -937,7 +901,7 @@
   The sigmoid function has finite and nonzero derivative everywhere
 ]
 
-#slide(title: [Backpropagation])[
+#sslide[
   #side-by-side[#cimage("figures/lecture_4/heaviside.svg")][#cimage("figures/lecture_4/sigmoid.svg")][ $ sigma(z) = 1 / (1 + e^(-z)) $]
 
   The derivative of the sigmoid function is
@@ -949,7 +913,7 @@
 
 // 97:00
 
-#slide(title: [Backpropagation])[
+#sslide[
   Back to our layer #pause
 
   $ gradient_(bold(theta)) f(bold(x), bold(theta)) = gradient_bold(theta) [sigma] (bold(theta)^top overline(bold(x))) dot gradient_(bold(theta)) (bold(theta)^top overline(bold(x))) $ #pause
@@ -965,7 +929,7 @@
   $ gradient_(bold(theta)) f(bold(x), bold(theta)) = (sigma(bold(theta)^top overline(bold(x))) dot.circle (1 - sigma(bold(theta)^top overline(bold(x))))) overline(bold(x))^top $ 
 ]
 
-#slide(title: [Backpropagation])[
+#sslide[
   $ gradient_(bold(theta)) f(bold(x), bold(theta)) = (sigma(bold(theta)^top overline(bold(x))) dot.circle (1 - sigma(bold(theta)^top overline(bold(x))))) overline(bold(x))^top $ #pause
 
   This is the gradient for the layer of a neural network! #pause
@@ -973,7 +937,7 @@
   We will use this to compute the gradient of a deep neural network
 ]
 
-#slide(title: [Backpropagation])[
+#sslide[
   Recall the deep neural network has many layers
 
     $ f_1(bold(x), bold(phi)) = sigma(bold(phi)^top overline(bold(x))) quad
@@ -995,7 +959,7 @@
   //$ f(bold(x), bold(theta)) = f_(ell) (dots f_2(f_1(bold(x), bold(phi)), bold(psi)) dots bold(xi) ) $
 ]
 
-#slide(title: [Backpropagation])[
+#sslide[
   #side-by-side[Take the gradient of both sides][
   $  gradient_(bold(phi), bold(psi), dots, bold(xi)) bold(z)_1 &=  gradient_(bold(phi), bold(psi), bold(xi)) f_1(bold(x), bold(phi)) \ 
   gradient_(bold(phi), bold(psi), dots, bold(xi)) bold(z)_2 &=  gradient_(bold(phi), bold(psi), bold(xi)) f_2(bold(z)_1, bold(psi)) \
@@ -1014,7 +978,7 @@
   $] #pause
 ]
 
-#slide(title: [Backpropagation])[
+#sslide[
   The gradient of a deep neural network is 
 
   $ 
@@ -1031,7 +995,7 @@
   $ gradient_(bold(xi)) f_ell (bold(z)_(ell - 1), bold(xi)) = (sigma(bold(xi)^top overline(bold(z))_(ell - 1)) dot.circle (1 - sigma(bold(xi)^top overline(bold(z))_(ell - 1)))) overline(bold(z))_(ell - 1)^top $ 
 ]
 
-#slide(title: [Backpropagation])[
+#sslide[
   We computed the gradient of a neural network layer #pause
 
   We computed the gradient of the neural network #pause
@@ -1039,7 +1003,7 @@
   Now, we must compute gradient of the loss function #pause
 ]
 
-#slide(title: [Backpropagation])[
+#sslide[
   $ cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i = 1)^n (f(bold(x)_[i], bold(theta)) - bold(y)_[i])^2 $
 
   $ gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = gradient_bold(theta) sum_(i = 1)^n (f(bold(x)_[i], bold(theta)) - bold(y)_[i])^2 $ #pause
@@ -1051,7 +1015,7 @@
   $ gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i = 1)^n 2 ( f(bold(x)_[i], bold(theta)) - bold(y)_[i]) gradient_bold(theta) f(bold(x)_[i], bold(theta)) $ 
 ]
 
-#slide(title: [Backpropagation])[
+#sslide[
   To summarize: #pause
 
   $ gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i = 1)^n 2 ( f(bold(x)_[i], bold(theta)) - bold(y)_[i]) #redm[$gradient_bold(theta) f(bold(x)_[i], bold(theta))$] 
@@ -1070,7 +1034,7 @@
   $ #redm[$gradient_(bold(xi)) f_ell (bold(z)_(ell - 1), bold(xi))$] = (sigma(bold(xi)^top overline(bold(z))_(ell - 1)) dot.circle (1 - sigma(bold(xi)^top overline(bold(z))_(ell - 1)))) overline(bold(z))_(ell - 1)^top $ 
 ]
 
-#slide(title: [Backpropagation])[
+#sslide[
   *Question:* Why did we spend all this time deriving gradients? #pause
 
   *Answer:* The gradient is necessary for gradient descent #pause
@@ -1089,12 +1053,8 @@
     $ bold(theta)_(t + 1) = bold(theta)_t - alpha gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)_t) $ 
 ]
 
-#slide(title: [Agenda])[
-  #agenda(index: 6)
-]
-#slide(title: [Agenda])[
-  #agenda(index: 7)
-]
+#aslide(ag, 6)
+#aslide(ag, 7)
 
 #slide[
   How do gradients work in `jax` or `torch`? #pause
