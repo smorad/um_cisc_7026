@@ -32,15 +32,15 @@
     - Week 3 (09.02): Linear Regression (D2L 3.1, 3.6)
     - Week 4 (09.09): Neural Networks (D2L 5.1, 5.2, 6.1)
     - Week 5 (09.16): Backpropagation and Optimization (D2L 5.3, 12.1, 12.3-12.5)
-    - Week 6 (09.23): Training Tricks (D2L 4.1, 5.5, 5.6, 6.1-6.3)
-    - Week 7 (09.30): Convolutional Neural Networks (D2L 7)
-    - Week 8 (10.07): Autoencoders and Generative Models
+    - Week 6 (09.23): Classification (D2L 4.1, 4.2, 4.4)
+    - Week 7 (09.23): Training Tricks (D2L 5.1-5.5, 6.1-6.3, 12.1-12.10)
+    - Week 8 (09.30): Convolutional Neural Networks (D2L 7)
     - Week 9 (10.14): Recurrent Neural Networks (D2L 9-10)
     - Week 10 (10.21): Graph Neural Networks
-    - Week 11 (10.28): Attention and Transformers (D2L 11.1-11.7)
-    - Week 12 (11.04): Foundation Models (D2L 11.8-11.9)
-    - Week 13 (11.11): Reinforcement Learning I (D2L 17)
-    - Week 14 (11.18): Reinforcement Learning II
+    - Week 11 (10.07): Autoencoders and Generative Models
+    - Week 12 (10.28): Attention and Transformers (D2L 11.1-11.7)
+    - Week 13 (11.04): Foundation Models (D2L 11.8-11.9)
+    - Week 14 (11.11): Reinforcement Learning (D2L 17)
   ],
   [Preliminary Assignment Schedule], [
     - Week 3-4 (09.02 - 09.09): Linear Regression

@@ -6,6 +6,7 @@
 #import algorithmic: algorithm
 
 // FUTURE TODO: Remove event space, only sample space
+// FUTURE TODO: Fix bounds for probs (0, 1) or [0, 1]
 
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")

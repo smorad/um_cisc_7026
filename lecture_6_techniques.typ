@@ -18,12 +18,13 @@
   [Deeper Neural Networks],
   [Activation Functions],
   [Parameter Initialization],
-  //[Regularization],
-  //[Residual networks],
   [Stochastic Gradient Descent],
   [Modern Optimization],
+  [Weight Decay],
   [Coding]
 )
+
+// 3:00
 
 #show: university-theme.with(
   aspect-ratio: "16-9",
@@ -37,6 +38,18 @@
   subtitle: "CISC 7026: Introduction to Deep Learning",
   institution-name: "University of Macau",
 )
+
+#slide(title: [Admin])[
+  Quiz 2 grades online, mean 3.5/4 #pause
+
+  Assignment 2 grades online, mean 82/100 #pause
+
+  Assignment 3 due next week #pause
+
+  Syllabus has optional reading for most lectures #pause
+
+  d2l.ai Section 5.1-5.5, 6.1-6.3, 12.1-12.10 
+]
 
 
 #aslide(ag, none)
@@ -118,9 +131,9 @@
     e^(x_k) / (e^(x_1) + e^(x_2) + dots e^(x_k)),
   ) $ #pause
 
-  If we attach it to our linear model, we can output probabilities!
+  If we attach it to our model, we can output probabilities!
 
-  $ f(bold(x), bold(theta)) = "softmax"(bold(theta)^top bold(x)) $
+  $ f(bold(x), bold(theta)) = "softmax"(bold(theta)^top overline(bold(x))) $
 ]
 
 #sslide[
@@ -154,14 +167,15 @@
     P("Bag" | #image("figures/lecture_5/shirt.png", height: 10%))
   ) = vec(1, 0) $ #pause
 
-  What loss function should we use for classification?
+  We approximate this with our model $f(bold(x), bold(theta))$ #pause
+
+  Our loss function measures the difference between two distributions  #pause
+  
+  $ P(bold(y)_[i] | bold(x)_[i]), quad f(bold(x), bold(theta)) $
 ]
 
-
 #sslide[
-  Since $f(bold(x), bold(theta))$ and $P(bold(y) | bold(x))$ are both distributions, we want to measure the difference between distributions #pause
-
-  One measurement is the *Kullback-Leibler Divergence (KL)* #pause
+  The *Kullback-Leibler Divergence (KL)* measures the difference between distributions #pause
 
   #cimage("figures/lecture_5/forwardkl.png", height: 50%)
 ]
@@ -172,14 +186,22 @@
   $ = - sum_(i=1)^(d_y) P(y_i | bold(x)) log f(bold(x), bold(theta))_i $ #pause
 
   $ cal(L)(bold(x), bold(y), bold(theta)) = [- sum_(j=1)^n sum_(i=1)^(d_y) P(y_([j], i) | bold(x)_[j]) log f(bold(x)_[j], bold(theta))_i ] $ 
-
 ]
+
+// 12:30
 
 #sslide[
   Finish coding exercise
 
   https://colab.research.google.com/drive/1BGMIE2CjlLJOH-D2r9AariPDVgxjWlqG#scrollTo=AnHP-PHVhpW_
 ]
+
+// 12:30 + 15:00?
+
+#sslide[
+  #cimage("figures/lecture_6/poor_minima.png")
+]
+
 
 #aslide(ag, 0)
 #aslide(ag, 1)
@@ -199,14 +221,6 @@
 ]
 
 #sslide[
-    Similar to using neural networks for 40 years without knowing how to train them #pause
-
-    #cimage("figures/lecture_1/timeline.svg", width: 90%) #pause
-
-    Are modern networks are too complex for humans to understand?
-]
-
-#sslide[
     Scientific method: #pause
         + Collect observations #pause
         + Form hypothesis #pause
@@ -214,10 +228,10 @@
         + Publish theory #pause
 
     However, there is a second part: #pause
-        + Find theory #pause
-        + Find counterexample #pause
+        + Find existing theory #pause
+        + Show counterexample through experiment #pause
         + Publish counterexample #pause
-        + Falsify theory
+        + Update or falsify theory 
 
     Deep learning is new, so much of part 2 has not happened yet!
 
@@ -228,9 +242,9 @@
 
     Observe that a concept improves many types of neural networks #pause
 
-    Then, try to create a theory #pause
+    Concepts we discuss today are known to improve neural networks #pause
 
-    Often, these theories are incomplete #pause
+    We will discuss theories about why they improve neural networks #pause
 
     If you do not believe the theory, prove it wrong and be famous! #pause
 
@@ -239,8 +253,22 @@
     This is how medicine works (e.g., Anesthetics)!
 ]
 
+#sslide[
+  Theoretical advancements are still very important! #pause
+
+  Imagine the 40 years of neural network research before we understood how to train neural networks #pause
+
+  #cimage("figures/lecture_1/timeline.svg", width: 77%) #pause
+
+  Are modern networks too complex for humans to understand?
+]
+
+
+
 #aslide(ag, 1)
 #aslide(ag, 2)
+
+// 15:00 + 15:00
 
 #sslide[
     A 2-layer neural network can represent *any* continuous function to arbitrary precision #pause
@@ -259,7 +287,7 @@
 ]
 
 #sslide[
-    #cimage("figures/lecture_6/poor_minima.png", height: 75%) #pause
+    #cimage("figures/lecture_6/poor_minima.png", height: 75%) 
 
     Harder tasks can have millions of local optima, and many of the local optima are not very good!
 ]
@@ -267,7 +295,7 @@
 #sslide[
     Many of the concepts today create a *flat* loss landscape #pause
 
-    #cimage("figures/lecture_6/skip_connection_img.png", height: 70%)
+    #cimage("figures/lecture_6/skip_connection_img.png", height: 70%) #pause
 
     Gradient descent reaches a better optimum more quickly in these cases 
 ]
@@ -281,12 +309,19 @@
     But only with infinite width $d_h -> oo$ #pause
 
     For certain problems, adding one more layer is equivalent to *exponentially* increasing the width
-    #text(size: 18pt)[- Eldan, Ronen, and Ohad Shamir. "The power of depth for feedforward neural networks." Conference on learning theory. PMLR, 2016.]
+    #text(size: 18pt)[- Eldan, Ronen, and Ohad Shamir. "The power of depth for feedforward neural networks." Conference on learning theory. PMLR, 2016.] #pause
 
 
     $ 2 times 32 times 32 => 2^(2 times 32 times 32) approx 10^616; quad "universe has " 10^80 "atoms"$ #pause
 
+    One more layer can solve this problem $3 times 32 times 32$ #pause
+
     We need more layers for harder problems 
+]
+// 24:00 + 15:00
+
+#sslide[
+  #cimage("figures/lecture_6/filters.png", width: 120%)  
 ]
 
 #sslide[
@@ -294,11 +329,23 @@
 
     The number of neurons in a deep neural network affects the quality of local optima #pause
 
-    From Choromanska, Anna, et al. "The loss surfaces of multilayer networks.": #pause
+    From Choromanska, Anna, et al. _The loss surfaces of multilayer networks._ (2014): #pause
 
     - "For large-size networks, most local minima are equivalent and yield similar performance on a test set." #pause
 
     - "The probability of finding a “bad” (high value) local minimum is non-zero for small-size networks and decreases quickly with network size"
+]
+
+#sslide[
+  This is a difficult finding to conceptualize #pause
+
+  The plots I show you are always 3D (2 parameters) #pause
+
+  For neural networks with 1,000,000+ parameters, our geometric intuition begins to fail #pause
+
+  We understand bigger/deeper networks often perform better, but we are missing deeper theory #pause
+
+  We call such networks *overparameterized* neural networks
 ]
 
 #sslide[
@@ -340,19 +387,21 @@
     ```python
     import torch
     d_x, d_y, d_h = 1, 1, 256
-    net = torch.nn.Sequential([
+    net = torch.nn.Sequential(
         torch.nn.Linear(d_x, d_h),
         torch.nn.Sigmoid(),
         torch.nn.Linear(d_h, d_h),
         torch.nn.Sigmoid(),
         ...
         torch.nn.Linear(d_h, d_y),
-    ])
+    )
 
     x = torch.ones((d_x,))
     y = net(x)
     ```
 ]
+
+// 32:00 + 15:00
 
 #sslide[
     ```python
@@ -393,7 +442,7 @@
 
 
     #only(4)[
-    $ gradient_bold(theta) f(bold(x), bold(theta)) = 
+    $ gradient_bold(theta_1) f(bold(x), bold(theta)) = 
     gradient [sigma](bold(theta)_3^top sigma(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))))
 
     dot gradient[sigma](bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))
@@ -404,20 +453,21 @@
     ]
 
     #only((5,6))[
-    $ gradient_bold(theta) f(bold(x), bold(theta)) = 
-    underbrace(gradient [sigma](bold(theta)_3^top sigma(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))), < 1)
+    $ gradient_bold(theta_1) f(bold(x), bold(theta)) = 
+    underbrace(gradient [sigma](bold(theta)_3^top sigma(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))), < 0.5)
 
-    dot underbrace(gradient[sigma](bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))), < 1)
+    dot underbrace(gradient[sigma](bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))), < 0.5)
 
-    dot underbrace(gradient[sigma](bold(theta)_1^top overline(bold(x))), < 1)
+    dot underbrace(gradient[sigma](bold(theta)_1^top overline(bold(x))), < 0.5)
     $ 
     ]
 
     #only(6)[
-    $ gradient_bold(theta) f(bold(x), bold(theta)) approx 0 $
+    $ gradient_bold(theta_1) f(bold(x), bold(theta)) approx 0 $
     ]
-
 ]
+
+// Stopped here
 
 #sslide[
     #only((1,2))[To fix the vanishing gradient, researchers use the *rectified linear unit (ReLU)*]
@@ -429,7 +479,7 @@
 
     #only((5,6,7))[Via chain rule, gradient is $1 dot 1 dot 1 dots$ which does not vanish]
     
-    #only((6,7,8))[The gradient is constant, resulting in easier optimization] 
+    #only((6,7,8))[If layers outputs one positive number, gradient will not vanish] 
 
     #only((7,8,9))[*Question:* Any problems?]
 
@@ -457,7 +507,6 @@
 
     Small negative slope allows dead neurons to recover
 ]
-
 
 #sslide[
     #side-by-side[
@@ -532,11 +581,11 @@
     
     *Question:* Any issues? #pause
 
-    *Answer:* The gradient will always be zero
+    *Answer:* For ReLU activation, the gradient will always be zero
 
-    $ gradient_bold(theta)_1 f = sigma(bold(theta)^top_2 sigma( bold(theta)_1^top overline(bold(x)))) space sigma( bold(theta)_1^top overline(bold(x))) space  overline(bold(x)) $ #pause
+    $ gradient_bold(theta)_1 f = gradient[sigma] (bold(theta)^top_2 sigma( bold(theta)_1^top overline(bold(x)))) space gradient[sigma]( bold(theta)_1^top overline(bold(x))) space  overline(bold(x)) $ #pause
 
-    $ gradient_bold(theta)_1 f = sigma(bold(0)^top sigma( bold(theta)_1^top overline(bold(x)))) space sigma( bold(theta)_1^top overline(bold(x))) space  overline(bold(x)) = 0 $
+    $ gradient_bold(theta)_1 f = gradient[sigma] (bold(0)^top sigma ( bold(0)^top overline(bold(x)))) space gradient[sigma] ( bold(0)_1^top overline(bold(x))) space overline(bold(x)) = 0 $
 ]
 
 #sslide[
@@ -554,13 +603,13 @@
     
     *Question:* Any issues? #pause
 
-    All neurons in a layer will have the same gradient, and so they will always be the same (useless)
+    $ z_i = sigma(sum_(j=1)^d_x theta_j dot overline(x)_j)  = sigma(sum_(j=1)^d_x overline(x)_j) $ #pause
 
-    $ z_i = sigma(sum_(j=1)^d_x theta_j dot overline(x)_j)  = sigma(sum_(j=1)^d_x overline(x)_j) $
+    All neurons in layer have the same gradient,and will receive the same update. Equivalent to a network of width 1, not good!
 ]
 
 #sslide[
-    $bold(theta)$ must be randomly initialized for neurons
+    We randomly initialize $bold(theta)$ to break symmetry
 
     $ bold(theta) = mat(
         -0.5, dots, 2; 
@@ -572,7 +621,7 @@
         -0.8, dots, -1.1
     ), dots $ #pause
 
-    But what scale? If $bold(theta) << 0$ the gradients will vanish to zero, if $bold(theta) >> 0$ the gradients explode to infinity #pause
+    But what scale? If $bold(theta) << 0$ the gradient will vanish to zero, if $bold(theta) >> 0$ the gradient explode to infinity #pause
 
     Almost everyone initializes following a single paper from 2010: #pause
         - Glorot, Xavier, and Yoshua Bengio. "Understanding the difficulty of training deep feedforward neural networks." #pause
@@ -620,9 +669,9 @@
 
     # Using nn.Linear
     layer = torch.nn.Linear(d_h, d_h)
-    # USe .data, to bypass autograd security
+    # Use .data, to bypass autograd security
     torch.nn.init.xavier_uniform_(layer.weight.data)
-    torch.nn.init.xavier_uniform_(layer.bias.data)
+    torch.nn.init.xavier_uniform_(layer.bias.data) # Or zero
 
     ```
 ]
@@ -646,9 +695,9 @@
     
     layer = equinox.nn.Linear(d_h, d_h, key=jax.random.key(0))
     # Create new bias and weight
+    init = jax.nn.initializers.glorot_uniform()
     new_weight = init(jax.random.key(1), (d_h, d_h))
     new_bias = init(jax.random.key(2), (d_h,))
-
     # Use a lambda function to save space
     # tree_at creates a new layer with the new weight
     layer = equinox.tree_at(lambda l: l.weight, layer, new_weight)
@@ -657,7 +706,11 @@
 ]
 
 #sslide[
-    Remember, in `equinox` and `torch`, `nn.Linear` will already be initialized correctly! 
+    Remember, in `equinox` and `torch`, `nn.Linear` is already initialized correctly! #pause
+
+    In some cases, you may want to use different initializations #pause
+    - Reinforcement learning #pause
+    - Recurrent neural networks
 ]
 
 
@@ -697,7 +750,7 @@
         Cmt[Compute the gradient of the loss]        
         Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$]
         Cmt[Update the parameters using the negative gradient]
-        Assign[$bold(theta)$][$bold(theta) - alpha bold(J)$]
+        Assign[$bold(theta)$][$bold(theta) - alpha dot bold(J)$]
       })
 
     Return[$bold(theta)$]
@@ -727,10 +780,13 @@
 #sslide[
     *Question:* We do not have enough memory to compute the gradient. What can we do? #pause
 
-    *Answer:*  We approximate the gradient using a subset of the data 
+    *Answer:*  We approximate the gradient using a subset of the data #pause
+
+    We call this *stochastic gradient descent* (SGD)
 
 ]
 
+/*
 #sslide[
 
     First, we sample random datapoint indices 
@@ -743,6 +799,7 @@
 
     We call this *stochastic gradient descent*
 ]
+*/
 
 #sslide[
     #algorithm({
@@ -755,8 +812,8 @@
       For(cond: $i in 1 dots t$, {
         Assign[$bold(X), bold(Y)$][$"Shuffle"(bold(X)), "Shuffle"(bold(Y))$]
         For(cond: $j in 0 dots n / B - 1$, {
-        Assign[$bold(X)_j$][$mat(bold(x)_[ j B], bold(x)_[ j B + 1], dots, bold(x)_[ (j + 1) B])$]
-        Assign[$bold(Y)_j$][$mat(bold(y)_[ j B], bold(y)_[ j B + 1], dots, bold(y)_[ (j + 1) B])$]
+        Assign[$bold(X)_j$][$mat(bold(x)_[ j B], bold(x)_[ j B + 1], dots, bold(x)_[ (j + 1) B - 1])^top$]
+        Assign[$bold(Y)_j$][$mat(bold(y)_[ j B], bold(y)_[ j B + 1], dots, bold(y)_[ (j + 1) B - 1])^top$]
         Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X)_j, bold(Y)_j, bold(theta))$]
         Assign[$bold(theta)$][$bold(theta) - alpha bold(J)$]
         })
@@ -781,7 +838,7 @@
 ]
 
 #sslide[
-    There is `torch.utils.data.DataLoader` to help #pause
+    `torch.utils.data.DataLoader` helps with SGD #pause
 
     ```python
     import torch
@@ -801,6 +858,7 @@
 
 
 #aslide(ag, 6)
+#focus-slide[Relax]
 #aslide(ag, 7)
 
 
@@ -809,11 +867,11 @@
     + It can be slow to converge #pause
     + It can get stuck in poor local optima #pause
 
-    Many researchers work on improving gradient descent to converge more quickly, while also preventing premature convergence #pause
+    Improve gradient descent convergence rate, while also preventing premature convergence #pause
 
-    It is hard to teach adaptive optimization through math #pause
+    It is hard to teach adaptive optimization solely through equations #pause
 
-    So first, I want to show you a video to prepare you
+    I want to show you a video to prepare you
 
     https://www.youtube.com/watch?v=MD2fYip6QsQ&t=77s
 ]
@@ -844,7 +902,7 @@
         Cmt[Compute the gradient of the loss]        
         Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$]
         Cmt[Update the parameters using the negative gradient]
-        Assign[$bold(theta)$][$bold(theta) - alpha bold(J)$]
+        Assign[$bold(theta)$][$bold(theta) - alpha dot bold(J)$]
       })
 
     Return[$bold(theta)$]
@@ -867,7 +925,7 @@
       For(cond: $i in 1 dots t$, {
         Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$ #text(fill: red)[\# Represents acceleration]]
         Assign[#redm[$bold(M)$]][#redm[$beta dot bold(M) + (1 - beta) dot bold(J)$] #text(fill: red)[\# Momentum and acceleration]]
-        Assign[$bold(theta)$][$bold(theta) - alpha #redm[$bold(M)$]$]
+        Assign[$bold(theta)$][$bold(theta) - alpha dot #redm[$bold(M)$]$]
       })
 
     Return[$bold(theta)$]
@@ -889,7 +947,7 @@
       For(cond: $i in 1 dots t$, {
         Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$ \# Represents acceleration]
         Assign[#redm[$bold(V)$]][#redm[$beta dot bold(V) + (1 - beta) dot bold(J) dot.circle bold(J) $] #text(fill: red)[\# Magnitude]]
-        Assign[$bold(theta)$][$bold(theta) - alpha #redm[$bold(J) ⊘ root(dot.circle, bold(V) + epsilon)$]$ #text(fill: red)[\# Rescale grad by prev updates]]
+        Assign[$bold(theta)$][$bold(theta) - alpha dot #redm[$bold(J) ⊘ root(dot.circle, bold(V) + epsilon)$]$ #text(fill: red)[\# Rescale grad by prev updates]]
       })
 
     Return[$bold(theta)$]
@@ -910,12 +968,12 @@
 
       For(cond: $i in 1 dots t$, {
         Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$]
-        Assign[#greenm[$bold(M)$]][#greenm[$beta_1 bold(M) + (1 - beta_1) bold(J)$] \# Compute momentum]
+        Assign[#greenm[$bold(M)$]][#greenm[$beta_1 dot bold(M) + (1 - beta_1) bold(J)$] \# Compute momentum]
         Assign[#bluem[$bold(V)$]][#bluem[$beta_2 dot bold(V) + (1 - beta_2) dot bold(J) dot.circle bold(J)$] \# Magnitude]
         //Assign[$hat(bold(M))$][$bold(M)  "/" (1 - beta_1)$ \# Bias correction]
         //Assign[$hat(bold(V))$][$bold(V) "/" (1 - beta_2)$ \# Bias correction]
 
-        Assign[$bold(theta)$][$bold(theta) - alpha #greenm[$bold(M)$] #bluem[$⊘ root(dot.circle, bold(V) + epsilon)$]$ \# Adaptive param update]
+        Assign[$bold(theta)$][$bold(theta) - alpha dot #greenm[$bold(M)$] #bluem[$⊘ root(dot.circle, bold(V) + epsilon)$]$ \# Adaptive param update]
       })
 
     Return[$bold(theta)$ \# Note, we use biased $bold(M), bold(V)$ for clarity]
@@ -961,6 +1019,44 @@
 
 #aslide(ag, 7)
 #aslide(ag, 8)
+
+#sslide[
+  Many modern optimizers also include *weight decay* #pause
+
+  Weight decay penalizes large parameters #pause
+
+  $ cal(L)_("decay")(bold(X), bold(Y), bold(theta)) = cal(L)_("decay")(bold(X), bold(Y), bold(theta)) + lambda sum_(i) theta_i^2 $ #pause
+
+  This results in a smoother, parabolic loss landscape that is easier to optimize #pause
+
+  (Unproven opinion) It reduces the number of saddle points and local minima
+]
+
+#sslide[
+  $ z = sin^2(x) + sin^2(y) $
+  #side-by-side[
+    #cimage("figures/lecture_6/wd0.png")
+  ][
+    #cimage("figures/lecture_6/wd1.png")
+  ]
+]
+
+#sslide[
+  Weight decay is built into the Adam optimizer #pause
+
+  But the implementation is wrong! #pause
+
+  Years later, someone noticed and published a new paper that fixes weight decay implementation #pause
+
+  ```python
+  Lambda = 0.01
+  opt = torch.optim.adamw(..., weight_decay=Lambda)
+  opt = optax.adamw(..., weight_decay=Lambda)
+  ```
+]
+
+#aslide(ag, 8)
+#aslide(ag, 9)
 
 #sslide[
   https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD#scrollTo=YVkCyz78x4Rp
