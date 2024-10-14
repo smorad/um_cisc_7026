@@ -3,6 +3,9 @@
 #import "@preview/cetz:0.2.2": canvas, draw, plot
 #import "common.typ": *
 
+
+// TODO: Missing x^2 term when we show polynomial+multivariate example (not 2^3, should be 3^2 + 1)
+
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
 
