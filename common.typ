@@ -1,11 +1,13 @@
 #import "@preview/polylux:0.3.1": *
 #import themes.university: *
 #import "@preview/cetz:0.2.2": canvas, draw, plot
+#import "@preview/cetz:0.2.2"
 
 #set text(size: 25pt)
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
 #let argmin = $op("arg min", limits: #true)$
+#let scan = $op("scan")$
 
 #let cimage(..args) = { 
   align(center + horizon, image(..args))
@@ -162,3 +164,23 @@
       )
     })
 })}
+
+#let draw_filter(x, y, cells, colors: none) = {
+  import cetz.draw: *
+  grid((x, y), (x + cells.len(), y + cells.at(0).len()))
+  for i in range(cells.len()) {
+    for j in range(cells.at(i).len()) {
+      if (colors != none)  {
+        let cell_color = colors.at(cells.at(i).len() - j - 1).at(i)
+        if (cell_color != none){
+          rect((i, j), (i + 1, j + 1), fill: cell_color)
+        }
+        content((x + i + 0.4, y + j + 0.6), (i, j), cells.at(cells.at(i).len() - j - 1).at(i))
+
+      } else {
+        content((x + i + 0.4, y + j + 0.6), (i, j), str(cells.at(cells.at(i).len() - j - 1).at(i)))
+      }
+
+      }
+  }
+}

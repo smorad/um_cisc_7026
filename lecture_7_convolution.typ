@@ -6,6 +6,7 @@
 #import "@preview/algorithmic:0.1.0"
 #import algorithmic: algorithm
 
+// FUTURE TODO: Repeat self too much on locality/equivariance, restructure and replace with something else
 
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
@@ -845,7 +846,6 @@ draw_filter(0, 0, image_values)
   There is an underlying structure to $x(t)$ #pause
 
   *Structure:* Tomorrow's stock price will be close to today's stock price
-
 ]
 
 #slide(title: [Signal Processing])[
@@ -1321,7 +1321,7 @@ draw_filter(0, 0, image_values)
   ) $ #pause][
     Local, only considers a few nearby inputs at a time #pause
 
-    Translation equivariant, each output corresponds to input #pause
+    Translation equivariant, each output corresponds to input 
   ]
 ]
 
@@ -1336,7 +1336,7 @@ draw_filter(0, 0, image_values)
 
   *Answer 1:* Depends on sequence length and filter size! #pause
 
-  *Answer 2:* $T - k$, where $T$ is sequence length and $k$ is filter length 
+  *Answer 2:* $T - k + 1$, where $T$ is sequence length and $k$ is filter length 
 ]
 
 #sslide[
@@ -1357,7 +1357,7 @@ draw_filter(0, 0, image_values)
   $ "SumPool"(z(t)) = sigma(bold(theta)^top vec(1, x(0.1), x(0.2))) + sigma(bold(theta)^top vec(1, x(0.2), x(0.3))) + dots
   $ #pause
 
-  $ "MeanPool"(z(t)) = 1 / (T - k) "SumPool"(z(t)); quad "MaxPool"(z(t)) = max(z(t))
+  $ "MeanPool"(z(t)) = 1 / (T - k + 1) "SumPool"(z(t)); quad "MaxPool"(z(t)) = max(z(t))
   $
 ]
 
