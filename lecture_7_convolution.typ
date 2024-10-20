@@ -1586,8 +1586,8 @@ draw_filter(0, 0, image_values)
   $ bold(theta) in bb(R)^(c_x times c_y times k times k + c_y) $
   
   - Input channels: $c_x$
-  - Output channels: $c_y$
-  - Filter $u$ (height): $k + 1$
+  - Output channels: $c_y + 1$ 
+  - Filter $u$ (height): $k$
   - Filter $v$ (width): $k$ #pause
 
   Convolve $c_y$ filters of size $k times k$ across $c_x$ channels, bias for each output

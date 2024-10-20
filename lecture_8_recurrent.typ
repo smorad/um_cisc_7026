@@ -69,7 +69,9 @@
 )
 
 #slide(title: [Admin])[
-    Makeup lecture Saturday October 26, 13:00-16:00 
+    Makeup lecture Saturday October 26, 13:00-16:00 #pause
+
+    Assignment 5 is on Moodle, due in 2 weeks
 ]
 
 
@@ -77,7 +79,7 @@
 #aslide(ag, 0)
 // TODO Review
 #sslide[
-  In perceptrons, each pixel is an independent neuron #pause
+  In perceptrons, each neuron in a layer is independent #pause
 
   #align(center, cetz.canvas({
     import cetz.draw: *
@@ -149,6 +151,8 @@
 ]
 
 #sslide[
+    Two common properties of signals: #pause
+
     *Locality:* Information concentrated over small regions of space/time #pause
 
     *Translation Equivariance:* Shift in signal results in shift in output
@@ -186,7 +190,7 @@
   })) 
 ]
 
-#slide(title: [Convolution])[
+#sslide[
   We use convolution to turn signals into useful signals
 
   #side-by-side[#waveform_left][#hello] #pause
@@ -194,7 +198,7 @@
   Convolution is translation equivariant and local
 ]
 
-#slide(title: [Convolution])[
+#sslide[
   Convolution is the sum of products of a signal $x(t)$ and a *filter* $g(t)$ #pause
 
   If the t is continuous in $x(t)$
@@ -208,8 +212,7 @@
   We slide the filter $g(t)$ across the signal $x(t)$
 ]
 
-#slide(title: [Convolution])[
-
+#sslide[
   #conv_signal_plot #pause
 
   #conv_filter_plot #pause
@@ -217,7 +220,7 @@
   #conv_result_plot
 ]
 
-#slide(title: [Convolution])[
+#sslide[
   $
   vec(
     x(t),
@@ -231,7 +234,7 @@
   $
 ]
 
-#slide(title: [Convolution])[
+#sslide[
   $
   vec(
     x(t),
@@ -245,7 +248,7 @@
   $
 ]
 
-#slide(title: [Convolution])[
+#sslide[
   $
   vec(
     x(t),
@@ -259,7 +262,7 @@
   $
 ]
 
-#slide(title: [Convolution])[
+#sslide[
   $
   vec(
     x(t),
@@ -273,7 +276,7 @@
   $
 ]
 
-#slide(title: [Convolution])[
+#sslide[
   $
   vec(
     x(t),
@@ -288,7 +291,7 @@
 ]
 
 
-#slide(title: [Convolution])[
+#sslide[
   $
   vec(
     x(t),
@@ -346,6 +349,21 @@
 
   $ "MeanPool"(z(t)) = 1 / (T - k + 1) "SumPool"(z(t)); quad "MaxPool"(z(t)) = max(z(t))
   $
+]
+
+#sslide[
+  Our examples considered: #pause
+  - 1 dimensional variable $t$ #pause
+  - 1 dimensional output/channel $x(t)$ #pause
+  - 1 filter #pause
+
+  We can expand to arbitary dimensions #pause
+  - Images 2D $(u, v)$ #pause
+  - Video 3D $(u, v, t)$ #pause
+  - Robot position, orientation, and time (7D) #pause
+  - Arbitrary signals #pause
+
+  The idea is exactly the same
 ]
 
 #sslide[
@@ -496,11 +514,13 @@
 
     Convolution is an electrical engineering approach to modeling sequences #pause
 
-    Now, we will discuss a psychological approach to sequence modeling #pause
+    Now, we will discuss a neuroscience approach to sequence modeling #pause
 
-    We call these models *recurrent neural networks* (RNNs) #pause
+    We call these models *recurrent models* #pause
 
-    You can solve temporal tasks using either convolution or RNNs
+    You can solve temporal tasks using either convolution or RNNs #pause
+
+    So what is the difference between convolution and recurrent models?
 ]
 
 #sslide[
@@ -512,7 +532,9 @@
 
     Recurrent models do not assume locality or equivariance #pause
 
-    Equivariance and locality make learning more efficient, but not all problems have this structure 
+    Equivariance and locality make learning more efficient, but not all problems have this structure #pause
+
+    Let us examine some real life signals, and see if these properties hold
 ]
 
 #sslide[
@@ -520,7 +542,7 @@
 
     *Question:* Is this local? #pause
 
-    *Answer:* No, two events separated by 20 years #pause
+    *Answer:* No, two related events separated by 20 years 
 ]
 
 #sslide[
@@ -528,7 +550,7 @@
 
     *Question:* Translation equivariant? #pause
 
-    No! Ok if you are a baby, different meaning if you are an adult! #pause
+    No! Ok if you are a baby, different meaning if you are an adult! 
 ]
 
 #sslide[
@@ -547,7 +569,7 @@
 
     For these problems, we need something else! #pause
 
-    Humans experience time and process temporal data #pause
+    How do humans experience time and process temporal data? #pause
 
     Can we design a neural network based on human perceptions of time?
 ]
@@ -556,11 +578,19 @@
 #aslide(ag, 2)
 
 #sslide[
-    How do humans experience time? #pause
+    How do humans process temporal data? #pause
 
-    Humans create memories #pause
+    We only perceive the present #pause
 
-    We experience time when we reason over our memories
+    See dog $->$ photoreceptors fire $->$ neurons fire in the brain #pause
+
+    No dog $->$ no photoreceptors fire $->$ no neurons fire #pause
+
+    We know there was a dog, even if we no longer see it #pause
+
+    We can reason over time by recording information as *memories* #pause
+
+    Humans process temporal data by storing and recalling memories
 ]
 
 #sslide[
@@ -571,7 +601,7 @@
 
         If all your memories were erased, you would be a different person #pause
 
-        Without the ability to reason over memories, we would simply react to stimuli like bacteria
+        Without the ability to reason over memories, we would only react to stimuli like bacteria
     ]
 ]
 
@@ -581,7 +611,7 @@
 
 #sslide[
     #side-by-side[
-        Francis Galton (1822-1911), composite memory
+        Francis Galton (1822-1911) \ photo composite memory
 
         #cimage("figures/lecture_8/galton.jpg", height: 70%) #pause
     ][
@@ -592,13 +622,15 @@
 ]
 
 #sslide[
-    *Task:* Model how our mind represents memories #pause
+    *Task:* Find a mathematical model of how our mind represents memories #pause
 
-    $ X: bb(R)^(T times h times w) quad "Faces you see at the club" $ #pause
+    $ X: bb(R)^(h times w) quad "People you see at the party" $ #pause
 
-    $ Y: bb(R)^(h times w) quad "The image in your mind" $
+    $ H: bb(R)^(h times w) quad "The image in your mind" $
 
-    $ f: X times Theta |-> Y $ #pause
+    $ f: X^T times Theta |-> H $ #pause
+
+    Composite photography/memory uses a weighted sum #pause
 
     $ f(bold(x), bold(theta)) = sum_(i=1)^T bold(theta)^top overline(bold(x))_i $
 ]
@@ -606,25 +638,31 @@
 #sslide[
     $ f(bold(x), bold(theta)) = sum_(i=1)^T bold(theta)^top overline(bold(x))_i $ #pause
 
-    *Question:* What if we see a new face? #pause
+    #side-by-side[What if we see a new face? #pause][
+        $ f(bold(x), bold(theta)) = (sum_(i=1)^T bold(theta)^top overline(bold(x))_i) + bold(theta)^top overline(bold(x))_"new" $ #pause
+    ]
 
-    $ f(bold(x), bold(theta)) = (sum_(i=1)^T bold(theta)^top overline(bold(x))_i) + bold(theta)^top overline(bold(x))_"new" $ #pause
 
 
-    *Question:* And another new face? #pause
+    #side-by-side[And another new face? #pause][
+        $ = (sum_(i=1)^T bold(theta)^top overline(bold(x))_i) + bold(theta)^top overline(bold(x))_"new" + bold(theta)^top overline(bold(x))_"newnew"  $ #pause
+    ]
 
-    $ f(bold(x), bold(theta)) = (sum_(i=1)^T bold(theta)^top overline(bold(x))_i) + bold(theta)^top overline(bold(x))_"new" + bold(theta)^top overline(bold(x))_"newnew"  $
+    We repeat the same process for each new face #pause
+
+    We can rewrite $f$ as a *recurrent function*
+
 ]
 
 #aslide(ag, 2)
 #aslide(ag, 3)
 
 #sslide[
-    We can rewrite this function *recurrently* #pause
+    Let us rewrite composite memory as a recurrent function #pause
 
     $ f(bold(x), bold(theta)) = underbrace((sum_(i=1)^T bold(theta)^top overline(bold(x))_i), bold(h)) + bold(theta)^top overline(bold(x))_"new" $ #pause
 
-    $ f(bold(h), bold(x), bold(theta)) = bold(h) + bold(theta)^top overline(bold(x)) $
+    $ f(bold(h), bold(x), bold(theta)) = bold(h) + bold(theta)^top overline(bold(x)) $ #pause
 
     $ bold(x) in bb(R)^(d_x), quad bold(h) in bb(R)^(d_h) $
 ]
@@ -657,9 +695,15 @@
 #sslide[
     Right now, our model remembers everything #pause
 
+    But $bold(h)$ is a fixed size, what if $T$ is very large? #pause
+
+    If we keep adding and adding $bold(x)$ into $bold(h)$, we will run out of space
+
     https://www.youtube.com/watch?v=IQ8Aak-k5Yc #pause
 
     Humans cannot remember everything! #pause
+
+    We forget old information
 ]
 
 #sslide[
@@ -673,7 +717,9 @@
 
         $ 0.9 dot 0.9 dot bold(h) = 0.81 bold(h) $ #pause
         $ 0.9 dot 0.9 dot 0.9 dot bold(h) = 0.72 bold(h) $ #pause
-        $ 0.9 dot 0.9 dot 0.9 dot dots dot bold(h) = 0 $ 
+        $ 0.9 dot 0.9 dot 0.9 dot dots dot bold(h) = 0 $ #pause
+
+        Let us work out how forgetting works
         ] 
 ]
 
@@ -685,7 +731,7 @@
 
     *Question:* What is $bold(h)_(T - 1)$ in terms of $bold(h)_(T - 2)$? #pause
     
-    $ #redm[$gamma bold(h)_(T-2) + bold(theta)^top overline(bold(x))_(T - 1)$] $ #pause
+    $ bold(h)_(T - 1) = #redm[$gamma bold(h)_(T-2) + bold(theta)^top overline(bold(x))_(T - 1)$] $ #pause
 
     $ bold(h)_T = gamma (#redm[$gamma bold(h)_(T - 2) + bold(theta)^top overline(bold(x))_(T - 1)$]) +  bold(theta)^top overline(bold(x))_T $ #pause
 
@@ -699,26 +745,28 @@
 #sslide[
     $ bold(h)_T = gamma^3 bold(h)_(T - 3) + gamma^2 bold(theta)^top overline(bold(x))_(T - 2) + gamma bold(theta)^top overline(bold(x))_(T - 1) + bold(theta)^top overline(bold(x))_T $ #pause
 
-    $ bold(h)_T = sum_(i=1)^T gamma^(T - i - 1) bold(theta)^top bold(x)_i $ #pause
+    $ bold(h)_T = gamma^T bold(theta)^top overline(bold(x))_1 + gamma^(T - 1) bold(theta)^top overline(bold(x))_2 + dots + gamma^2 bold(theta)^top overline(bold(x))_(T - 2) + gamma bold(theta)^top overline(bold(x))_(T - 1) + bold(theta)^top overline(bold(x))_T $ #pause
+
+    //$ bold(h)_T = sum_(i=1)^T gamma^(T - i - 1) bold(theta)^top bold(x)_i $ #pause
 
 
     #align(center)[#forgetting]
 ]
 
 #sslide[
-    As $T$ increases, we add new information #pause
+    As $T$ increases, we add new information $bold(x)_T$ #pause
 
     As $T$ increases, we slowly forget old information #pause
 
     The memory decay is smooth and differentiable #pause
 
-    We can learn the parameters using gradient descent
+    We can learn the parameters $gamma, bold(theta)$ using gradient descent
 ]
 
 #sslide[
     Morad et al., _Reinforcement Learning with Fast and Forgetful Memory_. Neural Information Processing Systems. (2024). #pause
     
-    $ bold(H)_t = bold(gamma) dot.circle bold(H)_(t - 1) + g(bold(x)_t) $ #pause
+    $ bold(H)_T = bold(gamma) dot.circle bold(H)_(T - 1) + g(bold(x)_T) $ #pause
 
     Our models learn to play board games and computer games #pause
 
@@ -738,7 +786,7 @@
 
     $ dots.v $
 
-    $ bold(y) = bold(h)_T = f(bold(h)_(T-1), bold(x)_T, bold(theta)) = gamma bold(h)_(T-1) + bold(theta)^top overline(bold(x))_T $ #pause
+    $ bold(h)_T = f(bold(h)_(T-1), bold(x)_T, bold(theta)) = gamma bold(h)_(T-1) + bold(theta)^top overline(bold(x))_T $ #pause
 
     How do we compute $bold(h)_1, bold(h)_2, dots, bold(h)_T$ on a computer? #pause
 
@@ -771,16 +819,16 @@
     import jax
     import jax.numpy as jnp
 
-    T, d_h = 10, 4
-    xs, h0 = jnp.ones((T, d_h)), jnp.zeros((d_h,))
-    theta = (jnp.ones((d_h,)), jnp.ones((d_h, d_h))) # (b, W)
+    T, d_x, d_h = 10, 2, 4
+    xs, h0 = jnp.ones((T, d_x)), jnp.zeros((d_h,))
+    theta = [jnp.ones((d_h,)), jnp.ones((d_x, d_h))] # (b, W)
 
     def f(h, x):
         b, W = theta
-        result = h + W.T @ x + b
+        result = h + (W.T @ x + b)
         return result, result # return one, return all
 
-    _, hs = jax.lax.scan(f, init=h0, xs=xs) # Scan f over x
+    hT, hs = jax.lax.scan(f, init=h0, xs=xs) # Scan f over x
     ```
 ]
 
@@ -798,7 +846,7 @@
             h = f(h, x, theta) 
             hs.append(h)
         # output shape is (T, d_h)
-        return hs
+        return torch.stack(hs)
     ```
 
 ]
@@ -806,12 +854,14 @@
 #sslide[
     ```python
     import torch
-    T, d_h = 10, 4
-    xs, h0 = torch.ones((T, d_h)), torch.zeros((d_h,))
-    theta = (torch.ones((d_h,)), torch.ones((d_h, d_h))) 
+    T, d_x, d_h = 10, 2, 4
+
+    xs, h0 = torch.ones((T, d_x)), torch.zeros((d_h,))
+    theta = (torch.ones((d_h,)), torch.ones((d_x, d_h))) 
+
     def f(h, x):
         b, W = theta
-        result = h + W.T @ x + b
+        result = h + (W.T @ x + b)
         return result # h
 
     hs = scan(f, h0, xs)
@@ -827,7 +877,7 @@
 
     Standard LLM: \~8000 words, LLM + associative scan: 1M+ words #pause
 
-    An associative scan is a very fast scan we use when $f$ obeys the associative property #pause
+    An associative scan is a very fast scan we use when $f$ obeys the associative property $(a + b) + c = a + (b + c)$ #pause
 
     *Question:* Does $f(bold(h), bold(x), bold(theta)) = gamma bold(h) + bold(theta)^top overline(bold(x))$ obey the associative property? #pause
 
@@ -842,27 +892,29 @@
 
     There is one more step we must consider, *memory recall* #pause
 
-    $bold(h)$ represents all memories, but humans only access a few memories at once #pause
+    $bold(h)$ stores all memories, but humans only access a few memories at once #pause
 
     *Example:* I ask you your favorite ice cream flavor #pause
 
     You recall previous times you ate ice cream, but not your phone number #pause
+
+    We will model this recall of memories using a function $g$
 ]
 
 #sslide[
-    We model recall using a function $g$ #pause
+    Let $g$ define our memory recall function #pause 
 
     $ g: H times X times Theta |-> Y $ #pause
 
     $g$ searches your memories $h$ using the input $x$, to produce output $y$ #pause
 
-    $bold(x):$ What is your favorite ice cream flavor? #pause 
+    $bold(x):$ "What is your favorite ice cream flavor?" #pause 
 
     $bold(h):$ Everything you remember (hometown, birthday, etc) #pause
 
-    $g:$ Searches your memories for ice cream memories, and responds "chocolate" #pause
+    $g:$ Searches your memories for ice cream information, and responds "chocolate" #pause
 
-    Now, combine $f$ and $g$
+    Now, we will combine $f$ and $g$
 ]
 
 #sslide[
@@ -882,17 +934,18 @@
 ]
 
 #sslide[
-    We defined: 
+    To summarize, we defined: #pause
     - Recurrent function $f$ #pause
     - Scanned recurrence $scan(f)$ #pause
     - Output function $g$
 
-    To run: #pause
+    To run our model: #pause
     - Execute $scan(f)$ over inputs to make recurrent states #pause
     - Execute $g$ over recurrent states to make outputs
 ]
 
 #aslide(ag, 5)
+#focus-slide[Relax]
 #aslide(ag, 6)
 
 // We built the recurrent model to model human mind
@@ -912,42 +965,40 @@
 #sslide[
     *Task:* Clock -- keep track of time #pause
 
-    Every second, the second hand ticks #pause
-
     Every minute, the minute hand ticks #pause
 
-    Add up the ticks to know the time #pause
+    Count/remember the ticks to know the time #pause
 
-    $ X in {0, 1}^2, quad Y in bb(R)^2 $ 
+    $ X in {0, 1}, quad Y in bb(R)^2 $ 
 ]
 
 #sslide[
     #side-by-side[Example input sequence:][
-        $ mat(0, 1; 0, 1; dots.v, dots.v; 1, 1) $
+        $ mat(1; 1; dots.v; 1;) $
     ] #pause
         
 
     #side-by-side[Desired output sequence][
-        $  mat(0, 1; 0, 2; dots.v, dots.v; m, s) $
+        $  mat(0, 1; 0, 2; dots.v, dots.v; 2, 13) $
     ]
+
+    We have a corresponding label $bold(y)$ for each input $x$
 ]
 
 #sslide[
-    We have a ground truth for each input $y_i$ #pause
-
     Can use square error #pause
 
     First, scan $f$ over the inputs to find $h$
 
-    $ bold(h)_([i], j) = scan(f)(bold(h)_0, bold(x)_[i], bold(theta)_f) $ #pause
+    $ bold(h)_([i], j) = scan(f)(bold(h)_0, vec(bold(x)_([i], 1), dots.v, bold(x)_([i], T)), bold(theta)_f) $ #pause
 
-    $ cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i=1)^n sum_(j=1)^T [g(bold(h)_([i], j), bold(x)_([i], j), bold(theta)_g) - bold(y)_([i], j)^2]^2 $ #pause
+    $ cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i=1)^n sum_(j=1)^T [g(bold(h)_([i], j), bold(x)_([i], j), bold(theta)_g) - bold(y)_([i], j)]^2 $ #pause
 
     Onto the next task
 ]
 
 #sslide[
-    *Task:* Watch a video, then explain it to me
+    *Task:* Watch a video, then explain it 
 
     $ X in bb(Z)^(3 times 32 times 32), quad Y in {"comedy show", "action movie", ...} $ #pause
 
@@ -963,9 +1014,9 @@
 
     We scan $f$ over the sequence, the compute $g$ for the final timestep #pause
 
-    $ h_([i],j) = scan(f)(bold(h)_0, bold(x)_[i], bold(theta)_f) $ #pause
+    $ bold(h)_([i],j) = scan(f)(bold(h)_0, vec(bold(x)_([i], 1), dots.v, bold(x)_([i], T)), bold(theta)_f) $ #pause
 
-    $ cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_y) y_([i], j) log g(bold(h)_([i], T), bold(x)_([i], T))_j $ #pause
+    $ cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_y) y_([i], j) log g(bold(h)_([i], T), bold(x)_([i], T), bold(theta)_g)_j $ #pause
 
     We only care about the $bold(h)_T$
 ]
@@ -978,20 +1029,27 @@
     + We found the loss function #pause
     + Now we need to find the parameters! #pause
 
-    Just like all other neural networks, we train recurrent models using gradient descent #pause
+    Just like all other models, we train recurrent models using gradient descent #pause
 
     *Step 1:* Compute gradient #pause
 
-    *Step 2:* Update parameters
+    *Step 2:* Update parameters using gradient #pause
+
+    How do we compute gradients for recurrent functions?
+
 ]
 
 #sslide[
+    First, compute gradient of $f$
+    
     $ f(bold(h), bold(x), bold(theta)) = gamma bold(h) + bold(theta)^top overline(bold(x)) $ #pause
 
     *Question:* What is $gradient_bold(theta) f$? #pause
 
     $ gradient_bold(theta) f(bold(h), bold(x), bold(theta)) = overline(bold(x))^top
-    $
+    $ #pause
+
+    Too easy, now let us find the gradient of $scan(f)$
 ]
 #sslide[
     $ scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(f(h_0, x_1, bold(theta)), f(h_1, x_2, bold(theta)), dots.v, f(h_(T-1), x_T, bold(theta))) = vec(f(h_0, x_1), f(f(h_0, x_1), x_2), dots.v, f( dots f(h_0, x_1) dots, x_T)) $
@@ -1000,26 +1058,41 @@
 
     $ gradient_bold(theta) scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
         gradient_bold(theta)[f](h_0, x_1), 
-        gradient_bold(theta)[f](f(h_0, x_1), x_2) dot gradient_bold(theta) [f](h_0, x_1), 
+        gradient_bold(theta)[f](f(h_0, x_1), x_2) gradient_bold(theta) [f](h_0, x_1), 
         dots.v, 
-        gradient_bold(theta)[f]( dots f(h_0, x_1) dots, x_T) dot dots dot gradient_bold(theta)[f](h_0, x_1)
+        gradient_bold(theta)[f]( dots f(h_0, x_1) dots, x_T) dots dot gradient_bold(theta)[f](h_0, x_1)
     ) $
+]
+
+#sslide[
+    $ gradient_bold(theta) scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
+        gradient_bold(theta)[f],
+        gradient_bold(theta)[f] gradient_bold(theta)[f],
+        gradient_bold(theta)[f] gradient_bold(theta)[f] gradient_bold(theta)[f],
+        dots.v
+    ) $ #pause
+
+    *Question:* Any issues with this? #pause
+
+    What if $gradient_bold(theta) f$ is $ << 1$ or $ >> 1$ ?
 ]
 
 #aslide(ag, 7)
 #aslide(ag, 8)
 
 #sslide[
-    If $f$ is a neural network, then we have a recurrent neural network
+    Until now, $f$ was a linear function #pause
+    
+    If we make $f$ a neural network, then we have a *recurrent neural network* (RNN)
 ]
 
 #sslide[
-    The first recurrent neural network was the *Elman Network* #pause
+    The simplest recurrent neural network is the *Elman Network* #pause
 
-    $ f(bold(h), bold(x), bold(theta)) = sigma(bold(theta)^top_1 overline(bold(h)) + bold(theta)^top_2 overline(bold(x))) $ #pause
+    $ f(bold(h), bold(x), bold(theta)) = sigma(bold(theta)^top_1 bold(h) + bold(theta)^top_2 overline(bold(x))) $ #pause
 
     $ g(bold(h), bold(x), bold(theta)) = 
-        bold(theta)^top_3 overline(bold(h))
+        bold(theta)^top_3 bold(h)
     $ #pause
 
     $bold(h)$ grows large and causes exploding gradients, $sigma$ should be sigmoid! #pause
@@ -1034,9 +1107,18 @@
 
 #sslide[
     Add forgetting 
+
+    $ 
+    f (bold(h), bold(x), bold(theta)) = 
+    sigma(
+        bold(theta)_1^top bold(h) #redm[$dot.circle f_"forget" (bold(h), bold(x), bold(theta))$] + bold(theta)_2^top overline(bold(x)) 
+    )
+    $ #pause
+
+
     $ 
     f_"forget" (bold(h), bold(x), bold(theta)) = sigma(
-        bold(theta)_1^top overline(bold(x)) +  bold(theta)_2^top overline(bold(h))
+        bold(theta)_1^top overline(bold(x)) +  bold(theta)_2^top bold(h)
     )
     $ #pause
 
@@ -1044,33 +1126,29 @@
 
     *Answer:* $[0, 1]$ #pause
 
-    $ 
-    f (bold(h), bold(x), bold(theta)) = 
-    sigma(
-        bold(theta)_3^top overline(bold(x)) + bold(theta)_4^top overline(bold(h)) dot.circle f_"forget" (bold(h), bold(x), bold(theta))
-    )
-    $ #pause
+    When $f_"forget" < 1$, we forget some of our memories! #pause
 
-    When $f_"forget < 1"$, we forget! 
+    Through gradient descent, neural network learns which memories to forget
 
 ]
 
 #sslide[
-    *Minimal gated unit* (MGU) #pause
+    *Minimal gated unit* (MGU) is a modern RNN #pause
+    
+    MGU defines two helper functions #pause
 
     $ 
     f_"forget" (bold(h), bold(x), bold(theta)) = sigma(
-        bold(theta)_1^top overline(bold(x)) +  bold(theta)_2^top overline(bold(h))
+        bold(theta)_1^top overline(bold(x)) +  bold(theta)_2^top bold(h)
     ) 
     $ #pause
 
     $ 
     f_2(bold(h), bold(x), bold(theta)) = sigma(
-        bold(theta)_3^top overline(bold(x)) + bold(theta)_4^top (
+        bold(theta)_3^top overline(bold(x)) + bold(theta)_4^top 
             f_"forget" (bold(h), bold(x), bold(theta)) dot.circle bold(h)
-        )
     ) 
-    $
+    $ #pause
 
     $
     f(bold(h), bold(x), bold(theta)) = 
@@ -1085,45 +1163,50 @@
     - Long Short-Term Memory (LSTM) #pause
     - Gated Recurrent Unit (GRU) #pause
 
-    LSTM has 6 different functions! Too complicated to review
+    LSTM has 6 different functions! Too complicated to review #pause
+
+    MGU is simpler and performs similarly to LSTM and GRU
 ]
 
 #sslide[
-    #side-by-side[Elman network $f$:][$ f(bold(h), bold(x), bold(theta)) = sigma(bold(theta)^top_1 overline(bold(h)) + bold(theta)^top_2 overline(bold(x))) $] #pause
-
-    *Question:* What is the gradient for $scan(f)$? #pause
-
+    Recall the gradient for the linear recurrence #pause
     $ gradient_bold(theta) scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
-        gradient_bold(theta)[f](h_0, x_1), 
-        gradient_bold(theta)[f](f(h_0, x_1), x_2) dot gradient_bold(theta) [f](h_0, x_1), 
-        dots.v, 
-        gradient_bold(theta)[f]( dots f(h_0, x_1) dots, x_T) dot dots dot gradient_bold(theta)[f](h_0, x_1)
-    ) $ #pause
+        gradient_bold(theta)[f],
+        gradient_bold(theta)[f] gradient_bold(theta)[f],
+        gradient_bold(theta)[f] gradient_bold(theta)[f] gradient_bold(theta)[f],
+        dots.v
+    ) $ #pause        
 
-]
-#sslide[
-    #side-by-side[Elman network $f$:][$ f(bold(h), bold(x), bold(theta)) = sigma(bold(theta)^top_1 overline(bold(h)) + bold(theta)^top_2 overline(bold(x))) $] #pause
+    #side-by-side[Elman network $f$:][$ f(bold(h), bold(x), bold(theta)) = sigma(bold(theta)^top_1 bold(h) + bold(theta)^top_2 overline(bold(x))) $] #pause
 
-    $ gradient_bold(theta) scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
-        gradient_bold(theta)[f](h_0, x_1), 
-        gradient_bold(theta)[f](f(h_0, x_1), x_2) dot gradient_bold(theta) [f](h_0, x_1), 
-        dots.v, 
-        gradient_bold(theta)[f]( dots f(h_0, x_1) dots, x_T) dot dots dot gradient_bold(theta)[f](h_0, x_1)
-    ) $ #pause
-
-    $ gradient_bold(theta) scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
-        gradient_bold(theta)[sigma](bold(theta)_1^top overline(bold(x))_1) overline(bold(x))_1^top, 
-        gradient_bold(theta)[sigma](bold(theta)_2 overline(bold(h))_1, x_2) gradient_bold(theta) [sigma] (bold(theta)_1^top overline(bold(x))_1) overline(bold(x))_1^top, 
-        dots.v, 
-    ) $ #pause
+    *Question:* What is the gradient for $scan(f)$ of Elman network? 
 ]
 
 #sslide[
+    #side-by-side[Elman network $f$:][$ f(bold(h), bold(x), bold(theta)) = sigma(bold(theta)^top_1 bold(h) + bold(theta)^top_2 overline(bold(x))) $] #pause
+
     $ gradient_bold(theta) scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
-        gradient_bold(theta)[sigma](bold(theta)_1^top overline(bold(x))_1) overline(bold(x))_1^top, 
-        gradient_bold(theta)[sigma](bold(theta)_2 overline(bold(h))_1, bold(x)_2) gradient_bold(theta) [sigma] (bold(theta)_1^top overline(bold(x))_1) overline(bold(x))_1^top, 
-        dots.v, 
-    ) $ #pause
+        gradient_bold(theta)[f],
+        gradient_bold(theta)[f] gradient_bold(theta)[f],
+        gradient_bold(theta)[f] gradient_bold(theta)[f] gradient_bold(theta)[f],
+        dots.v
+    ) $ #pause        
+
+    $ gradient_bold(theta) scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
+        gradient_bold(theta)[sigma],
+        gradient_bold(theta)[sigma] gradient_bold(theta)[sigma],
+        gradient_bold(theta)[sigma] gradient_bold(theta)[sigma]  gradient_bold(theta)[sigma],
+        dots.v
+    ) $ 
+]
+
+#sslide[
+    $ gradient_bold(theta) scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
+        gradient_bold(theta)[sigma],
+        gradient_bold(theta)[sigma] gradient_bold(theta)[sigma],
+        gradient_bold(theta)[sigma] gradient_bold(theta)[sigma]  gradient_bold(theta)[sigma],
+        dots.v
+    ) $ 
 
     *Question:* What's the problem? #pause
 
@@ -1135,8 +1218,8 @@
 ]
 
 
-#aslide(ag, 7)
 #aslide(ag, 8)
+#aslide(ag, 9)
 
 #sslide[
     Jax RNN https://colab.research.google.com/drive/147z7FNGyERV8oQ_4gZmxDVdeoNt0hKta#scrollTo=TUMonlJ1u8Va
