@@ -584,6 +584,272 @@
 ]
 
 #sslide[
+  *Key idea:* There is some latent variable $bold(z)$ which generates data $bold(x)$ #pause
+
+
+  $ x: #cimage("figures/lecture_9/vae_slider.png") $
+
+  $ z: mat("woman", "brown hair", ("frown" | "smile")) $
+]
+
+#sslide[
+  #cimage("figures/lecture_9/vae_slider.png") #pause
+
+  We can only see $bold(x)$, we cannot directly observe $bold(z)$ #pause
+
+  Given the image $bold(x)$, what is the probability that the person is smiling? $P(bold(z) | bold(x))$
+]
+
+#sslide[
+  How can we find $P(bold(z) | bold(x))$? #pause
+
+  Use Bayes rule 
+
+  $ P(bold(z) | bold(x)) = (P(bold(x) | bold(z)) P(bold(z))) / P(bold(x)) $ #pause
+
+  How do we find $P(bold(x))$ ? Marginalize
+
+  $ P(bold(x), bold(z)) = P(bold(x) | bold(z)) P(bold(z)) $
+
+  $ P(bold(x)) = integral_bold(z) P(bold(x) | bold(z)) P(bold(z)) $
+]
+
+#sslide[
+
+  #side-by-side[
+    $ P(bold(z) | bold(x)) = (P(bold(x) | bold(z)) P(bold(z))) / P(bold(x)) $
+  ][
+
+    $ P(bold(x)) = integral_bold(z) P(bold(x) | bold(z)) P(bold(z)) $ 
+  ] #pause
+
+  $ P(bold(z) | bold(x)) = (P(bold(x) | bold(z)) P(bold(z))) / (integral_bold(z) P(bold(x) | bold(z)) P(bold(z))) $ #pause
+
+  This integral is intractable to compute! #pause
+
+  Instead, we approximate this distribution using our encoder 
+
+  $ f(bold(x), bold(theta)_e) = cal(N)(bold(mu), bold(theta)) approx P(bold(z) | bold(x)) $
+
+  Remember, $f$ outputs a *distribution*
+]
+
+#sslide[
+  We want to make $f(bold(x), bold(theta)_e)$ close to $P(bold(z) | bold(x))$ #pause
+
+  Remember, it is intractable to find $P(bold(z) | bold(x))$ #pause
+
+  But let us continue and see if $P(bold(z) | bold(x))$ goes away
+
+  *Question:* How do we measure the distance between probability distributions? 
+]
+
+#sslide[
+  *Answer:* KL divergence
+
+  #cimage("figures/lecture_5/forwardkl.png", height: 50%)
+  
+  $ KL(P, Q) = sum_i P(i) log P(i) / Q(i) $
+]
+
+#sslide[
+  $ KL(f(bold(x), bold(theta)_e), P(bold(z) | bold(x))) $ #pause
+
+  Through *magic*, we can write the KL divergence as
+
+  $ KL(f(bold(x), bold(theta)_e), P(bold(z) | bold(x))) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - underbrace(KL(f(bold(x), bold(theta)_e), P(bold(z))), "Encoder and prior") $ #pause
+
+  We can pick our prior distribution $P(bold(z))$, let's pick
+
+  $ P(bold(z)) = cal(N)(bold(0), bold(1)) $ #pause
+
+  We will reconstruct the input, and the latent space will be distributed according to $cal(N)(bold(0), bold(1))$
+]
+
+#sslide[
+  How do we implement $f$? #pause
+
+  $ f : X times Theta |-> Delta Z $
+
+
+  We represent a normal distribution with a mean $mu in bb(R)$ and standard deviation $sigma in bb(R)_+$
+
+  Our encoder should output $d_z$ means and $d_z$ standard deviations #pause
+
+  $ f : X times Theta |-> bb(R)^(d_z) times bb(R)_+^(d_z) $
+
+
+
+]
+
+#sslide[
+  ```python
+  core = nn.Sequential(...)
+  mu_layer = nn.Linear(d_h, d_z)
+  # Neural networks output real numbers
+  # But sigma must be positive
+  # So we output log sigma, because e^(sigma) is always positive
+  log_sigma_layer = nn.Linear(d_h, d_z)
+
+  tmp = core(x)
+  mu = mu_layer(tmp)
+  log_sigma = log_sigma_layer(tmp)
+  distribution = (mu, exp(sigma))
+  ```
+]
+
+#sslide[
+  We covered the encoder
+
+  $ f: X times Theta |-> Delta Z $
+  
+  We can use the same decoder as a standard autoencoder #pause
+
+  $ f^(-1): Z times Theta |-> X $
+
+  *Question:* Any issues? #pause
+
+  *Answer:* Encoder outputs a distribution $Delta Z$ but decoder input is $Z$
+]
+
+#sslide[
+  We can sample from the distribution 
+  
+  $ bold(mu), bold(sigma) &= f(bold(x), bold(theta)_e) \ 
+  bold(z) & tilde cal(N)(bold(mu), bold(sigma)) $ #pause 
+
+  But there is a problem! Sampling is not differentiable #pause
+
+  *Question:* Why does that matter?
+
+  *Answer:* Must be differentiable for gradient descent
+]
+
+#sslide[
+  VAE paper proposes the *reparameterization trick* #pause
+
+  $ bold(z) & tilde cal(N)(bold(mu), bold(sigma)) $ 
+
+  $ bold(z) = bold(mu) + bold(sigma) dot.circle bold(epsilon) quad bold(epsilon) tilde cal(U)(0, 1) $ #pause
+
+  Gradient can flow through $bold(mu), bold(sigma)$ #pause
+
+  We can sample and use gradient descent #pause
+
+  This trick only works with certain distributions
+]
+
+#sslide[
+  Put it all together #pause
+
+  *Step 1:* Encode the input to a normal distribution
+
+  $ bold(mu), bold(sigma) = f(bold(x), bold(theta)_e) $
+
+  *Step 2:* Generate a sample from distribution
+
+  $ bold(z) = bold(mu) + bold(sigma) dot.circle bold(epsilon) $
+
+  *Step 3:* Decode the sample 
+
+  $ bold(x) = f^(-1)(bold(z), bold(theta)_d) $
+]
+
+#sslide[
+  One last thing, the loss function #pause
+
+  We have this error function #pause
+
+  $ KL(f(bold(x), bold(theta)_e), P(bold(z) | bold(x))) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - underbrace(KL(f(bold(x), bold(theta)_e), P(bold(z))), "Encoder and prior") $ #pause
+
+  Turn it into a loss function
+]
+
+#sslide[
+  $ KL(f(bold(x), bold(theta)_e), P(bold(z) | bold(x))) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - underbrace(KL(f(bold(x), bold(theta)_e), P(bold(z))), "Encoder and prior") $ #pause
+
+  Since $f(bold(x), bold(theta)_e)$ and $P(bold(z) | bold(x))$ are Gaussian, we can simplify the KL term #pause
+
+  $ KL(f(bold(x), bold(theta)_e), P(bold(z) | bold(x))) = (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $ #pause
+
+  $ KL(f(bold(x), bold(theta)_e), P(bold(z) | bold(x))) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $
+]
+
+#sslide[
+  $ KL(f(bold(x), bold(theta)_e), P(bold(z) | bold(x))) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $
+
+  Plug in square error 
+
+  $ = sum_(j=1)^d_z (x_j - f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d)_j )^2 - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $
+
+  $ cal(L)(bold(x), bold(theta)) = sum_(j=1)^d_z (x_j - f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d)_j )^2 - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $
+]
+
+#sslide[
+  $ = sum_(j=1)^d_z (x_j - f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d)_j )^2 - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $
+
+  Define over the entire dataset
+
+  $ cal(L)(bold(X), bold(theta)) &= sum_(i=1)^n sum_(j=1)^d_z (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_(j) )^2 - \ 
+   &(sum_(i=1)^n sum_(j=1)^d_z mu^2_([i],j) + sigma^2_([i],j) - log(sigma_([i], j)^2) - 1) $
+]
+
+#sslide[
+  $ cal(L)(bold(X), bold(theta)) &= sum_(i=1)^n sum_(j=1)^d_z (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_(j) )^2 - \ 
+   &(sum_(i=1)^n sum_(j=1)^d_z mu^2_([i],j) + sigma^2_([i],j) - log(sigma_([i], j)^2) - 1) $
+
+  Scale of two terms can vary, we do not want one term to dominate
+]
+
+#sslide[
+  Paper suggests using minibatch size $m$ and dataset size $n$ #pause
+
+  $ cal(L)(bold(X), bold(theta)) &= #redm[$m / n$] sum_(i=1)^n sum_(j=1)^d_z (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_(j) )^2 - \ 
+   &(sum_(i=1)^n sum_(j=1)^d_z mu^2_([i],j) + sigma^2_([i],j) - log(sigma_([i], j)^2) - 1) $
+]
+
+#sslide[
+  Another paper finds hyperparameter $beta$ also helps #pause
+
+  $ cal(L)(bold(X), bold(theta)) &= #redm[$m / n$] sum_(i=1)^n sum_(j=1)^d_z (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_(j) )^2 - \ 
+   & #redm[$beta$] (sum_(i=1)^n sum_(j=1)^d_z mu^2_([i],j) + sigma^2_([i],j) - log(sigma_([i], j)^2) - 1) $
+]
+
+#sslide[
+  ```python
+  def L(model, x, m, n, beta, key):
+    mu, sigma = model.f(x)
+    epsilon = jax.random.normal(key, x.shape[0])
+    z = mu + sigma * epsilon
+    pred_x = model.f_inverse(z)
+    
+    recon = jnp.sum((x - pred_x) ** 2)
+    kl = jnp.sum(mu ** 2 + sigma ** 2 - jnp.log(sigma) - 1)
+
+    return m / n * recon + beta * kl
+  ```
+]
+
+#sslide[
+  Coding VAE
+
+  https://colab.research.google.com/drive/1UyR_W6NDIujaJXYlHZh6O3NfaCAMscpH#scrollTo=nmyQ8aE2pSbb
+
+  https://www.youtube.com/watch?v=UZDiGooFs54
+]
+
+
+/*
+
+#sslide[
+  However, to find $P(bold(x))$, we must marginalize, which is intractable
+
+  TODO: We should step by step to go from "and" to marginal
+
+  $ P(bold(x)) = integral_bold(z) P(bold(x) | bold(z)) P(bold(z)) dif z $
+]
+
+#sslide[
   *Warning:* Derivation of variational autoencoders is difficult #pause
 
   I have done my best to simplify it, but it is still complex #pause
@@ -598,13 +864,27 @@
 
   $ P(bold(z) | bold(x)) $ #pause
 
-  *Step 2:* Decoder produces $bold(x)_"new"$ sampled from a distribution 
+  *Step 2:* We sample a $bold(z)$ from this distribution
 
-  $ bold(x)_"new" tilde P(bold(x) | bold(z)) P(bold(z)) $ #pause
+  $ bold(z) tilde P(bold(z) | bold(x)) $
+
+  *Step 3:* Decoder produces $bold(x)$ from the sample $bold(z)$
+
+  $ bold(x) = f^(-1)(bold(z), bold(theta)_d) $
+]
+#sslide[
+  *Step 2:* We sample a $bold(z)$ from this distribution
+
+  $ bold(z) tilde P(bold(z) | bold(x)) $
+
+  *Step 3:* Decoder produces $bold(x)$ 
+
+  //$ bold(x) tilde P(bold(x) | bold(z)) $ #pause
+  $ bold(x) = f^(-1)(bold(z), bold(theta)_d) $
 
   VAE is generative because we sample from a distribution #pause
 
-  We are sampling new $bold(z)$ that were not in the dataset!
+  We are sampling new $bold(z)$ that was not in the dataset!
 ]
 
 #sslide[
@@ -614,7 +894,7 @@
 
   Start with the joint probability $P(bold(z), bold(x))$
 
-  $ P(bold(z), bold(x)) = underbrace(P(bold(z) | bold(x)), "Likelihood") underbrace(P(bold(x)), "Prior") $
+  $ P(bold(z), bold(x)) = underbrace(P(bold(z) | bold(x)), "Posterior") underbrace(P(bold(x)), "Evidence") $
 
   #side-by-side[
     $ P(bold(x)) $
@@ -833,3 +1113,4 @@
 #sslide[
   The loss for a VAE contains the reconstruction error and the KL loss
 ]
+*/
