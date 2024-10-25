@@ -9,7 +9,6 @@
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
 
-// #enable-handout-mode(true)
 
 // TODO: Should X represent the sequence and X_i represent just one element of the sequence?
 
@@ -69,9 +68,19 @@
 )
 
 #slide(title: [Admin])[
-    Makeup lecture Saturday October 26, 13:00-16:00 #pause
+    #strike(stroke: 3pt)[Prof. Qingbiao Li GNN lecture 28 October] #pause
 
-    Assignment 5 is on Moodle, due in 2 weeks
+    November 4 holiday, no lecture #pause
+
+    Saturday lecture made everyone look sad #pause
+
+    #strike(stroke: 3pt)[Makeup lecture Saturday October 26, 13:00-16:00] #pause
+    
+    Virtual lecture, but department policy states it must be in person #pause
+
+    I will be here on a Saturday (not sure when) to answer questions or discuss the virtual lecture #pause
+
+    Updated assignment 5 is on Moodle, due in 2 weeks 
 ]
 
 
@@ -766,11 +775,11 @@
 #sslide[
     Morad et al., _Reinforcement Learning with Fast and Forgetful Memory_. Neural Information Processing Systems. (2024). #pause
     
-    $ bold(H)_T = bold(gamma) dot.circle bold(H)_(T - 1) + g(bold(x)_T) $ #pause
+    $ bold(H)_T = bold(gamma) bold(H)_(T - 1) + g(bold(x)_T) $ #pause
 
-    Our models learn to play board games and computer games #pause
+    #side-by-side[#cimage("figures/lecture_8/blind-minesweeper.png")][#cimage("figures/lecture_8/blind-maze.png")]
 
-    Outperforms other recurrent models (LSTM, GRU, etc)
+    https://www.youtube.com/watch?v=0ey63XPB-4U&t=85s
 ]
 
 
@@ -1021,6 +1030,14 @@
     We only care about the $bold(h)_T$
 ]
 
+#sslide[
+    To summarize, we use standard losses for recurrent loss functions #pause
+
+    Just be careful -- we often sum over an additional axis
+
+    $ sum_(i=1)^n #redm[$sum_(j=1)^T$] dots $
+]
+
 #aslide(ag, 6)
 #aslide(ag, 7)
 
@@ -1225,6 +1242,4 @@
     Jax RNN https://colab.research.google.com/drive/147z7FNGyERV8oQ_4gZmxDVdeoNt0hKta#scrollTo=TUMonlJ1u8Va
 
     Homework https://colab.research.google.com/drive/1CNaDxx1yJ4-phyMvgbxECL8ydZYBGQGt?usp=sharing
-
-    Makeup lecture Saturday October 26, 13:00-16:00 
 ]

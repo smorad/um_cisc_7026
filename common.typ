@@ -8,6 +8,7 @@
 #set math.mat(delim: "[")
 #let argmin = $op("arg min", limits: #true)$
 #let scan = $op("scan")$
+#let KL = $op("KL")$
 
 #let cimage(..args) = { 
   align(center + horizon, image(..args))
