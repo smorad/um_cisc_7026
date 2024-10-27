@@ -4,6 +4,34 @@
 #import "common.typ": *
 #import "@preview/algorithmic:0.1.0"
 #import algorithmic: algorithm
+#import "@preview/fletcher:0.5.2" as fletcher: diagram, node, edge
+
+#let varinf = diagram(
+  node-stroke: .1em,
+  spacing: 4em,
+  node((0,0), $bold(z)$, radius: 2em),
+  edge($P(bold(x) | bold(z); bold(theta))$, "-|>"),
+  node((2,0), $bold(x)$, radius: 2em),
+  edge((0,0), (2,0), $P(bold(z) | bold(x); bold(theta))$, "<|-", bend: -40deg),
+)
+
+#let normal = { 
+    canvas(length: 1cm, {
+  plot.plot(size: (16, 10),
+    x-tick-step: 2,
+    y-tick-step: 0.5,
+    y-min: 0,
+    y-max: 1,
+    x-label: [$ bold(z) $],
+    y-label: [$ P(bold(z)) $],
+    {
+      plot.add(
+        domain: (-4, 4), 
+        style: (stroke: (thickness: 5pt, paint: red)),
+        x => calc.pow(calc.e, -(0.5 * calc.pow(x, 2)))
+      )
+    })
+})}
 
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
@@ -16,7 +44,8 @@
   [Compression],
   [Autoencoders],
   [Applications],
-  [Variational Models],
+  [Variational Modeling],
+  [VAE Implementation],
   [Coding]
 )
 
@@ -37,16 +66,235 @@
 #aslide(ag, none)
 #aslide(ag, 0)
 
-// TODO Review
+#sslide[
+    Convolution works over inputs of any variables (time, space, etc) #pause
+
+    Recurrent neural networks only work with time #pause
+
+    Convolution makes use of locality and translation equivariance properties #pause
+
+    Recurrent models do not assume locality or equivariance #pause
+
+    Equivariance and locality make learning more efficient, but not all problems have this structure
+]
 
 #sslide[
+    How do humans process temporal data? #pause
 
+    Humans only perceive the present #pause
+
+    Humans process temporal data by storing and recalling memories
+]
+
+#sslide[
+    #side-by-side[
+        Francis Galton (1822-1911) \ photo composite memory
+
+        #cimage("figures/lecture_8/galton.jpg", height: 70%) #pause
+    ][
+        Composite photo of members of a party 
+
+        #cimage("figures/lecture_8/composite_memory.jpg", height: 70%)
+    ]
+]
+
+#sslide[
+    *Task:* Find a mathematical model of how our mind represents memories #pause
+
+    $ X: bb(R)^(h times w) quad "People you see at the party" $ #pause
+
+    $ H: bb(R)^(h times w) quad "The image in your mind" $
+
+    $ f: X^T times Theta |-> H $ #pause
+
+    Composite photography/memory uses a weighted sum #pause
+
+    $ f(bold(x), bold(theta)) = sum_(i=1)^T bold(theta)^top overline(bold(x))_i $
+]
+
+#sslide[
+    $ f(bold(x), bold(theta)) = sum_(i=1)^T bold(theta)^top overline(bold(x))_i $ #pause
+
+    #side-by-side[What if we see a new face? #pause][
+        $ f(bold(x), bold(theta)) = (sum_(i=1)^T bold(theta)^top overline(bold(x))_i) + bold(theta)^top overline(bold(x))_"new" $ #pause
+    ]
+
+    We repeat the same process for each new face #pause
+
+    We can rewrite $f$ as a *recurrent function*
+
+]
+#sslide[
+    Let us rewrite composite memory as a recurrent function #pause
+
+    $ f(bold(x), bold(theta)) = underbrace((sum_(i=1)^T bold(theta)^top overline(bold(x))_i), bold(h)) + bold(theta)^top overline(bold(x))_"new" $ #pause
+
+    $ f(bold(h), bold(x), bold(theta)) = bold(h) + bold(theta)^top overline(bold(x)) $ #pause
+
+    $ bold(x) in bb(R)^(d_x), quad bold(h) in bb(R)^(d_h) $
+]
+
+#sslide[
+    #side-by-side[$  bold(x) in bb(R)^(d_x), quad bold(h) in bb(R)^(d_h) $][
+    $ f(bold(h), bold(x), bold(theta)) = bold(h) + bold(theta)^top overline(bold(x)) $] #pause
+
+    $ #redm[$bold(h)_1$] = f(bold(0), bold(x)_1, bold(theta)) = bold(0) + bold(theta)^top overline(bold(x))_1 $ #pause
+
+    $ #greenm[$bold(h)_2$] = f(#redm[$bold(h)_1$], bold(x)_2, bold(theta)) = bold(h)_1 + bold(theta)^top overline(bold(x))_2 $ #pause
+
+    $ bold(h)_3 = f(#greenm[$bold(h)_2$], bold(x)_3, bold(theta)) = bold(h)_2 + bold(theta)^top overline(bold(x))_3 $ #pause
+
+    $ dots.v $
+
+    $ bold(h)_T = f(bold(h)_(T-1), bold(x)_T, bold(theta)) = bold(h)_(T-1) + bold(theta)^top overline(bold(x))_T $ #pause
+
+    //We *scan* through the inputs $bold(x)_1, bold(x)_2, dots, bold(x)_T$
+]
+
+#sslide[
+    Right now, our model remembers everything #pause
+
+    But $bold(h)$ is a fixed size, what if $T$ is very large? #pause
+
+    If we keep adding and adding $bold(x)$ into $bold(h)$, we will run out of space #pause
+
+    Humans forget old information
+]
+
+#sslide[
+    #side-by-side[Murdock (1982) #cimage("figures/lecture_8/murdock.jpg", height: 80%) #pause ][
+        
+        $ f(bold(h), bold(x), bold(theta)) = #redm[$gamma$] bold(h) + bold(theta)^top overline(bold(x)); quad 0 < gamma < 1 $ #pause
+
+        *Key Idea:* $lim_(T -> oo) gamma^T = 0$ #pause 
+
+        Let $gamma = 0.9$ #pause
+
+        $ 0.9 dot 0.9 dot bold(h) = 0.81 bold(h) $ #pause
+        $ 0.9 dot 0.9 dot 0.9 dot bold(h) = 0.72 bold(h) $ #pause
+        $ 0.9 dot 0.9 dot 0.9 dot dots dot bold(h) = 0 $
+
+        ] 
+]
+
+#sslide[
+    $ bold(h)_T = gamma^3 bold(h)_(T - 3) + gamma^2 bold(theta)^top overline(bold(x))_(T - 2) + gamma bold(theta)^top overline(bold(x))_(T - 1) + bold(theta)^top overline(bold(x))_T $ #pause
+
+    $ bold(h)_T = gamma^T bold(theta)^top overline(bold(x))_1 + gamma^(T - 1) bold(theta)^top overline(bold(x))_2 + dots + gamma^2 bold(theta)^top overline(bold(x))_(T - 2) + gamma bold(theta)^top overline(bold(x))_(T - 1) + bold(theta)^top overline(bold(x))_T $
+]
+#sslide[
+    Our function $f$ is just defined for a single $X$ #pause
+
+    $ f: H times X times Theta |-> H $ #pause
+
+    To extend $f$ to sequences, we scan $f$ over the inputs
+
+    $ scan(f): H times X^T times Theta |-> H^T $ #pause
+
+    $ scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(h_1, h_2, dots.v, h_T) $ 
+]
+
+#sslide[
+    $ f: H times X times Theta |-> H, quad scan(f): H times X^T times Theta |-> H^T $ #pause
+
+    $ scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(h_1, h_2, dots.v, h_T) $ #pause
+    
+    $ scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(f(h_0, x_1, bold(theta)), f(h_1, x_2, bold(theta)), dots.v, f(h_(T-1), x_T, bold(theta))) = vec(f(h_0, x_1), f(f(h_0, x_1), x_2), dots.v, f( dots f(h_0, x_1) dots, x_T)) $
+]
+
+#sslide[
+    Let $g$ define our memory recall function #pause 
+
+    $ g: H times X times Theta |-> Y $ #pause
+
+    $g$ searches your memories $h$ using the input $x$, to produce output $y$ #pause
+
+    $bold(x):$ "What is your favorite ice cream flavor?" #pause 
+
+    $bold(h):$ Everything you remember (hometown, birthday, etc) #pause
+
+    $g:$ Searches your memories for ice cream information, and responds "chocolate"
+]
+
+#sslide[
+    *Step 1:* Perform scan to find recurrent states #pause
+
+    $ vec(bold(h)_1, dots.v, bold(h)_T) = scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_f) $ #pause
+
+    *Step 2:* Perform recall on recurrent states #pause
+
+    $ vec(bold(y)_1, dots.v, bold(y)_T) = vec(
+        g(bold(h)_1, bold(x)_1, bold(theta)_g),
+        dots.v,
+        g(bold(h)_T, bold(x)_T, bold(theta)_g),
+    ) $
+]
+
+#sslide[
+    The simplest recurrent neural network is the *Elman Network* #pause
+
+    $ f(bold(h), bold(x), bold(theta)) = sigma(bold(theta)^top_1 bold(h) + bold(theta)^top_2 overline(bold(x))) $ #pause
+
+    $ g(bold(h), bold(x), bold(theta)) = 
+        bold(theta)^top_3 bold(h)
+    $
+]
+
+#sslide[
+    Add forgetting 
+
+    $ 
+    f (bold(h), bold(x), bold(theta)) = 
+    sigma(
+        bold(theta)_1^top bold(h) #redm[$dot.circle f_"forget" (bold(h), bold(x), bold(theta))$] + bold(theta)_2^top overline(bold(x)) 
+    )
+    $ #pause
+
+
+    $ 
+    f_"forget" (bold(h), bold(x), bold(theta)) = sigma(
+        bold(theta)_1^top overline(bold(x)) +  bold(theta)_2^top bold(h)
+    )
+    $ #pause
+
+    When $f_"forget" < 1$, we forget some of our memories! #pause
+
+    Through gradient descent, neural network learns which memories to forget
+]
+
+#sslide[
+    *Minimal gated unit* (MGU) is a modern RNN #pause
+    
+    MGU defines two helper functions #pause
+
+    $ 
+    f_"forget" (bold(h), bold(x), bold(theta)) = sigma(
+        bold(theta)_1^top overline(bold(x)) +  bold(theta)_2^top bold(h)
+    ) 
+    $ #pause
+
+    $ 
+    f_2(bold(h), bold(x), bold(theta)) = sigma(
+        bold(theta)_3^top overline(bold(x)) + bold(theta)_4^top 
+            f_"forget" (bold(h), bold(x), bold(theta)) dot.circle bold(h)
+    ) 
+    $ #pause
+
+    $
+    f(bold(h), bold(x), bold(theta)) = 
+        f_"forget" (bold(h), bold(x), bold(theta)) dot.circle bold(h) + (1 - f_"forget" (bold(h), bold(x), bold(theta))) dot.circle f_2(bold(h), bold(x), bold(theta))
+    $ #pause
+
+    Left term forgets old, right term replaces forgotten memories
+]
+
+#sslide[
+    Jax RNN https://colab.research.google.com/drive/147z7FNGyERV8oQ_4gZmxDVdeoNt0hKta#scrollTo=TUMonlJ1u8Va
 ]
 
 #aslide(ag, 0)
 #aslide(ag, 1)
 
-#sslide[
   // See a movie (shrek), how do you tell a friend?
   // You cannot draw each frame from memory
   // Summarization (capture key elements)
@@ -65,7 +313,6 @@
   
   // Q: Why do we need a small bottleneck?
   // Q: Why do we want to do this?
-]
 
 #sslide[
   #side-by-side[#cimage("figures/lecture_9/shrek.jpg") #pause][
@@ -80,13 +327,13 @@
 ]
 
 #sslide[
-  When you discuss concepts with friends (paintings, music, films, etc), you summarize them #pause
+  When you discuss films with friends, you summarize them #pause
 
   This is a form of *compression* #pause
 
   $ f(vec(bold(x)_1, dots.v, bold(x)_n)) = "Green ogre and donkey save princess" $ #pause
 
-  In compression, we take some data and reduce its size by removing unnecessary information #pause
+  In compression, we reduce the size of data by removing information #pause
 
   Let us examine a more principled form of video compression
 
@@ -99,10 +346,9 @@
 
   *Answer:* 3000 GB #pause
 
-  Fortunately, very talented engineers created the H.264 video codec #pause
+  But if you download films, you know they are smaller than 3 TB #pause
 
-  H.264 MPEG-AVC *encoder* transforms videos into a more compact representation 
-
+  Today, we use the H.264 video *encoder* to transform videos into a more compact representation
 ]
 
 
@@ -123,22 +369,24 @@
 ]
 
 #sslide[
+  What happens on your computer when you watch Shrek? #pause
 
-  #side-by-side[We download $Z$ from the internet #pause][$ Z in {0, 1}^n $] #pause
+  #side-by-side[Download $bold(z) in Z$ from the internet #pause][$ Z in {0, 1}^n $] #pause
 
   Information is no longer pixels, it is a string of bits #pause
 
-  *Question:* How do we watch the video? #pause
+  We must *decode* $bold(z)$ back into pixels #pause
 
-  *Answer:* Transform or *decode* $Z$ back into pixels #pause
+  We need to undo (invert) the encoder $f$
 
-  We need to undo (invert) the encoding function $f$
+  $ f: X^t |-> Z $
 
   $ f^(-1): Z |-> X^t $ #pause
 
   You CPU has a H.264 decoder built in to make this fast
 ]
 
+/*
 #sslide[
   To summarize: #pause
 
@@ -152,6 +400,7 @@
 
   $ f^(-1): Z |-> X^t $
 ]
+*/
 
 #sslide[
   #side-by-side[
@@ -159,7 +408,7 @@
   ][
     or *lossless*
   ] #pause
-  #cimage("figures/lecture_9/lossy.jpg", height: 70%)
+  #cimage("figures/lecture_9/lossy.jpg", height: 70%) #pause
 
   *Question:* Which is H.264?
 ]
@@ -167,8 +416,10 @@
 #aslide(ag, 1)
 #aslide(ag, 2)
 
+
+
 #sslide[
-  The encoders and decoders for images, videos, etc are very complex #pause
+  Encoders and decoders for images, videos, and music are functions #pause
 
   Neural networks can represent any continuous function #pause
 
@@ -178,7 +429,7 @@
 
   $ f^(-1): Z times Theta |-> X $ #pause
 
-  We call this an *autoencoder*
+  We call this an *autoencoder* #pause
 
   Notice there is no $Y$ this time #pause
 
@@ -221,40 +472,44 @@
 
   #side-by-side[$ d_x: 28 times 28 $][$ d_z: 4 $]
 
-  #side-by-side[$ X: [0, 1]^(d_x) $][$ Z: bb(R)^(d_z) $] #pause
+  #side-by-side[$ X in [0, 1]^(d_x) $][$ Z in bb(R)^(d_z) $] #pause
 
+  /*
   #side-by-side[$ f(bold(x), bold(theta)) = bold(z) $][
     $ f^(-1)(bold(z), bold(theta)) = bold(x) $
-  ]
+  ] #pause
+  */
+  #side-by-side[$ f: X times Theta |-> Z $][
+    $ f^(-1): Z times Theta |-> X $
+  ] #pause
 
   #side-by-side[What is the structure of $f, f^(-1)$? #pause][How do we find $bold(theta)$?] 
 ]
 
 #sslide[
-  Let us find $f$, then find the inverse #pause
+  Let us find $f$, then find the inverse $f^(-1)$ #pause
 
   Start with a perceptron #pause
 
-  $ f(bold(x), bold(theta)) = sigma(bold(theta)^top overline(bold(x))); quad bold(theta) in bb(R)^(d_x, d_z) $ #pause
+  $ f(bold(x), bold(theta)) = sigma(bold(theta)^top overline(bold(x))); quad bold(theta) in bb(R)^(d_x times d_z) $ #pause
 
-  $ bold(z) = sigma(bold(theta)^top overline(bold(x))) $
+  $ bold(z) = sigma(bold(theta)^top overline(bold(x))) $ #pause
 
-  Solve for $bold(x)$ to find the inverse
+  Solve for $bold(x)$ to find the inverse #pause
 
-  $ sigma^(-1)(bold(z)) = sigma^(-1)(sigma(bold(theta)^top overline(bold(x)))) $
+  $ sigma^(-1)(bold(z)) = sigma^(-1)(sigma(bold(theta)^top overline(bold(x)))) $ #pause
 
   $ sigma^(-1)(bold(z)) = bold(theta)^top overline(bold(x)) $
 ]
 
 #sslide[
-  $ sigma^(-1)(bold(z)) = bold(theta)^top overline(bold(x)) $
+  $ sigma^(-1)(bold(z)) = bold(theta)^top overline(bold(x)) $ #pause
 
-  $ (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) = (bold(theta)^top)^(-1) bold(theta)^top overline(bold(x)) $
+  $ (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) = (bold(theta)^top)^(-1) bold(theta)^top overline(bold(x)) $ #pause
 
-  $ (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) = bold(I) overline(bold(x)) $
+  $ (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) = bold(I) overline(bold(x)) $ #pause
 
-  $ (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) = overline(bold(x)) $
-
+  $ (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) = overline(bold(x)) $ #pause
 
   $ f^(-1)(bold(z), bold(theta)) =  (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) $
 ]
@@ -265,7 +520,7 @@
   ][
     $ f^(-1)(bold(z), bold(theta)) = (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) $
   ][
-    $ bold(theta) in bb(R)^(d_x, d_z) $
+    $ bold(theta) in bb(R)^(d_x times d_z) $
   ] #pause
 
   *Question:* Any issues? #h(5em) *Hint:* What if $d_x != d_z$? #pause
@@ -283,11 +538,11 @@
 ]
 
 #sslide[
-  Let us try another way
+  Let us try another way #pause
 
   $ bold(z) = f(bold(x), bold(theta)_e) = sigma(bold(theta)_e^top bold(overline(x))) $
 
-  $ bold(x) = f^(-1)(bold(z), bold(theta)_d) = sigma(bold(theta)_d^top bold(overline(z))) $
+  $ bold(x) = f^(-1)(bold(z), bold(theta)_d) = sigma(bold(theta)_d^top bold(overline(z))) $ #pause
 
   What if we plug $bold(z)$ into the second equation?
 ]
@@ -306,7 +561,7 @@
 ]
 
 #sslide[
-  $ bold(x) = f^(-1)((bold(x), bold(theta)_e), bold(theta)_d) = sigma(bold(theta)_d^top bold(sigma(bold(theta)_e^top bold(overline(x))))) $
+  $ bold(x) = f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d) = sigma(bold(theta)_d^top bold(sigma(bold(theta)_e^top bold(overline(x))))) $ #pause
 
   More generally, $f, f^(-1)$ may be any neural network #pause
 
@@ -314,7 +569,9 @@
 
   Turn this into a loss function using the square error #pause
 
-  $ cal(L)(bold(x), bold(theta)) = sum_(j=1)^(d_x) (x_j - f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d)_j)^2 $
+  $ cal(L)(bold(x), bold(theta)) = sum_(j=1)^(d_x) (x_j - f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d)_j)^2 $ #pause
+
+  Forces the networks to compress and reconstruct $bold(x)$
 ]
 
 #sslide[
@@ -342,7 +599,7 @@
 #aslide(ag, 3)
 
 #sslide[
-  We can use autoencoders for other tasks too #pause
+  We can use autoencoders for more than compression #pause
 
   We can make *denoising autoencoders* that remove noise #pause
 
@@ -353,16 +610,17 @@
 #sslide[
   #side-by-side[Generate some noise][
     $ bold(epsilon) tilde cal(N)(bold(mu), bold(Sigma)) $
-  ]
+  ] #pause
 
   #side-by-side[Add noise to the image][
     $ bold(x) + bold(epsilon) $
-  ]
-
+  ] #pause
 
   $ "Original loss" quad cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_j)^2 $ #pause
 
-  $ "Denoising loss" quad cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f(bold(x)_[i] #redm[$+ bold(epsilon)$], bold(theta)_e), bold(theta)_d)_j)^2 $ 
+  $ "Denoising loss" quad cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f(bold(x)_[i] #redm[$+ bold(epsilon)$], bold(theta)_e), bold(theta)_d)_j)^2 $ #pause
+
+  Autoencoder will learn to remove noise when reconstructing image
 ]
 
 #sslide[
@@ -426,6 +684,8 @@
 ]
 
 #sslide[
+  If the dataset is lung images, the model learns the structure of lungs #pause
+
   If the dataset is pictures from our world, then the autoencoders learn the structure of the world #pause
 
   Nobody tells them what a dog or cat is #pause
@@ -446,7 +706,9 @@
 
   Humans are also pattern recognition machines #pause
 
-  Clearly, these networks can understand our world
+  #cimage("figures/lecture_9/face.jpg", height: 60%) #pause
+
+  These networks can understand our world
 ]
 
 #aslide(ag, 3)
@@ -455,7 +717,7 @@
 #sslide[
   #cimage("figures/lecture_9/vae_gen_faces.png", height: 70%) #pause
 
-  These pictures were created by an autoencoder #pause
+  These pictures were created by a *variational* autoencoder #pause
 
   But these people do not exist!
 ]
@@ -465,29 +727,34 @@
 
   But we can also use them as *generative models* #pause
 
-  A generative model is a "creative" model that creates new data #pause
-  - Generate pictures of people that do not exist #pause
-  - Write a new book #pause
-  - Create new proteins #pause
+  A generative model learns the structure of data #pause
+
+  Using this structure, it generates *new* data #pause
+
+  - Train on face dataset, generate *new* pictures #pause
+  - Train on book dataset, write a *new* book #pause
+  - Train on protein dataset, create *new* proteins #pause
 
   How does this work?
 ]
 
 #sslide[
-  Latent space $Z$ after training on the clothes dataset with $d_z = 2$
+  Latent space $Z$ after training on the clothes dataset with $d_z = 3$
 
-  #cimage("figures/lecture_9/latent_space.png") #pause
+  #cimage("figures/lecture_9/fashion-latent.png", height: 85%)
+
+  // #cimage("figures/lecture_9/latent_space.png") #pause
 ]
 
 #sslide[
   What happens if we decode a new point?
 
-  #cimage("figures/lecture_9/latent_space.png")
+  #cimage("figures/lecture_9/fashion-latent.png", height: 85%)
 ]
 
 #sslide[
   #side-by-side[
-  #cimage("figures/lecture_9/latent_space.png")
+    #cimage("figures/lecture_9/fashion-latent.png")
   ][
   Autoencoder generative model: #pause
   
@@ -497,7 +764,7 @@
 
   Add some noise $bold(z)_"new" = bold(z)_[k] + bold(epsilon)$ #pause
 
-  Decode $bold(z)_"new"$ into a new $bold(x)$
+  Decode $bold(z)_"new"$ into $bold(x)_"new"$
   ]
 ]
 
@@ -509,16 +776,16 @@
 
 #sslide[
   #side-by-side[
-  But there is a problem #pause
+  
+  But there is a problem, the *curse of dimensionality* #pause
 
-  As $d_z$ increases, it becomes difficult to find useful parts of latent space #pause
+  As $d_z$ increases, points move further and further apart #pause
 
-  For large $d_z$, similar inputs map to $bold(z)$ that are very far from each other #pause
-
-  Points $bold(z) + bold(epsilon)$ decode into garbage
   ][
-  #cimage("figures/lecture_9/3d_latent_space.png", height: 100%)
+    #cimage("figures/lecture_9/curse.png") #pause
   ]
+
+  $f^(-1)(bold(z) + epsilon)$ will produce either garbage, or $bold(z)$
 ]
 
 #sslide[
@@ -543,13 +810,18 @@
 
   How? #pause
 
-  Make $bold(z)_[i], dots, bold(z)_[n]$ normally distributed #pause
+  Make $bold(z)_[1], dots, bold(z)_[n]$ normally distributed #pause
 
   $ bold(z) tilde cal(N)(mu, sigma), quad mu = 0, sigma = 1 $
 ]
 
 #sslide[
-  If $bold(z)_[i], dots, bold(z)_[n]$ are distributed following $cal(N)(0, 1)$: #pause
+  //#cimage("figures/lecture_2/normal_dist.png")
+  #align(center, normal)
+]
+
+#sslide[
+  If $bold(z)_[1], dots, bold(z)_[n]$ are distributed following $cal(N)(0, 1)$: #pause
 
   + 99.7% of $bold(z)_[1], dots, bold(z)_[n]$ lie within $3 sigma = [-3, 3]$ #pause
 
@@ -558,15 +830,16 @@
 
 
 #sslide[
-  So how do we ensure that $bold(z)_[i], dots, bold(z)_[n]$ are normally distributed? #pause
+  So how do we ensure that $bold(z)_[1], dots, bold(z)_[n]$ are normally distributed? #pause
 
-  We have to remember conditional probabilities
+  We have to remember conditional probabilities #pause
 
   $ P("rain" | "cloud") = "Probability of rain, given that it is cloudy" $ #pause
 
   //First, let us assume we already have some latent variable $bold(z)$, and focus on the decoder #pause
 ]
 
+/*
 #sslide[
   Introduce one more Bayesian concept called *marginalization* #pause
 
@@ -574,18 +847,33 @@
 
   $ P(A sect B) = P(A, B) $ #pause
 
-  From Bayes rule 
-
-  $ P(A sect B) = P(A | B) P(B) $ #pause
-
   We can find $P(A)$ by marginalizing out $B$ #pause
 
-  $ P(A) = integral_B P(A | B) P(B) dif B $
+  $ P(A) = integral P(A, B) dif B $
+]
+*/
+
+#sslide[
+  *Key idea 1:* We want to model the distribution over the dataset $X$
+
+  $ P(bold(x); bold(theta)), quad bold(x) tilde bold(X) $ #pause
+
+  We want to learn $bold(theta)$ that best models the distribution of possible faces #pause
+
+  #side-by-side[
+    Large $P(bold(x); bold(theta))$
+  ][
+    $P(bold(x); bold(theta)) approx 0$
+  ]
+  #side-by-side[
+    #cimage("figures/lecture_9/vae_gen_faces.png", height: 40%)
+  ][
+    #cimage("figures/lecture_1/muffin.png", height: 40%)
+  ]
 ]
 
 #sslide[
-  *Key idea:* There is some latent variable $bold(z)$ which generates data $bold(x)$ #pause
-
+  *Key idea 2:* There is some latent variable $bold(z)$ which generates data $bold(x)$ #pause
 
   $ x: #cimage("figures/lecture_9/vae_slider.png") $
 
@@ -595,13 +883,113 @@
 #sslide[
   #cimage("figures/lecture_9/vae_slider.png") #pause
 
-  We can only see $bold(x)$, we cannot directly observe $bold(z)$ #pause
+  Network can only see $bold(x)$, it cannot directly observe $bold(z)$ #pause
 
-  Given the image $bold(x)$, what is the probability that the person is smiling? $P(bold(z) | bold(x))$
+  Given $bold(x)$, find the probability that the person is smiling $P(bold(z) | bold(x); bold(theta))$
 ]
 
 #sslide[
-  How can we find $P(bold(z) | bold(x))$? #pause
+  We cast the autoencoding task as a *variational inference* problem #pause
+
+  #align(center, varinf)
+
+  #side-by-side[
+    Decoder 
+    $ P(bold(x) | bold(z); bold(theta)) $
+  ][
+    Encoder 
+    $ P(bold(z) | bold(x); bold(theta)) $
+  ] #pause
+
+  We want to learn both the encoder and decoder: $P(bold(z), bold(x); bold(theta))$
+]
+
+#sslide[
+  $ P(bold(z), bold(x); bold(theta)) = P(bold(x) | bold(z); bold(theta)) space P(bold(z); bold(theta))  $ #pause
+
+  We can choose any distribution for $P(bold(z))$ #pause
+
+  $ P(bold(z)) = cal(N)(bold(0), bold(1)) $ #pause
+
+  We can generate all possible $bold(x)$ by sampling $bold(z) tilde cal(N)(bold(0), bold(1))$ #pause
+
+  We can randomly generate $bold(z)$, which we can decode into new $bold(x)$!
+]
+
+#sslide[
+  Now, all we must do is find $bold(theta)$ that best explains the dataset distribution #pause
+
+  Learned distribution $P(bold(x); bold(theta))$ to be close to dataset $P(bold(x)), quad bold(x) tilde X$ #pause
+
+  We need some error function between $P(bold(x); bold(theta))$ and $P(bold(x))$ #pause
+  
+  *Question:* How do we measure the distance between probability distributions? 
+]
+
+#sslide[
+  *Answer:* KL divergence #pause
+
+  #cimage("figures/lecture_5/forwardkl.png", height: 50%)
+  
+  $ KL(P, Q) = sum_i P(i) log P(i) / Q(i) $
+]
+
+#sslide[
+  Learn the parameters for our model #pause
+
+  $ argmin_bold(theta) KL(P(bold(x)), P(bold(x); bold(theta))) $ #pause
+
+  Unfortunately, this objective is intractable to optimize #pause
+
+  The paper provides surrogate objective
+
+  $ argmin_bold(theta) [ -log P(bold(x) | bold(z); bold(theta)) + KL(P(bold(z) | bold(x); bold(theta)), P(bold(z)))] $ #pause
+
+  We call this the *Evidence Lower Bound Objective* (ELBO) 
+]
+
+#sslide[
+  $ argmin_bold(theta) [- log P(bold(x) | bold(z); bold(theta)) + KL(P(bold(z) | bold(x); bold(theta)), P(bold(z))) ] $ #pause
+
+  How is this ELBO helpful? #pause
+
+  #side-by-side[
+    Decoder 
+    $ P(bold(x) | bold(z); bold(theta)) $
+  ][
+    Encoder 
+    $ P(bold(z) | bold(x); bold(theta)) $
+  ][
+    Prior
+    $ P(bold(z)) = cal(N)(bold(0), bold(1)) $
+  ] #pause
+
+  $  argmin_bold(theta) [ underbrace(-log P(bold(x) | bold(z); bold(theta)), "Reconstruction error") + underbrace(KL(P(bold(z) | bold(x); bold(theta)), P(bold(z))), "Constrain latent") ] $ #pause
+
+  Now we know how to train our autoencoder!
+]
+
+#aslide(ag, 4)
+#aslide(ag, 5)
+
+
+
+  /*
+
+  $ argmax_bold(theta) sum_(i=1)^n log P(bold(x)_[i]; bold(theta)) $ #pause
+
+
+  We can only find $P(bold(x); bold(theta))$ by *marginalizing* #pause
+
+  $ P(bold(x); bold(theta)) = integral P(bold(z), bold(x); bold(theta)) dif bold(z) $
+
+
+  #side-by-side[$ P(bold(x); bold(theta)) = integral P(bold(x) | bold(z); bold(theta)) space P(bold(z); bold(theta)) dif bold(z) $][Bayes rule]
+  */
+
+/*
+#sslide[
+  We want to find $P(bold(z) | bold(x))$, the latent characteristics of $bold(x)$ #pause
 
   Use Bayes rule 
 
@@ -611,7 +999,7 @@
 
   $ P(bold(x), bold(z)) = P(bold(x) | bold(z)) P(bold(z)) $
 
-  $ P(bold(x)) = integral_bold(z) P(bold(x) | bold(z)) P(bold(z)) $
+  $ P(bold(x)) = integral P(bold(x) | bold(z)) P(bold(z)) dif bold(z) $
 ]
 
 #sslide[
@@ -620,21 +1008,35 @@
     $ P(bold(z) | bold(x)) = (P(bold(x) | bold(z)) P(bold(z))) / P(bold(x)) $
   ][
 
-    $ P(bold(x)) = integral_bold(z) P(bold(x) | bold(z)) P(bold(z)) $ 
+    $ P(bold(x)) = integral P(bold(x) | bold(z)) P(bold(z)) dif bold(z) $ 
   ] #pause
 
-  $ P(bold(z) | bold(x)) = (P(bold(x) | bold(z)) P(bold(z))) / (integral_bold(z) P(bold(x) | bold(z)) P(bold(z))) $ #pause
+  $ P(bold(z) | bold(x)) = (P(bold(x) | bold(z)) P(bold(z))) / (integral P(bold(x) | bold(z)) P(bold(z)) dif bold(z)) $ #pause
 
   This integral is intractable to compute! #pause
 
-  Instead, we approximate this distribution using our encoder 
+  We approximate $P(bold(z) | bold(x))$ using an encoder network #pause
 
-  $ f(bold(x), bold(theta)_e) = cal(N)(bold(mu), bold(theta)) approx P(bold(z) | bold(x)) $
-
-  Remember, $f$ outputs a *distribution*
+  $ f(bold(x), bold(theta)_e) = cal(N)(bold(mu), bold(sigma)) approx P(bold(z) | bold(x)) $
 ]
 
 #sslide[
+  #align(center, varinf)
+
+  #side-by-side[
+    Decoder 
+    $ P(bold(x) | bold(z)) $
+  ][
+    Encoder 
+    $ P(bold(z) | bold(x)) $
+  ]
+
+  $ P(bold(z) | bold(x)) = (P(bold(x) | bold(z)) P(bold(z))) / (integral P(bold(x) | bold(z)) P(bold(z)) dif bold(z)) $
+]
+
+#sslide[
+  $ f(bold(x), bold(theta)_e) = cal(N)(bold(mu), bold(sigma)) approx P(bold(z) | bold(x)) $ #pause
+
   We want to make $f(bold(x), bold(theta)_e)$ close to $P(bold(z) | bold(x))$ #pause
 
   Remember, it is intractable to find $P(bold(z) | bold(x))$ #pause
@@ -665,21 +1067,17 @@
 
   We will reconstruct the input, and the latent space will be distributed according to $cal(N)(bold(0), bold(1))$
 ]
-
+*/
 #sslide[
-  How do we implement $f$? #pause
+  How do we implement $f$ (i.e., $P(bold(z) | bold(x); bold(theta))$ )? #pause
 
-  $ f : X times Theta |-> Delta Z $
+  $ f : X times Theta |-> Delta Z $ #pause
 
-
-  We represent a normal distribution with a mean $mu in bb(R)$ and standard deviation $sigma in bb(R)_+$
+  Normal distribution has a mean $mu in bb(R)$ and standard deviation $sigma in bb(R)_+$ #pause
 
   Our encoder should output $d_z$ means and $d_z$ standard deviations #pause
 
   $ f : X times Theta |-> bb(R)^(d_z) times bb(R)_+^(d_z) $
-
-
-
 ]
 
 #sslide[
@@ -720,7 +1118,7 @@
 
   But there is a problem! Sampling is not differentiable #pause
 
-  *Question:* Why does that matter?
+  *Question:* Why does this matter? #pause
 
   *Answer:* Must be differentiable for gradient descent
 ]
@@ -730,7 +1128,7 @@
 
   $ bold(z) & tilde cal(N)(bold(mu), bold(sigma)) $ 
 
-  $ bold(z) = bold(mu) + bold(sigma) dot.circle bold(epsilon) quad bold(epsilon) tilde cal(U)(0, 1) $ #pause
+  $ bold(z) = bold(mu) + bold(sigma) dot.circle bold(epsilon) quad bold(epsilon) tilde cal(N)(bold(0), bold(1)) $ #pause
 
   Gradient can flow through $bold(mu), bold(sigma)$ #pause
 
@@ -744,11 +1142,11 @@
 
   *Step 1:* Encode the input to a normal distribution
 
-  $ bold(mu), bold(sigma) = f(bold(x), bold(theta)_e) $
+  $ bold(mu), bold(sigma) = f(bold(x), bold(theta)_e) $ #pause
 
   *Step 2:* Generate a sample from distribution
 
-  $ bold(z) = bold(mu) + bold(sigma) dot.circle bold(epsilon) $
+  $ bold(z) = bold(mu) + bold(sigma) dot.circle bold(epsilon) $ #pause
 
   *Step 3:* Decode the sample 
 
@@ -756,15 +1154,61 @@
 ]
 
 #sslide[
-  One last thing, the loss function #pause
+  One last thing, implement the loss function #pause
 
-  We have this error function #pause
 
-  $ KL(f(bold(x), bold(theta)_e), P(bold(z) | bold(x))) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - underbrace(KL(f(bold(x), bold(theta)_e), P(bold(z))), "Encoder and prior") $ #pause
+  #side-by-side[
+    Decoder 
+    $ P(bold(x) | bold(z); bold(theta)) $
+  ][
+    Encoder 
+    $ P(bold(z) | bold(x); bold(theta)) $
+  ][
+    Prior
+    $ P(bold(z)) = cal(N)(bold(0), bold(1)) $
+  ] #pause
 
-  Turn it into a loss function
+  $ cal(L)(bold(x), bold(theta)) = argmin_bold(theta) [ underbrace(-log P(bold(x) | bold(z); bold(theta)), "Reconstruction error") + underbrace(KL(P(bold(z) | bold(x); bold(theta)), P(bold(z))), "Constrain latent") ] $ #pause
+
+  Start with the KL term first
 ]
 
+#sslide[
+  $ cal(L)(bold(x), bold(theta)) = argmin_bold(theta) [ -log P(bold(x) | bold(z); bold(theta)) + KL(P(bold(z) | bold(x); bold(theta)), P(bold(z))) ] $ #pause
+
+  First, rewrite KL term using our encoder $f$ #pause
+
+  $ cal(L)(bold(x), bold(theta)) = argmin_bold(theta) [ -log P(bold(x) | bold(z)) + KL(f(bold(x), bold(theta)_e), P(bold(z))) ] $ #pause
+
+  $P(bold(z))$ and $f(bold(x), bold(theta)_e)$ are Gaussian, we can simplify KL term
+
+  $ cal(L)(bold(x), bold(theta)) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $
+]
+
+#sslide[
+  $ cal(L)(bold(x), bold(theta)) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $ #pause
+
+  Next, plug in square error for reconstruction error #pause
+
+  $ = sum_(j=1)^d_z (x_j - f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d)_j )^2 - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $ #pause
+
+  $ cal(L)(bold(x), bold(theta)) = sum_(j=1)^d_z (x_j - f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d)_j )^2 - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $
+]
+
+#sslide[
+  $ cal(L)(bold(x), bold(theta)) = sum_(j=1)^d_z (x_j - f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d)_j )^2 - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $ #pause
+
+  Finally, define over the entire dataset
+
+  $ cal(L)(bold(X), bold(theta)) &= sum_(i=1)^n sum_(j=1)^d_z (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_(j) )^2 - \ 
+  &(sum_(i=1)^n sum_(j=1)^d_z mu^2_([i],j) + sigma^2_([i],j) - log(sigma_([i], j)^2) - 1) $
+]
+
+#sslide[
+
+]
+
+/*
 #sslide[
   $ KL(f(bold(x), bold(theta)_e), P(bold(z) | bold(x))) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - underbrace(KL(f(bold(x), bold(theta)_e), P(bold(z))), "Encoder and prior") $ #pause
 
@@ -793,7 +1237,7 @@
   $ cal(L)(bold(X), bold(theta)) &= sum_(i=1)^n sum_(j=1)^d_z (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_(j) )^2 - \ 
    &(sum_(i=1)^n sum_(j=1)^d_z mu^2_([i],j) + sigma^2_([i],j) - log(sigma_([i], j)^2) - 1) $
 ]
-
+*/
 #sslide[
   $ cal(L)(bold(X), bold(theta)) &= sum_(i=1)^n sum_(j=1)^d_z (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_(j) )^2 - \ 
    &(sum_(i=1)^n sum_(j=1)^d_z mu^2_([i],j) + sigma^2_([i],j) - log(sigma_([i], j)^2) - 1) $
@@ -822,7 +1266,7 @@
     epsilon = jax.random.normal(key, x.shape[0])
     z = mu + sigma * epsilon
     pred_x = model.f_inverse(z)
-    
+
     recon = jnp.sum((x - pred_x) ** 2)
     kl = jnp.sum(mu ** 2 + sigma ** 2 - jnp.log(sigma) - 1)
 

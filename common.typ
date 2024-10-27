@@ -7,6 +7,7 @@
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
 #let argmin = $op("arg min", limits: #true)$
+#let argmax = $op("arg max", limits: #true)$
 #let scan = $op("scan")$
 #let KL = $op("KL")$
 

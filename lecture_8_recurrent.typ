@@ -688,7 +688,7 @@
 
     $ dots.v $
 
-    $ bold(y) = bold(h)_T = f(bold(h)_(T-1), bold(x)_T, bold(theta)) = bold(h)_(T-1) + bold(theta)^top overline(bold(x))_T $ #pause
+    $ bold(h)_T = f(bold(h)_(T-1), bold(x)_T, bold(theta)) = bold(h)_(T-1) + bold(theta)^top overline(bold(x))_T $ #pause
 
     //We *scan* through the inputs $bold(x)_1, bold(x)_2, dots, bold(x)_T$
 ]
