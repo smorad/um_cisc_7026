@@ -943,13 +943,13 @@
 
   The paper provides surrogate objective
 
-  $ argmin_bold(theta) [ -log P(bold(x) | bold(z); bold(theta)) + KL(P(bold(z) | bold(x); bold(theta)), P(bold(z)))] $ #pause
+  $ argmin_bold(theta) [ -log P(bold(x) | bold(z); bold(theta)) + 1 / 2 KL(P(bold(z) | bold(x); bold(theta)), P(bold(z)))] $ #pause
 
   We call this the *Evidence Lower Bound Objective* (ELBO) 
 ]
 
 #sslide[
-  $ argmin_bold(theta) [- log P(bold(x) | bold(z); bold(theta)) + KL(P(bold(z) | bold(x); bold(theta)), P(bold(z))) ] $ #pause
+  $ argmin_bold(theta)  [- log P(bold(x) | bold(z); bold(theta)) + 1/2 KL(P(bold(z) | bold(x); bold(theta)), P(bold(z))) ] $ #pause
 
   How is this ELBO helpful? #pause
 
@@ -964,7 +964,7 @@
     $ P(bold(z)) = cal(N)(bold(0), bold(1)) $
   ] #pause
 
-  $  argmin_bold(theta) [ underbrace(-log P(bold(x) | bold(z); bold(theta)), "Reconstruction error") + underbrace(KL(P(bold(z) | bold(x); bold(theta)), P(bold(z))), "Constrain latent") ] $ #pause
+  $  argmin_bold(theta) [ underbrace(-log P(bold(x) | bold(z); bold(theta)), "Reconstruction error") + 1 / 2 underbrace(KL(P(bold(z) | bold(x); bold(theta)), P(bold(z))), "Constrain latent") ] $ #pause
 
   Now we know how to train our autoencoder!
 ]
@@ -973,101 +973,6 @@
 #aslide(ag, 5)
 
 
-
-  /*
-
-  $ argmax_bold(theta) sum_(i=1)^n log P(bold(x)_[i]; bold(theta)) $ #pause
-
-
-  We can only find $P(bold(x); bold(theta))$ by *marginalizing* #pause
-
-  $ P(bold(x); bold(theta)) = integral P(bold(z), bold(x); bold(theta)) dif bold(z) $
-
-
-  #side-by-side[$ P(bold(x); bold(theta)) = integral P(bold(x) | bold(z); bold(theta)) space P(bold(z); bold(theta)) dif bold(z) $][Bayes rule]
-  */
-
-/*
-#sslide[
-  We want to find $P(bold(z) | bold(x))$, the latent characteristics of $bold(x)$ #pause
-
-  Use Bayes rule 
-
-  $ P(bold(z) | bold(x)) = (P(bold(x) | bold(z)) P(bold(z))) / P(bold(x)) $ #pause
-
-  How do we find $P(bold(x))$ ? Marginalize
-
-  $ P(bold(x), bold(z)) = P(bold(x) | bold(z)) P(bold(z)) $
-
-  $ P(bold(x)) = integral P(bold(x) | bold(z)) P(bold(z)) dif bold(z) $
-]
-
-#sslide[
-
-  #side-by-side[
-    $ P(bold(z) | bold(x)) = (P(bold(x) | bold(z)) P(bold(z))) / P(bold(x)) $
-  ][
-
-    $ P(bold(x)) = integral P(bold(x) | bold(z)) P(bold(z)) dif bold(z) $ 
-  ] #pause
-
-  $ P(bold(z) | bold(x)) = (P(bold(x) | bold(z)) P(bold(z))) / (integral P(bold(x) | bold(z)) P(bold(z)) dif bold(z)) $ #pause
-
-  This integral is intractable to compute! #pause
-
-  We approximate $P(bold(z) | bold(x))$ using an encoder network #pause
-
-  $ f(bold(x), bold(theta)_e) = cal(N)(bold(mu), bold(sigma)) approx P(bold(z) | bold(x)) $
-]
-
-#sslide[
-  #align(center, varinf)
-
-  #side-by-side[
-    Decoder 
-    $ P(bold(x) | bold(z)) $
-  ][
-    Encoder 
-    $ P(bold(z) | bold(x)) $
-  ]
-
-  $ P(bold(z) | bold(x)) = (P(bold(x) | bold(z)) P(bold(z))) / (integral P(bold(x) | bold(z)) P(bold(z)) dif bold(z)) $
-]
-
-#sslide[
-  $ f(bold(x), bold(theta)_e) = cal(N)(bold(mu), bold(sigma)) approx P(bold(z) | bold(x)) $ #pause
-
-  We want to make $f(bold(x), bold(theta)_e)$ close to $P(bold(z) | bold(x))$ #pause
-
-  Remember, it is intractable to find $P(bold(z) | bold(x))$ #pause
-
-  But let us continue and see if $P(bold(z) | bold(x))$ goes away
-
-  *Question:* How do we measure the distance between probability distributions? 
-]
-
-#sslide[
-  *Answer:* KL divergence
-
-  #cimage("figures/lecture_5/forwardkl.png", height: 50%)
-  
-  $ KL(P, Q) = sum_i P(i) log P(i) / Q(i) $
-]
-
-#sslide[
-  $ KL(f(bold(x), bold(theta)_e), P(bold(z) | bold(x))) $ #pause
-
-  Through *magic*, we can write the KL divergence as
-
-  $ KL(f(bold(x), bold(theta)_e), P(bold(z) | bold(x))) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - underbrace(KL(f(bold(x), bold(theta)_e), P(bold(z))), "Encoder and prior") $ #pause
-
-  We can pick our prior distribution $P(bold(z))$, let's pick
-
-  $ P(bold(z)) = cal(N)(bold(0), bold(1)) $ #pause
-
-  We will reconstruct the input, and the latent space will be distributed according to $cal(N)(bold(0), bold(1))$
-]
-*/
 #sslide[
   How do we implement $f$ (i.e., $P(bold(z) | bold(x); bold(theta))$ )? #pause
 
@@ -1086,8 +991,10 @@
   mu_layer = nn.Linear(d_h, d_z)
   # Neural networks output real numbers
   # But sigma must be positive
-  # So we output log sigma, because e^(sigma) is always positive
+  # Output log sigma, because e^(sigma) is always positive
   log_sigma_layer = nn.Linear(d_h, d_z)
+  # Alternatively, one sigma for all data
+  log_sigma = jnp.ones((d_z,))
 
   tmp = core(x)
   mu = mu_layer(tmp)
@@ -1168,17 +1075,17 @@
     $ P(bold(z)) = cal(N)(bold(0), bold(1)) $
   ] #pause
 
-  $ cal(L)(bold(x), bold(theta)) = argmin_bold(theta) [ underbrace(-log P(bold(x) | bold(z); bold(theta)), "Reconstruction error") + underbrace(KL(P(bold(z) | bold(x); bold(theta)), P(bold(z))), "Constrain latent") ] $ #pause
+  $ cal(L)(bold(x), bold(theta)) = argmin_bold(theta) [ underbrace(-log P(bold(x) | bold(z); bold(theta)), "Reconstruction error") + underbrace( 1 / 2 KL(P(bold(z) | bold(x); bold(theta)), P(bold(z))), "Constrain latent") ] $ #pause
 
   Start with the KL term first
 ]
 
 #sslide[
-  $ cal(L)(bold(x), bold(theta)) = argmin_bold(theta) [ -log P(bold(x) | bold(z); bold(theta)) + KL(P(bold(z) | bold(x); bold(theta)), P(bold(z))) ] $ #pause
+  $ cal(L)(bold(x), bold(theta)) = argmin_bold(theta) [ -log P(bold(x) | bold(z); bold(theta)) + 1 / 2 KL(P(bold(z) | bold(x); bold(theta)), P(bold(z))) ] $ #pause
 
   First, rewrite KL term using our encoder $f$ #pause
 
-  $ cal(L)(bold(x), bold(theta)) = argmin_bold(theta) [ -log P(bold(x) | bold(z)) + KL(f(bold(x), bold(theta)_e), P(bold(z))) ] $ #pause
+  $ cal(L)(bold(x), bold(theta)) = argmin_bold(theta) [ -log P(bold(x) | bold(z)) + 1 / 2 KL(f(bold(x), bold(theta)_e), P(bold(z))) ] $ #pause
 
   $P(bold(z))$ and $f(bold(x), bold(theta)_e)$ are Gaussian, we can simplify KL term
 
@@ -1205,40 +1112,6 @@
 ]
 
 #sslide[
-
-]
-
-/*
-#sslide[
-  $ KL(f(bold(x), bold(theta)_e), P(bold(z) | bold(x))) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - underbrace(KL(f(bold(x), bold(theta)_e), P(bold(z))), "Encoder and prior") $ #pause
-
-  Since $f(bold(x), bold(theta)_e)$ and $P(bold(z) | bold(x))$ are Gaussian, we can simplify the KL term #pause
-
-  $ KL(f(bold(x), bold(theta)_e), P(bold(z) | bold(x))) = (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $ #pause
-
-  $ KL(f(bold(x), bold(theta)_e), P(bold(z) | bold(x))) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $
-]
-
-#sslide[
-  $ KL(f(bold(x), bold(theta)_e), P(bold(z) | bold(x))) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $
-
-  Plug in square error 
-
-  $ = sum_(j=1)^d_z (x_j - f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d)_j )^2 - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $
-
-  $ cal(L)(bold(x), bold(theta)) = sum_(j=1)^d_z (x_j - f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d)_j )^2 - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $
-]
-
-#sslide[
-  $ = sum_(j=1)^d_z (x_j - f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d)_j )^2 - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $
-
-  Define over the entire dataset
-
-  $ cal(L)(bold(X), bold(theta)) &= sum_(i=1)^n sum_(j=1)^d_z (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_(j) )^2 - \ 
-   &(sum_(i=1)^n sum_(j=1)^d_z mu^2_([i],j) + sigma^2_([i],j) - log(sigma_([i], j)^2) - 1) $
-]
-*/
-#sslide[
   $ cal(L)(bold(X), bold(theta)) &= sum_(i=1)^n sum_(j=1)^d_z (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_(j) )^2 - \ 
    &(sum_(i=1)^n sum_(j=1)^d_z mu^2_([i],j) + sigma^2_([i],j) - log(sigma_([i], j)^2) - 1) $
 
@@ -1261,300 +1134,32 @@
 
 #sslide[
   ```python
-  def L(model, x, m, n, beta, key):
+  def L(model, x, m, n, key):
     mu, sigma = model.f(x)
     epsilon = jax.random.normal(key, x.shape[0])
     z = mu + sigma * epsilon
     pred_x = model.f_inverse(z)
 
     recon = jnp.sum((x - pred_x) ** 2)
-    kl = jnp.sum(mu ** 2 + sigma ** 2 - jnp.log(sigma) - 1)
+    kl = jnp.sum(mu ** 2 + sigma ** 2 - jnp.log(sigma ** 2) - 1)
 
-    return m / n * recon + beta * kl
+    return m / n * recon + kl
   ```
 ]
 
 #sslide[
-  Coding VAE
-
   https://colab.research.google.com/drive/1UyR_W6NDIujaJXYlHZh6O3NfaCAMscpH#scrollTo=nmyQ8aE2pSbb
 
   https://www.youtube.com/watch?v=UZDiGooFs54
+
+
+  4 Nov - Compensatory rest day (holiday), no lecture
+
+  11 Nov - Quiz on autoencoders (not VAE) and Prof. Li on GNNs
+
+  18 Nov - Attention and transformers
+
+  25 Nov - Reinforcement learning
+
+  1 Dec - Foundation models (virtual, optional)
 ]
-
-
-/*
-
-#sslide[
-  However, to find $P(bold(x))$, we must marginalize, which is intractable
-
-  TODO: We should step by step to go from "and" to marginal
-
-  $ P(bold(x)) = integral_bold(z) P(bold(x) | bold(z)) P(bold(z)) dif z $
-]
-
-#sslide[
-  *Warning:* Derivation of variational autoencoders is difficult #pause
-
-  I have done my best to simplify it, but it is still complex #pause
-
-  There might be small mistakes!
-]
-
-#sslide[
-  *Key idea:*
-
-  *Step 1:* Encoder produces a distribution $P(bold(z))$ from an input $bold(x)$
-
-  $ P(bold(z) | bold(x)) $ #pause
-
-  *Step 2:* We sample a $bold(z)$ from this distribution
-
-  $ bold(z) tilde P(bold(z) | bold(x)) $
-
-  *Step 3:* Decoder produces $bold(x)$ from the sample $bold(z)$
-
-  $ bold(x) = f^(-1)(bold(z), bold(theta)_d) $
-]
-#sslide[
-  *Step 2:* We sample a $bold(z)$ from this distribution
-
-  $ bold(z) tilde P(bold(z) | bold(x)) $
-
-  *Step 3:* Decoder produces $bold(x)$ 
-
-  //$ bold(x) tilde P(bold(x) | bold(z)) $ #pause
-  $ bold(x) = f^(-1)(bold(z), bold(theta)_d) $
-
-  VAE is generative because we sample from a distribution #pause
-
-  We are sampling new $bold(z)$ that was not in the dataset!
-]
-
-#sslide[
-  Let us start with the encoder #pause
-
-  We want to turn an input $bold(x)$ into a latent normal distribution over $Z$ #pause
-
-  Start with the joint probability $P(bold(z), bold(x))$
-
-  $ P(bold(z), bold(x)) = underbrace(P(bold(z) | bold(x)), "Posterior") underbrace(P(bold(x)), "Evidence") $
-
-  #side-by-side[
-    $ P(bold(x)) $
-  ][Probability of a specific input (image) existing in the world] #pause
-
-  #side-by-side[
-    $ P(bold(z) | bold(x)) $
-  ][
-    Latent distribution that summarizes $bold(x)$
-  ]
-]
-
-#sslide[
-  We can marginalize to get the latent distribution $P(bold(z))$
-
-  $ P(bold(z)) = integral_bold(x) P(bold(z) | bold(x)) P(bold(x)) dif x $ 
-
-  We approximate this function using the encoder
-
-  $ f(bold(x), bold(theta)_e) = P(bold(z)) $
-
-  *Question:* What distribution should $P(bold(z))$ be? #pause
-
-  *Answer:* A normal distribution $cal(N)(bold(mu), bold(sigma))$
-]
-
-
-#sslide[
-  We represent a normal distribution with a *mean* $mu in M$ and a *standard deviation* $sigma in Sigma$ #pause
-
-  $ f : X times Theta |-> M times Sigma  $ #pause
-
-  So our encoder should output two values
-
-  $ M in bb(R)^(d_z), Sigma in bb(R)_+^(d_z) $
-]
-
-#sslide[
-  ```python
-  core = nn.Sequential(...)
-  mu_layer = nn.Linear(d_h, d_z)
-  # Neural networks output real numbers
-  # But sigma must be positive
-  # So we output log sigma, because e^(sigma) is always positive
-  log_sigma_layer = nn.Linear(d_h, d_z)
-
-  tmp = core(x)
-  mu = mu_layer(tmp)
-  log_sigma = log_sigma_layer(tmp)
-  dist = (mu, exp(sigma))
-  ```
-]
-
-#sslide[
-  Decoder maps the distribution $P(bold(z))$ to $P(bold(x))$
-
-  $ P(bold(x)) = integral_z P(bold(x) | bold(z)) P(bold(z)) $
-
-  $ bold(x) tilde P(bold(x)) $
-
-  #side-by-side[
-    $ P(bold(z)) $
-  ][Normal dist. given by encoder] #pause
-
-  #side-by-side[
-    $ P(bold(x) | bold(z)) $
-  ][
-    Output distribution 
-  ]
-  #side-by-side[
-    $ bold(x) $
-  ][
-    Output (e.g., an image)
-  ]
-]
-
-#sslide[
-  $ P(bold(x)) = integral_z P(bold(x) | bold(z)) P(bold(z)) $
-
-  $ bold(x) tilde P(bold(x)) $
-
-  Integral is intractable, so the decoder inputs and outputs a *sample*
-
-  $ f^(-1): Z times Theta |-> X $
-]
-
-#sslide[
-  ```python
-  decoder = nn.Sequential(
-    nn.Linear(d_z, d_h),
-    ...
-    nn.Linear(d_h, d_x)
-  )
-  ```
-
-  Decoder is the same as a normal autoencoder
-]
-
-#sslide[
-  So far, we have the encoder
-
-  $ f : X times Theta |-> M times Sigma  $ #pause
-
-  And the decoder
-
-  $ f^(-1): Z times Theta |-> X $ #pause
-  
-  *Question:* Any problems? #pause
-
-  *Answer:* The encoder output is a distribution $M times Sigma$, but the decoder input is a sample $Z$
-]
-
-#sslide[
-  To convert from a distribution over $Z$ to a $bold(z)$, we must sample #pause
-
-  $ bold(z) tilde P(bold(z)) $ #pause
-
-  But sampling from a distribution is not differentiable #pause
-
-  The authors discover the *reparameterization trick* #pause
-
-  $ bold(z) = bold(mu) + bold(sigma) dot.circle bold(epsilon) quad bold(epsilon) tilde cal(U)(0, 1) $ #pause
-
-  Gradient can flow through $bold(mu), bold(sigma)$ #pause
-
-  We can draw samples but still use gradient descent
-]
-
-#sslide[
-  Put it all together #pause
-
-  *Step 1:* Encode the input to a latent distribution
-
-  $ bold(mu), bold(sigma) = f(bold(x), bold(theta)_e) $
-
-  *Step 2:* Generate a sample from distribution
-
-  $ bold(z) = bold(mu) + bold(sigma) dot.circle bold(epsilon) $
-
-  *Step 3:* Decode the sample 
-
-  $ bold(x) = f^(-1)(bold(z), bold(theta)_d) $
-]
-
-#sslide[
-
-]
-
-#sslide[
-  Todo loss
-]
-
-
-#sslide[
-  We want to constrain the distribution 
-  
-  $ P(bold(z) | bold(x)) approx cal(N)(0, 1) $ #pause
-
-  We will implement this constraint in the loss function #pause
-
-  *Question:* How to measure distance between two distributions?
-]
-
-#sslide[
-  *Answer:* KL divergence
-
-  #cimage("figures/lecture_5/forwardkl.png", height: 50%)
-  
-  $ KL(P, Q) = sum_i P(i) log P(i) / Q(i) $
-]
-
-#sslide[
-  $ cal(L)_"KL" (bold(x), bold(theta)) = sum_(j=1)^d_z KL(P(z_j | bold(x)), cal(N)(bold(0), bold(1))) $
-
-  $ cal(L)_"KL" (bold(x), bold(theta)) = sum_(j=1)^d_z KL(f(bold(x), bold(theta)_e)_j, cal(N)(bold(0), bold(1))) $
-
-  This ensures that the latent representations $bold(z)$ are easy to sample 
-]
-
-#sslide[
-  $ cal(L)_"KL" (bold(x), bold(theta)) = sum_(j=1)^d_z KL(P(z_j | bold(x)), cal(N)(0, 1)) $
-
-  Remember, our neural network outputs $P(bold(z))$ as $bold(mu), bold(sigma)$
-
-  $ f(bold(x), bold(theta)) = bold(mu), bold(sigma) $ #pause
-
-  The KL divergence between two normal distributions simplifies to
-
-  $ cal(L)_"KL" (bold(x), bold(theta)) = (sum_(j=1)^d_z 1 + sigma_j^2 + mu_j^2 - exp(sigma_j^2)) $ #pause
-
-]
-
-#sslide[
-  $ cal(L)_"KL" (bold(x), bold(theta)) = (sum_(j=1)^d_z 1 + sigma_j^2 + mu_j^2 - exp(sigma_j^2)) $ #pause
-
-  Over the whole dataset
-
-  $ cal(L)_"KL" (bold(X), bold(theta)) = sum_(i=1)^n (sum_(j=1)^d_z 1 + sigma_([i],j)^2 + mu_([i],j)^2 - exp(sigma_([i], j)^2)) $ 
-]
-
-#sslide[
-  $ cal(L)_"KL" (bold(X), bold(theta)) = sum_(i=1)^n (sum_(j=1)^d_z 1 + sigma_([i],j)^2 + mu_([i],j)^2 - exp(sigma_([i], j)^2)) $  #pause
-
-  The KL loss ensures that $bold(z) tilde cal(N)(bold(0), bold(1))$ #pause
-
-  We also want to make sure we reconstruct the input!
-
-  $ 
-   cal(L)_"recon" (bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_j)^2 
-  $ #pause
-
-  cal(L)(bold(X), bold(theta))
-  
-]
-
-#sslide[
-  The loss for a VAE contains the reconstruction error and the KL loss
-]
-*/
