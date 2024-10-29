@@ -103,7 +103,7 @@
 
     $ X: bb(R)^(h times w) quad "People you see at the party" $ #pause
 
-    $ H: bb(R)^(h times w) quad "The image in your mind" $
+    $ H: bb(R)^(h times w) quad "The image in your mind" $ #pause
 
     $ f: X^T times Theta |-> H $ #pause
 
@@ -449,7 +449,7 @@
 
     $ bold(X) = mat(x_[1], x_[2], dots, x_[n])^top $ #pause
 
-    The training algorithm may generate labels
+    The training algorithm will learn *unsupervised* (only from $bold(X)$)
 ]
 
 /*
@@ -468,17 +468,12 @@
 
   *Task:* Compress images for your clothing website to save on costs #pause
 
-  #cimage("figures/lecture_5/classify_input.svg", width: 80%)
-
-  #side-by-side[$ d_x: 28 times 28 $][$ d_z: 4 $]
+  #cimage("figures/lecture_5/classify_input.svg", width: 80%) #pause
 
   #side-by-side[$ X in [0, 1]^(d_x) $][$ Z in bb(R)^(d_z) $] #pause
 
-  /*
-  #side-by-side[$ f(bold(x), bold(theta)) = bold(z) $][
-    $ f^(-1)(bold(z), bold(theta)) = bold(x) $
-  ] #pause
-  */
+  #side-by-side[$ d_x: 28 times 28 $][$ d_z: 4 $] #pause
+
   #side-by-side[$ f: X times Theta |-> Z $][
     $ f^(-1): Z times Theta |-> X $
   ] #pause
@@ -609,7 +604,7 @@
 
 #sslide[
   #side-by-side[Generate some noise][
-    $ bold(epsilon) tilde cal(N)(bold(mu), bold(Sigma)) $
+    $ bold(epsilon) tilde cal(N)(bold(mu), bold(sigma)) $
   ] #pause
 
   #side-by-side[Add noise to the image][

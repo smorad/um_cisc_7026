@@ -635,7 +635,7 @@
 
     $ X: bb(R)^(h times w) quad "People you see at the party" $ #pause
 
-    $ H: bb(R)^(h times w) quad "The image in your mind" $
+    $ H: bb(R)^(h times w) quad "The image in your mind" $ #pause
 
     $ f: X^T times Theta |-> H $ #pause
 
