@@ -43,6 +43,8 @@
   [GNN Review],
   [VAE Review and Coding],
   [Attention],
+  [Keys and Queries],
+  [Self Attention],
   [Positional Encoding],
   [Transformers],
   [Coding]
@@ -942,7 +944,23 @@
 ]
 
 #sslide[
-    We compute the similarity between keys and queries using the dot product #pause
+    *Example:*
+
+    #side-by-side[
+        $bold(k)_i = bold(theta)_K^top #image("figures/lecture_11/einstein.jpg", height: 20%)$ #pause
+    ][
+        $bold(q) = bold(theta)_Q^top "Mathematician"$ #pause
+    ]
+
+    $ bold(q)^top bold(k)_i = (bold(theta)_Q^top "Mathematician")^top (bold(theta)_K^top #image("figures/lecture_11/einstein.jpg", height: 20%)) = 6.1 $ #pause
+
+    Large attention! #pause
+
+    Remember, there are multiple inputs to pay attention to
+]
+
+#sslide[
+    We compute attention for each input 
 
     $ bold(q)^top bold(K) = bold(q)^top vec(bold(k)_1, bold(k)_2, dots.v, bold(k)_T) = vec( 
         (bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_1),
@@ -953,6 +971,81 @@
     $
 ]
 
+#sslide[
+    Do not forget normalization! Only pay attention to important matches #pause
+
+    $ softmax(bold(q)^top bold(K)) = softmax(bold(q)^top vec(bold(k)_1, bold(k)_2, dots.v, bold(k)_T)) = softmax(vec( 
+        (bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_1),
+        (bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_2),
+        dots.v,
+        (bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_T),
+    ))
+    $ #pause
+
+    We call this *dot-product attention*
+]
+
+#sslide[
+    *Query:* Which person will help me on my exam? #pause
+
+    #only((2,3,4))[
+        #cimage("figures/lecture_11/composite_swift_einstein.svg", width: 75%)
+    ] 
+
+    #only(5)[#cimage("figures/lecture_11/composite_swift_einstein_attn_einstein.png", width: 75%)]
+
+    #side-by-side[][
+        $bold(q)^top bold(k)_1$
+    ][
+        $bold(q)^top bold(k)_2$
+    ][
+        $bold(q)^top bold(k)_3$
+    ][
+        $bold(q)^top bold(k)_4$
+    ][
+        $bold(q)^top bold(k)_5$
+    ][] #pause
+
+    $ softmax $ #pause
+
+    #side-by-side[][
+        $0.01$
+    ][
+        $0.10$
+    ][
+        $0.02$
+    ][
+        $0.03$
+    ][
+        $0.84$
+    ][] 
+]
+
+#sslide[
+    #cimage("figures/lecture_11/composite_swift_einstein_attn_einstein.png", width: 75%)
+        #side-by-side[][
+        $(bold(q)^top bold(k)_1) \
+        dot bold(theta)_V^top bold(x)_1$
+    ][
+        $bold(q)^top bold(k)_2 \ 
+        dot bold(theta)_V^top bold(x)_2$
+    ][
+        $bold(q)^top bold(k)_3 \ 
+        dot bold(theta)_V^top bold(x)_3$
+    ][
+        $bold(q)^top bold(k)_4 \ 
+        dot bold(theta)_V^top bold(x)_4$
+    ][
+        $bold(q)^top bold(k)_5 \ 
+        dot bold(theta)_V^top bold(x)_5$
+    ][] #pause
+]
+
+#sslide[
+    Self attention
+]
+
+/*
 #sslide[
     Another guest shows up to the party
 
@@ -985,3 +1078,4 @@
 
     TODO: Remove xbar because attention does not use bias?
 ]
+*/
