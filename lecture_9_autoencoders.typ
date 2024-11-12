@@ -336,7 +336,6 @@
   In compression, we reduce the size of data by removing information #pause
 
   Let us examine a more principled form of video compression
-
 ]
 
 #sslide[

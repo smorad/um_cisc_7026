@@ -10,6 +10,8 @@
 #let argmax = $op("arg max", limits: #true)$
 #let scan = $op("scan")$
 #let KL = $op("KL")$
+#let softmax = $op("softmax", limits: #true)$
+#let attention = $op("attention")$
 
 #let cimage(..args) = { 
   align(center + horizon, image(..args))
