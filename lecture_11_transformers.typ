@@ -66,15 +66,7 @@
 #aslide(ag, 0)
 
 #sslide[
-    Graph is a structure of nodes (vertices) and edges
-
-    #side-by-side[
-        $ G = (bold(X), bold(E)) $
-    ][
-        $ bold(X) in bb(R)^(T times d_x) $
-    ][
-        $ bold(E) in cal(P)(bb(Z)_T times bb(Z)_T) $
-    ] #pause
+    Graph is a structure of nodes (vertices) and edges #pause
 
     #side-by-side[
         #cimage("figures/lecture_11/graph.png") #pause
@@ -83,6 +75,15 @@
 
         An *edge* connects two nodes 
     ]
+
+    #side-by-side[
+        $ G = (bold(X), bold(E)) $
+    ][
+        $ bold(X) in bb(R)^(T times d_x) $
+    ][
+        $ bold(E) in cal(P)(bb(Z)_T times bb(Z)_T) $
+    ] 
+
 
     //#A *graph neural network* (GNN) is a model for learning on graph data 
 ]
@@ -95,7 +96,7 @@
 
         An *edge* connects two nodes 
 
-    ]
+    ] #pause
     If we connect nodes $i$ and $j$ with edge $(i, j)$, then $i$ and $j$ are *neighbors* #pause
 
     The *neighborhood* $N(j)$ contains all neighbors of node $j$
@@ -1203,13 +1204,186 @@
 #aslide(ag, 5)
 #aslide(ag, 6)
 
+// Transformer operates ons equences
+// Set operation
+// Permutation invariant
+// Equation
+// Do not understand time
+//
+// Transformers are an operation on *sets*
+
 #sslide[
-    // Transformer operates ons equences
-    // Set operation
-    // Permutation invariant
-    // Equation
-    // Do not understand time
-    //
-    Transformers are an operation on *sets*
+    *Question:* Do we care about the order of inputs $bold(x)_1, bold(x)_2, dots$ in attention? #pause
+
+    Let us see! #pause
+
+    Define a permutation matrix $bold(P) in {0, 1}^(T times T)$ #pause
+
+    *Example:*
+
+    $ P = mat(
+        1, 0, 0;
+        0, 1, 0;
+        0, 0, 1;
+    ); quad a = vec(3, 4, 5) $ #pause
+
+    $ P a = vec(3, 4, 5) $
+]
+
+#sslide[
+    *Example:*
+
+    $ P = mat(
+        0, 1, 0;
+        1, 0, 0;
+        0, 0, 1;
+    ); quad a = vec(3, 4, 5) $
+
+    $ P a = vec(4, 3, 5) $
+]
+
+#sslide[
+    Recall attention
+
+    $
+    bold(Q) = vec(bold(q)_1, bold(q)_2, dots.v, bold(q)_T) = vec(bold(theta)_Q^top bold(x)_1, bold(theta)_Q^top bold(x)_2, dots.v, bold(theta)_Q^top bold(x)_T) quad
+
+    bold(K) = vec(bold(k)_1, bold(k)_2, dots.v, bold(k)_T) = vec(bold(theta)_K^top bold(x)_1, bold(theta)_K^top bold(x)_2, dots.v, bold(theta)_K^top bold(x)_T) quad
+
+    bold(V) = vec(bold(v)_1, bold(v)_2, dots.v, bold(v)_T) = vec(bold(theta)_V^top bold(x)_1, bold(theta)_V^top bold(x)_2, dots.v, bold(theta)_V^top bold(x)_T) quad
+
+    $ #pause
+
+    $ "attn"(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( (bold(Q) bold(K)^top) / sqrt(d_h)) bold(V) $
+]
+
+#sslide[
+    What if we permute $mat(bold(x)_1, dots, bold(x)_T)^top$ by $bold(P)$? #pause
+
+    $ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( (bold(P) bold(Q) bold(P) bold(K)^top) / sqrt(d_h)) bold(P) bold(V) $
+
+    $
+    bold(P) bold(Q) = bold(P) vec(bold(q)_1, bold(q)_2, dots.v, bold(q)_T) quad
+
+    bold(P) bold(K) = bold(P) vec(bold(k)_1, bold(k)_2, dots.v, bold(k)_T)  quad
+
+    bold(P) bold(V) = bold(P) vec(bold(v)_1, bold(v)_2, dots.v, bold(v)_T)  quad
+
+    $ #pause
+
+]
+
+#sslide[
+    *Example:* #pause
+
+    $ "attn"(vec(bold(x)_T, bold(x)_1, dots.v, bold(x)_2), bold(theta)) = softmax( (bold(Q)_P bold(K)_P^top) / sqrt(d_h)) bold(V)_P $ #pause
+
+    $
+    bold(Q)_P = vec(bold(q)_T, bold(q)_1, dots.v, bold(q)_2) quad
+
+    bold(K)_P = vec(bold(k)_T, bold(k)_1, dots.v, bold(k)_2)  quad
+
+    bold(V)_P = vec(bold(v)_T, bold(v)_1, dots.v, bold(v)_2)  quad
+
+    $
+
+]
+
+#sslide[
+    $ bold(P) "attn"(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) $
+
+    Attention is *permutation equivariant* #pause
+
+    Order of the inputs does not matter
+]
+
+#sslide[
+    This makes sense, in our party example with attention we never consider the order #pause
+
+    #cimage("figures/lecture_11/composite_swift_einstein_attn_einstein.png") #pause
+
+    *Question:* Any situations where input order matters?
+]
+
+#sslide[
+    What about language? #pause
+
+    #side-by-side[
+        $ vec(bold(x)_1, bold(x)_2, bold(x)_3, bold(x)_4, bold(x)_5) = vec("The", "dog", "licks", "the", "owner") $ #pause
+    ][
+        $ vec(bold(x)_1, #redm[$bold(x)_5$], bold(x)_3, bold(x)_4, #redm[$bold(x)_2$]) = vec("The", "owner", "licks", "the", "dog") $
+    ] #pause
+
+    *Question:* Do these have the same meaning? #pause
+
+    To attention, these have the same meaning! #pause
+
+    We want to *break* the permutation equivariance for certain tasks
+]
+
+#sslide[
+    *Question:* What are some ways we can introduce ordering? #pause
+
+    *Answer 1:* We can introduce forgetting #pause
+
+    *ALiBi:* _Press, Ofir, Noah Smith, and Mike Lewis. "Train Short, Test Long: Attention with Linear Biases Enables Input Length Extrapolation." International Conference on Learning Representations._ #pause
+
+    *RoPE:* _Su, Jianlin, et al. "Roformer: Enhanced transformer with rotary position embedding." Neurocomputing._ #pause
+
+    *Answer 2:* We can modify the inputs based on their ordering #pause
+
+    We will focus on answer 2 because it was used first
+]
+
+#sslide[
+    *Approach 2:* Modify inputs based on ordering #pause
+
+    #side-by-side[
+        $ "attn"(vec(bold(x)_1, bold(x)_2, dots.v, bold(x)_T), bold(theta)) $ #pause
+    ][
+        $ "attn"(vec(bold(x)_1, bold(x)_2, dots.v, bold(x)_T) + vec(f_"pos" (1), f_"pos" (2), dots.v, f_"pos" (3)), bold(theta)) $ #pause
+    ]
+
+    $
+    bold(Q) = vec(bold(theta)_Q^top bold(x)_1, bold(theta)_Q^top bold(x)_2, dots.v, bold(theta)_Q^top bold(x)_T) quad
+
+    bold(K) = vec(bold(theta)_K^top bold(x)_1, bold(theta)_K^top bold(x)_2, dots.v, bold(theta)_K^top bold(x)_T) quad
+
+    bold(V) = vec(bold(theta)_V^top bold(x)_1, bold(theta)_V^top bold(x)_2, dots.v, bold(theta)_V^top bold(x)_T) quad
+
+    $ #pause
+
+]
+#sslide[
+    Now, keys and values 
+
+    Now what happens if we permute the inputs? #pause
+
+    $ "attn"(vec(bold(x)_1, bold(x)_2, dots.v, bold(x)_T) + vec(f_"pos" (1), f_"pos" (2), dots.v, f_"pos" (3)), bold(theta)) $ #pause
+
     
+]
+
+#sslide[
+    ```python
+    class PositionalTransformer(nn.Module):
+        def __init__(self):
+            self.f_pos = nn.Embedding(1024, d_x)
+            self.block1 = TransformerBlock()
+            self.block2 = TransformerBlock()
+        
+        def forward(self, x):
+            timesteps = torch.arange(x.shape[0])
+            x = x + self.embedding(timesteps)
+            x = self.block1(x)
+            x = self.block2(x)
+            return x
+    ```
+]
+
+#sslide[
+
+    Homework
+    
+    https://colab.research.google.com/drive/18VBb7sz0u8ul5vsFEJnQaepn0pQy4cUa?usp=sharing
 ]
