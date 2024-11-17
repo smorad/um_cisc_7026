@@ -9,6 +9,8 @@
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
 
+// TODO: Make conv and graph conv notation consistent
+
 #let varinf = diagram(
   node-stroke: .1em,
   spacing: 4em,
@@ -37,7 +39,6 @@
       )
     })
 })}
-
 
 #let ag = (
   [GNN Review],
@@ -74,8 +75,9 @@
         A *node* is a vector of information #pause
 
         An *edge* connects two nodes 
-    ]
+    ] #pause
 
+    /*
     #side-by-side[
         $ G = (bold(X), bold(E)) $
     ][
@@ -83,6 +85,7 @@
     ][
         $ bold(E) in cal(P)(bb(Z)_T times bb(Z)_T) $
     ] 
+    */
 
 
     //#A *graph neural network* (GNN) is a model for learning on graph data 
@@ -99,35 +102,47 @@
     ] #pause
     If we connect nodes $i$ and $j$ with edge $(i, j)$, then $i$ and $j$ are *neighbors* #pause
 
-    The *neighborhood* $N(j)$ contains all neighbors of node $j$
+    The *neighborhood* $bold(N)(i)$ contains all neighbors of node $i$
 ]
+
+#sslide[
+    Let us think of graphs as *signals* #pause
+
+    *Question:* Where did we see signals before? #pause
+
+    Rather than time $t$ or space $u, v$, graphs are a function of index $i$ #pause
+
+    $ "Node" i quad bold(x)(i) in bb(R)^(d_x); quad i in 1, dots, T $ #pause
+
+    $ "Neighborhood of" i quad bold(N)(i) = vec(i, j, k, dots.v); quad bold(N)(i) in cal(P)(i); quad i in 1, dots, T $
+]
+
 
 #sslide[
     Prof. Li introduced the *graph convolution layer* #pause
 
+    For a node $i$, the graph convolution layer is: #pause
 
-    For a node $j$, the graph convolution layer is: #pause
+    $ f(bold(x), bold(N), bold(theta))(i) = sigma(sum_(j in bold(N)(i)) bold(theta)^top overline(bold(x))(j)) $ #pause
 
-    $ f(bold(X), bold(E), bold(theta))_j = sigma(bold(theta)_1^top overline(bold(x))_j + sum_(i in N(j)) bold(theta)_2^top bold(x)_i) $ #pause
-
-    Combine information from current node $bold(x)_j$ with neighbors $bold(x)_i$ #pause
+    Combine information from the neighbors of $bold(x)(i)$ #pause
 
     This is just one node, we use this graph layer for all nodes in the graph
 ]
 
 #sslide[
-    Graph convolution over all nodes in the graph #pause
+    Apply graph convolution over all nodes in the graph #pause
 
-    $ f(bold(X), bold(E), bold(theta)) = vec(
-        f(bold(X), bold(E), bold(theta))_1,
-        f(bold(X), bold(E), bold(theta))_2,
+    $ f(bold(x), bold(N), bold(theta)) = vec(
+        f(bold(x), bold(N), bold(theta))(1),
+        f(bold(x), bold(N), bold(theta))(2),
         dots.v,
-        f(bold(X), bold(E), bold(theta))_T,
+        f(bold(x), bold(N), bold(theta))(T),
     ) = vec(
-        sigma(bold(theta)_1^top overline(bold(x))_1 + sum_(i in N(1)) bold(theta)_2^top bold(x)_i),
-        sigma(bold(theta)_1^top overline(bold(x))_2 + sum_(i in N(2)) bold(theta)_2^top bold(x)_i),
+        sigma(sum_(j in bold(N)(1)) bold(theta)^top overline(bold(x))(j)),
+        sigma(sum_(j in bold(N)(2)) bold(theta)^top overline(bold(x))(j)),
         dots.v,
-        sigma(bold(theta)_1^top overline(bold(x))_T + sum_(i in N(T)) bold(theta)_2^top bold(x)_i),
+        sigma(sum_(j in bold(N)(T)) bold(theta)^top overline(bold(x))(j))
     )
     $ #pause
 
@@ -136,13 +151,13 @@
 
 #sslide[
     #side-by-side[
-    Standard convolution 
+    Standard 1D convolution 
 
     $ vec(
-        sigma(bold(theta)_1^top overline(bold(x))_1 + sum_(i=1)^(k) bold(theta)_2^top bold(x)_i),
-        sigma(bold(theta)_1^top overline(bold(x))_2 + sum_(i=2)^(k+1) bold(theta)_2^top bold(x)_i),
+        sigma(sum_(j=1)^(k) bold(theta)^top overline(bold(x))(j)),
+        sigma(sum_(j=2)^(k+1) bold(theta)^top overline(bold(x))(j)),
         dots.v,
-        sigma(bold(theta)_1^top overline(bold(x))_T + sum_(i=T-k)^(T) bold(theta)_2^top bold(x)_i),
+        sigma(sum_(j=T-k)^(T) bold(theta)^top overline(bold(x))(j)),
     )
     $ #pause
 
@@ -150,30 +165,30 @@
     Graph convolution
 
     $ vec(
-        sigma(bold(theta)_1^top overline(bold(x))_1 + sum_(i in N(1)) bold(theta)_2^top bold(x)_i),
-        sigma(bold(theta)_1^top overline(bold(x))_2 + sum_(i in N(2)) bold(theta)_2^top bold(x)_i),
+        sigma(sum_(j in bold(N)(1)) bold(theta)^top overline(bold(x))(j)),
+        sigma(sum_(j in bold(N)(2)) bold(theta)^top overline(bold(x))(j)),
         dots.v,
-        sigma(bold(theta)_1^top overline(bold(x))_T + sum_(i in N(T)) bold(theta)_2^top bold(x)_i),
+        sigma(sum_(j in bold(N)(T)) bold(theta)^top overline(bold(x))(j))
     )
     $ #pause
     ]
 
     *Question:* What is the output size of standard convolution? #pause
 
-    *Answer:* $T - k - 1 times d_h$
+    *Answer:* $(T - k - 1) times d_h$
 ]
 
 
 
 #sslide[
     #side-by-side[
-    Standard convolution 
+    Standard 1D convolution 
 
     $ vec(
-        sigma(bold(theta)_1^top overline(bold(x))_1 + sum_(i=1)^(k) bold(theta)_2^top bold(x)_i),
-        sigma(bold(theta)_1^top overline(bold(x))_2 + sum_(i=2)^(k+1) bold(theta)_2^top bold(x)_i),
+        sigma(sum_(j=1)^(k) bold(theta)^top overline(bold(x))(j)),
+        sigma(sum_(j=2)^(k+1) bold(theta)^top overline(bold(x))(j)),
         dots.v,
-        sigma(bold(theta)_1^top overline(bold(x))_T + sum_(i=T-k)^(T) bold(theta)_2^top bold(x)_i),
+        sigma(sum_(j=T-k)^(T) bold(theta)^top overline(bold(x))(j)),
     )
     $ 
 
@@ -181,12 +196,12 @@
     Graph convolution
 
     $ vec(
-        sigma(bold(theta)_1^top overline(bold(x))_1 + sum_(i in N(1)) bold(theta)_2^top bold(x)_i),
-        sigma(bold(theta)_1^top overline(bold(x))_2 + sum_(i in N(2)) bold(theta)_2^top bold(x)_i),
+        sigma(sum_(j in bold(N)(1)) bold(theta)^top overline(bold(x))(j)),
+        sigma(sum_(j in bold(N)(2)) bold(theta)^top overline(bold(x))(j)),
         dots.v,
-        sigma(bold(theta)_1^top overline(bold(x))_T + sum_(i in N(T)) bold(theta)_2^top bold(x)_i),
+        sigma(sum_(j in bold(N)(T)) bold(theta)^top overline(bold(x))(j))
     )
-    $ 
+    $ #pause
     ]
 
     *Question:* What is the output size of graph convolution? #pause
@@ -197,14 +212,13 @@
 #sslide[
     We can use pooling with graph convolutions too
 
-    $ "SumPool"( vec(
-        sigma(bold(theta)_1^top overline(bold(x))_1 + sum_(i in N(1)) bold(theta)_2^top bold(x)_i),
-        sigma(bold(theta)_1^top overline(bold(x))_2 + sum_(i in N(2)) bold(theta)_2^top bold(x)_i),
+    $ "SumPool"(vec(
+        sigma(sum_(j in bold(N)(1)) bold(theta)^top overline(bold(x))(j)),
+        sigma(sum_(j in bold(N)(2)) bold(theta)^top overline(bold(x))(j)),
         dots.v,
-        sigma(bold(theta)_1^top overline(bold(x))_T + sum_(i in N(T)) bold(theta)_2^top bold(x)_i),
+        sigma(sum_(j in bold(N)(T)) bold(theta)^top overline(bold(x))(j))
     )) = \ 
-    sigma(bold(theta)_1^top overline(bold(x))_1 + sum_(i in N(1)) bold(theta)_2^top bold(x)_i) + sigma(bold(theta)_1^top overline(bold(x))_2 + sum_(i in N(2)) bold(theta)_2^top bold(x)_i) 
-    + dots
+    sigma(sum_(j in bold(N)(1)) bold(theta)^top overline(bold(x))(j)) +  sigma(sum_(j in bold(N)(2)) bold(theta)^top overline(bold(x))(j)) + dots + sigma(sum_(j in bold(N)(T)) bold(theta)^top overline(bold(x))(j))
     $ 
 ]
 /*
@@ -230,19 +244,31 @@
 #aslide(ag, 1)
 
 #sslide[
-  Autoencoders are useful for compression and denoising #pause
 
-  But we can also use them as *generative models* #pause
+  We can use autoencoders as *generative models* #pause
 
   A generative model learns the structure of data #pause
 
   Using this structure, it generates *new* data #pause
 
-  - Train on face dataset, generate *new* pictures #pause
+  - Train on face dataset, generate *new* faces #pause
   - Train on book dataset, write a *new* book #pause
-  - Train on protein dataset, create *new* proteins #pause
+  - Train on human knowledge, create *new* knowledge #pause
 
-  How does this work?
+  Generative models learn the dataset *distribution* $P(bold(x)); quad bold(x) in X$ 
+]
+
+#sslide[
+  Generative models learn the dataset *distribution* $P(bold(x)); quad bold(x) in X$ 
+
+  Virtually *all* generative methods learn the dataset distribution #pause
+  - Variational autoencoders #pause
+  - Diffusion models #pause
+  - Generative adversarial networks #pause
+
+  If you like generative models, you should study Bayesian statistics #pause
+
+  Back to the variational autoencoder
 ]
 
 #sslide[
@@ -263,15 +289,16 @@
   #side-by-side[
     #cimage("figures/lecture_9/fashion-latent.png")
   ][
+    #set align(left)
   Autoencoder generative model: #pause
   
-  Encode $ vec(bold(x)_[1], dots.v, bold(x)_[n])$ into $vec(bold(z)_[1], dots.v, bold(z)_[n]) $ #pause
+  1. Encode $ vec(bold(x)_[1], dots.v, bold(x)_[n])$ into $vec(bold(z)_[1], dots.v, bold(z)_[n]) $ #pause
 
-  Pick a point $bold(z)_[k]$ #pause
+  2. Pick a point $bold(z)_[k]$ #pause
 
-  Add some noise $bold(z)_"new" = bold(z)_[k] + bold(epsilon)$ #pause
+  3. Add some noise $bold(z)_"new" = bold(z)_[k] + bold(epsilon)$ #pause
 
-  Decode $bold(z)_"new"$ into $bold(x)_"new"$
+  4. Decode $bold(z)_"new"$ into $bold(x)_"new"$
   ]
 ]
 
@@ -296,29 +323,11 @@
 ]
 
 #sslide[
-  Variational autoencoders (VAEs) do three things: #pause
-  + Make it easy to sample random $bold(z)$ #pause
-  + Keep all $bold(z)_[1], dots bold(z)_[n]$ close together in a small region #pause
-  + Ensure that $bold(z) + bold(epsilon)$ is always meaningful #pause
+  Variational autoencoders (VAEs) make $bold(z)_[1], dots bold(z)_[n]$ normally distributed #pause
 
-  How? #pause
+  This keeps the point close together #pause
 
-  Make $bold(z)_[1], dots, bold(z)_[n]$ normally distributed #pause
-
-  $ bold(z) tilde cal(N)(mu, sigma), quad mu = 0, sigma = 1 $
-]
-
-//#sslide[
-  //#cimage("figures/lecture_2/normal_dist.png")
-//  #align(center, normal)
-//]
-
-#sslide[
-  If $bold(z)_[1], dots, bold(z)_[n]$ are distributed following $cal(N)(0, 1)$: #pause
-
-  + 99.7% of $bold(z)_[1], dots, bold(z)_[n]$ lie within $3 sigma = [-3, 3]$ #pause
-
-  + Make it easy to generate new $bold(z)$, just sample $bold(z) tilde cal(N)(0, 1)$
+  We can sample new points $bold(z)_"new" tilde N(bold(0), bold(1))$
 ]
 
 #sslide[
@@ -341,6 +350,21 @@
 ]
 
 #sslide[
+    Given a prior distribution
+    
+    $ P(bold(z)) = cal(N)(bold(0), bold(1)) $ #pause
+
+    We want to approximate the dataset distribution
+
+    $ P(bold(x)) $ #pause
+
+    By approximating the marginal likelihood (from Bayes rule)
+
+    $ P(bold(x); bold(theta)) = integral_bold(z) P(bold(x) | bold(z); bold(theta)) P(bold(z)) dif bold(z) $
+]
+
+
+#sslide[
   *Key idea 2:* There is some latent variable $bold(z)$ which generates data $bold(x)$ #pause
 
   $ x: #cimage("figures/lecture_9/vae_slider.png") $
@@ -348,6 +372,7 @@
   $ z: mat("woman", "brown hair", ("frown" | "smile")) $
 ]
 
+/*
 #sslide[
   #cimage("figures/lecture_9/vae_slider.png") #pause
 
@@ -355,6 +380,9 @@
 
   Given $bold(x)$, find the probability that the person is smiling $P(bold(z) | bold(x); bold(theta))$
 ]
+*/
+
+// TODO: Our generative model needs to approximate P(x) = P(x | z) P (z)
 
 #sslide[
   We cast the autoencoding task as a *variational inference* problem #pause
@@ -364,12 +392,14 @@
   #side-by-side[
     Decoder 
     $ P(bold(x) | bold(z); bold(theta)) $
+    Generate new $bold(x)$
   ][
     Encoder 
     $ P(bold(z) | bold(x); bold(theta)) $
+    Learn meaningful $bold(z)$
   ] #pause
 
-  We want to learn both the encoder and decoder: $P(bold(z), bold(x); bold(theta))$
+  //We want to learn both the encoder and decoder: $P(bold(z), bold(x); bold(theta))$
 ]
 
 #sslide[
@@ -398,7 +428,7 @@
   tmp = core(x)
   mu = mu_layer(tmp)
   log_sigma = log_sigma_layer(tmp)
-  distribution = (mu, exp(sigma))
+  distribution = (mu, exp(log_sigma))
   ```
 ]
 
@@ -409,7 +439,7 @@
   
   We can use the same decoder as a standard autoencoder #pause
 
-  $ f^(-1): Z times Theta |-> X $
+  $ f^(-1): Z times Theta |-> X $ #pause
 
   Encoder outputs a distribution $Delta Z$ but decoder input is $Z$ #pause
 
@@ -466,7 +496,7 @@
 
 #sslide[
   ```python
-  def L(model, x, m, n, key):
+  def L(model, x, m, n, beta, key):
     mu, sigma = model.f(x) # Encode input into distribution 
     # Sample from distribution
     z = mu + sigma * jax.random.normal(key, x.shape[0])
@@ -476,12 +506,14 @@
     recon = jnp.sum((x - pred_x) ** 2)
     kl = jnp.sum(mu ** 2 + sigma ** 2 - jnp.log(sigma ** 2) - 1)
     # Loss function contains reconstruction and kl terms
-    return m / n * recon + kl
+    return m / n * recon + beta * kl
   ```
 ]
 
 #sslide[
-  https://colab.research.google.com/drive/1UyR_W6NDIujaJXYlHZh6O3NfaCAMscpH#scrollTo=nmyQ8aE2pSbb
+  https://colab.research.google.com/drive/1UyR_W6NDIujaJXYlHZh6O3NfaCAMscpH#scrollTo=nmyQ8aE2pSbb #pause
+
+  https://openai.com/index/glow/
 ]
 
 #aslide(ag, 1)
@@ -518,13 +550,11 @@
 
 
 #sslide[
-    Today, we will investigate attention and transformers #pause
-
     Attention and transformers are the "hottest" topic in deep learning #pause
 
     People use them for almost every task (even if they shouldn't!) #pause
 
-    Let's review some products based on attention
+    Let's review some projects based on attention
 ]
 
 #sslide[
@@ -594,25 +624,37 @@
 #sslide[
     Limited space, cannot remember everything #pause
 
-    Introduced forgetting
+    Introduced forgetting term $gamma in [0, 1]$ #pause
 
-    #side-by-side[$ sum_(i=1)^T gamma^(T - i) dot bold(theta)^top overline(bold(x))_i $ #pause][
+    #side-by-side[$ f(bold(x), bold(theta)) = sum_(i=1)^T gamma^(T - i) dot bold(theta)^top overline(bold(x))_i $ #pause][
         #align(center)[#forgetting]
     ] #pause
 
-    *Question:* Does this accurately model what you remember?
+    *Question:* Does this accurately model what *you* remember?
 ]
 
 #sslide[
-    You go to a party and meet these people in order
+    *Example:* We attend a party in 1850s #pause
 
-    #cimage("figures/lecture_11/composite0.svg")
+    We talk with many people at this party #pause
+
+    #cimage("figures/lecture_11/composite0.svg") #pause
+
+    #side-by-side[
+    10 PM #pause
+    ][
+    11 PM #pause
+    ][
+    12 AM #pause
+    ][
+    1 AM
+    ]
 ]
 
 #sslide[
-    According to forgetting, the memories should fade with time
+    According to forgetting, the memories should fade with time #pause
 
-    #cimage("figures/lecture_11/composite_fade.png")
+    #cimage("figures/lecture_11/composite_fade.png") #pause
 
     #side-by-side[
     $ gamma^3 bold(theta)^top overline(bold(x))_1 $ #pause
@@ -622,11 +664,15 @@
     $ gamma^1 bold(theta)^top overline(bold(x))_3 $ #pause
     ][
     $ gamma^0 bold(theta)^top overline(bold(x))_4 $
-    ]
+    ] #pause
 ]
 
 #sslide[
-    Consider another party #pause
+    Any questions before moving on?
+]
+
+#sslide[
+    Consider another party, with one more guest #pause
 
     #cimage("figures/lecture_11/composite_swift.png") #pause
 
@@ -671,13 +717,15 @@
 
     Memories are not created equal, some are more important than others #pause
 
+    Important memories persist longer than unimportant memories #pause
+
     We will *pay more attention* to certain memories
 ]
 
 #slide[
-    My memory might actually be
+    What does human memory actually look like?
 
-    #cimage("figures/lecture_11/composite_softmax.png")
+    #cimage("figures/lecture_11/composite_softmax.png") #pause
 
     #side-by-side[
     $ 1.0 dot bold(theta)^top overline(bold(x))_1 $ #pause
@@ -703,7 +751,7 @@
 
     $ f_"forget" (bold(x), bold(theta)) = sigma(bold(theta)^top_lambda overline(bold(x))) $ #pause
 
-    $ f(bold(h), bold(x), bold(theta)) = f_"forget" (bold(x), bold(theta)) dot.circle bold(h) +  bold(theta)_x^top overline(bold(x)) $ #pause
+    $ f(bold(h), bold(x), bold(theta)) = f_"forget" (bold(x), bold(theta)) dot.circle bold(h) +  bold(theta)_x^top overline(bold(x)) $ 
 ]
 
 /*
@@ -720,23 +768,23 @@
 ]
 */
 #sslide[
-    First, write our forgetting function #pause
+    First, write our forgetting function with slightly different notation #pause
     $
         lambda(bold(x), bold(theta)_lambda) = sigma(bold(theta)^top_lambda overline(bold(x))); quad bold(theta)_lambda in bb(R)^((d_x + 1) times 1)
     $ #pause
+
+    #side-by-side[*Question:* Shape of $lambda(bold(x), bold(theta)_lambda)$? #pause][*Answer:* Scalar! #pause]
 
     Then, write our composite memory model with forgetting #pause
 
     $ f(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = sum_(i=1)^T bold(theta)^top bold(x)_i dot lambda(bold(x)_i, bold(theta)_lambda)
     $ #pause
 
-    This is one form of *attention* #pause
-
-    We only pay attention to specific inputs
+    Only pay attention to important inputs #pause
 ]
 
 #sslide[
-    We can use this simple form of attention to pay attention to Taylor Swift #pause
+    We can use this simple form of attention to remember Taylor Swift #pause
 
     #cimage("figures/lecture_11/composite_swift.png")
 ]
@@ -785,23 +833,23 @@
 
     For example, normalize attention to sum to one
 
-    $ sum_(i=1)^T lambda(bold(x), bold(theta)_lambda) = 1 $ #pause
+    $ sum_(i=1)^T lambda(bold(x)_i, bold(theta)_lambda) = 1 $ #pause
 
-    Now the model must carefully choose who to remember! #pause
+    Now the model must choose who to remember! #pause
 
-    *Question:* Do we know of any functions with this property? #pause
+    *Question:* How can we ensure that the attention sums to one? #pause
 
     *Answer:* Softmax!
 ]
 
 #sslide[
-  The softmax function maps real numbers to the simplex (probabilities)
+  The softmax function maps real numbers to the simplex (probabilities) #pause
 
   $ "softmax": bb(R)^k |-> Delta^(k - 1) $ #pause
 
   $ "softmax"(vec(x_1, dots.v, x_k)) = (exp(bold(x))) / (sum_(i=1)^k exp(x_i)) = vec(
     exp(x_1) / (exp(x_1) + exp(x_2) + dots exp(x_k)),
-    exp(x_2) / (exp(x_1) + e^(x_2) + dots exp(x_k)),
+    exp(x_2) / (exp(x_1) + exp(x_2) + dots exp(x_k)),
     dots.v,
     exp(x_k) / (exp(x_1) + exp(x_2) + dots exp(x_k)),
   ) $
@@ -814,54 +862,70 @@
 
     The attention we pay to person $i$ is
 
-    $ lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i = exp(bold(theta)^top_lambda overline(bold(x))_i) / (sum_(j=1)^T exp(bold(theta)^top_lambda overline(bold(x))_j)) $
+    $ lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i 
+    = softmax(vec(
+        bold(theta)_lambda^top overline(bold(x))_1,
+        dots.v,
+        bold(theta)_lambda^top overline(bold(x))_T,
+    ))_i 
+    = exp(bold(theta)^top_lambda overline(bold(x))_i) 
+        / (sum_(j=1)^T exp(bold(theta)^top_lambda overline(bold(x))_j)) 
+    $
 ]
 
 #sslide[
+    #cimage("figures/lecture_11/composite_swift.png") #pause
     
     #side-by-side[
-    $ lambda(vec(bold(x)_1, dots.v, bold(x)_5), bold(theta)_lambda)_1 \ dot bold(theta)^top overline(bold(x))_1 $
+    $ lambda(vec(bold(x)_1, dots.v, bold(x)_5), bold(theta)_lambda)_1 \ dot bold(theta)^top overline(bold(x))_1 $ #pause
     ][
-    $ lambda(vec(bold(x)_1, dots.v, bold(x)_5), bold(theta)_lambda)_2 \ dot bold(theta)^top overline(bold(x))_2 $
+    $ lambda(vec(bold(x)_1, dots.v, bold(x)_5), bold(theta)_lambda)_2 \ dot bold(theta)^top overline(bold(x))_2 $ #pause
     ][
-    $ lambda(vec(bold(x)_1, dots.v, bold(x)_5), bold(theta)_lambda)_3 \ dot bold(theta)^top overline(bold(x))_3 $
+    $ lambda(vec(bold(x)_1, dots.v, bold(x)_5), bold(theta)_lambda)_3 \ dot bold(theta)^top overline(bold(x))_3 $ #pause
     ][
-    $ lambda(vec(bold(x)_1, dots.v, bold(x)_5), bold(theta)_lambda)_4 \ dot bold(theta)^top overline(bold(x))_4 $
+    $ lambda(vec(bold(x)_1, dots.v, bold(x)_5), bold(theta)_lambda)_4 \ dot bold(theta)^top overline(bold(x))_4 $ #pause
     ][
     $ lambda(vec(bold(x)_1, dots.v, bold(x)_5), bold(theta)_lambda)_5 \ dot bold(theta)^top overline(bold(x))_5 $
     ] #pause
 
-    #cimage("figures/lecture_11/composite_swift.png")
 ]
 
 
 #sslide[
     
+    #cimage("figures/lecture_11/composite_softmax.png") #pause
+
     #side-by-side[
-    $ 0.70 dot bold(theta)^top overline(bold(x))_1 $
+    $ 0.70 dot bold(theta)^top overline(bold(x))_1 $ #pause
     ][
-    $ 0.04 dot bold(theta)^top overline(bold(x))_2 $
+    $ 0.04 dot bold(theta)^top overline(bold(x))_2 $ #pause
     ][
-    $ 0.03 dot bold(theta)^top overline(bold(x))_3 $
+    $ 0.03 dot bold(theta)^top overline(bold(x))_3 $ #pause
     ][
-    $ 0.20 dot bold(theta)^top overline(bold(x))_4 $
+    $ 0.20 dot bold(theta)^top overline(bold(x))_4 $ #pause
     ][
     $ 0.03 dot bold(theta)^top overline(bold(x))_5 $
     ] #pause
-
-    #cimage("figures/lecture_11/composite_softmax.png") #pause
 
     $ 0.70 + 0.04 + 0.03 + 0.20 + 0.03 = 1.0 $
 ]
 
 #sslide[
-    $ lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i = exp(bold(theta)^top_lambda overline(bold(x))) / (sum_(j=1)^T exp(bold(theta)^top_lambda overline(bold(x))_j)) $
+    $ lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i = exp(bold(theta)^top_lambda overline(bold(x)_i)) / (sum_(j=1)^T exp(bold(theta)^top_lambda overline(bold(x))_j)) $ #pause
+
+    Compute attention for all inputs at once #pause
 
     $ lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda) = vec(
         exp(bold(theta)^top_lambda overline(bold(x))_#redm[$1$]) / (sum_(j=1)^T exp(bold(theta)^top_lambda overline(bold(x))_j)), 
         dots.v,
         exp(bold(theta)^top_lambda overline(bold(x))_#redm[$T$]) / (sum_(j=1)^T exp(bold(theta)^top_lambda overline(bold(x))_j))
     ) $
+]
+
+#sslide[
+    This is a simple form of attention #pause
+
+    Next, we will investigate the attention used in transformers
 ]
 
 #aslide(ag, 2)
@@ -880,16 +944,17 @@
 ]
 
 #sslide[
-    We can search our keys using a *query* #pause
+    We can search through our keys using a *query* #pause
 
     *Query:* Which person will help me on my exam? #pause
 
-    #only(3)[
+    #only((3,4))[
         #cimage("figures/lecture_11/composite_swift_einstein.svg")
     ] #pause
+
     #side-by-side[Musician][Lawyer][Shopkeeper][Chef][Scientist] #pause
 
-    #only(4)[#cimage("figures/lecture_11/composite_swift_einstein_attn_einstein.png")]
+    #only(5)[#cimage("figures/lecture_11/composite_swift_einstein_attn_einstein.png")]
 ]
 
 #sslide[
@@ -897,16 +962,17 @@
 
     #only((2,3))[
         #cimage("figures/lecture_11/composite_swift_einstein.svg")
-    ] 
+    ] #pause
+
     #side-by-side[Musician][Lawyer][Shopkeeper][Chef][Scientist] #pause
 
-    #only(4)[#cimage("figures/lecture_11/composite_swift_einstein_attn_chef.png")] #pause
+    #only((4,5))[#cimage("figures/lecture_11/composite_swift_einstein_attn_chef.png")] #pause
 
-    How do we represent this mathematically?
+    How do we represent keys and queries mathematically?
 ]
 
 #sslide[
-    For an input, we create a key $bold(k)$ #pause
+    For each input, we create a key $bold(k)$ #pause
 
     $ bold(k)_j = bold(theta)^top_K bold(x)_j, quad bold(theta)_K in bb(R)^(d_x times d_h), quad bold(k)_j in bb(R)^(d_h) $ #pause
 
@@ -920,17 +986,19 @@
 
     $ bold(q) = bold(theta)^top_Q bold(x)_q,  quad bold(theta)_Q in bb(R)^(d_x times d_h), quad bold(q) in bb(R)^(d_h) $ #pause
 
-    A matching key and query will have a large dot product #pause
+    To determine if a key and query match, we will take the dot product #pause
 
     $ bold(q)^top bold(k)_i = (bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_i) $ #pause
 
     *Question:* What is the shape of $bold(q)^top bold(k)_i$? #pause
 
     *Answer:* $(1, d_h) times (d_h, 1) = 1$, the output is a scalar #pause
+
+    Large dot product $=>$ match! Small dot product $=>$ no match.
 ]
 
 #sslide[
-    *Example:*
+    *Example:* #pause
 
     #side-by-side[
         $bold(k)_i = bold(theta)_K^top #image("figures/lecture_11/swift.jpg", height: 20%)$ #pause
