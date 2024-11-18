@@ -65,6 +65,18 @@
   institution-name: "University of Macau",
 )
 
+#sslide[
+    All quiz 3 grades uploaded #pause
+
+    If you submitted a quiz but have no grade, come see me after class #pause
+
+    3 more lectures #pause
+
+    + Today: Attention #pause
+    + 11/25: Transformers #pause
+    + 12/3: (Virtual) reinforcement learning + QA
+]
+
 #aslide(ag, none)
 #aslide(ag, 0)
 
@@ -399,13 +411,13 @@
     Encoder 
     $ P(bold(z) | bold(x); bold(theta)) $
     Learn meaningful $bold(z)$
-  ] #pause
+  ] 
 
   //We want to learn both the encoder and decoder: $P(bold(z), bold(x); bold(theta))$
 ]
 
 #sslide[
-  How do we implement $f$ (i.e., $P(bold(z) | bold(x); bold(theta))$ )? #pause
+  How do we implement encoder $f$ (i.e., $P(bold(z) | bold(x); bold(theta))$ )? #pause
 
   $ f : X times Theta |-> Delta Z $ #pause
 
@@ -513,7 +525,11 @@
 ]
 
 #sslide[
-  https://colab.research.google.com/drive/1UyR_W6NDIujaJXYlHZh6O3NfaCAMscpH#scrollTo=nmyQ8aE2pSbb #pause
+  https://colab.research.google.com/drive/1UyR_W6NDIujaJXYlHZh6O3NfaCAMscpH#scrollTo=nmyQ8aE2pSbb
+
+  https://colab.research.google.com/drive/1fwbkU46kvRWoisgIIZ2CFcynMReJsDUA
+
+  Show my results
 
   https://openai.com/index/glow/
 ]
