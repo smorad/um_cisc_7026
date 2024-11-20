@@ -66,6 +66,10 @@
 )
 
 #sslide[
+    New laptop, bigger translation model, better captions? #pause
+
+    Final homework uploaded, due 12/18
+
     All quiz 3 grades uploaded #pause
 
     If you submitted a quiz but have no grade, come see me after class #pause
@@ -74,7 +78,13 @@
 
     + Today: Attention #pause
     + 11/25: Transformers #pause
-    + 12/3: (Virtual) reinforcement learning + QA
+    + 12/3: (Virtual) Introduction to reinforcement learning
+]
+
+#sslide[
+    Next term: CISC 7404 Special Topics in Artificial Intelligence (preliminary) #pause
+
+    Still designing course, but will focus on deep reinforcement learning 
 ]
 
 #aslide(ag, none)
@@ -279,6 +289,7 @@
   - Variational autoencoders #pause
   - Diffusion models #pause
   - Generative adversarial networks #pause
+  - Normalizing flows #pause
 
   If you like generative models, you should study Bayesian statistics #pause
 
@@ -798,7 +809,7 @@
     $ f(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = sum_(i=1)^T bold(theta)^top bold(x)_i dot lambda(bold(x)_i, bold(theta)_lambda)
     $ #pause
 
-    Only pay attention to important inputs #pause
+    Only pay attention to important inputs 
 ]
 
 #sslide[
@@ -994,7 +1005,7 @@
 
     $ bold(k)_j = bold(theta)^top_K bold(x)_j, quad bold(theta)_K in bb(R)^(d_x times d_h), quad bold(k)_j in bb(R)^(d_h) $ #pause
 
-    Create keys for all inputs #pause
+    //Create keys for all inputs #pause
 
     //$ bold(K) = vec(bold(k)_1, bold(k)_2, dots.v, bold(k)_T) = vec(bold(theta)_K^top bold(x)_1, bold(theta)_K^top bold(x)_2, dots.v, bold(theta)_K^top bold(x)_T), quad bold(K) in bb(R)^(T times d_h) $
     // $ bold(K) = mat(bold(k)_1, bold(k)_2, dots, bold(k)_T) = mat(bold(theta)_K^top bold(x)_1, bold(theta)_K^top bold(x)_2, dots, bold(theta)_K^top bold(x)_T), quad bold(K) in bb(R)^(d_h times T) $
@@ -1283,7 +1294,7 @@
 
         def forward(self, x):
             A = softmax(
-                self.theta_Q(x) @ self.theta_K(x).T / d_h, axis=0
+                self.theta_Q(x) @ self.theta_K(x).T / d_h, axis=1
             )
             return A @ self.theta_V(x)
     ```
