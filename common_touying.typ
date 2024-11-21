@@ -1,6 +1,7 @@
-#import "@preview/polylux:0.3.1": *
+#import "@preview/touying:0.5.3": *
 #import themes.university: *
-#import "@preview/cetz:0.2.2": canvas, draw, plot
+#import "@preview/cetz:0.3.1": canvas, draw
+#import "@preview/cetz-plot:0.1.0": plot, chart
 
 #set text(size: 25pt)
 #set math.vec(delim: "[")
