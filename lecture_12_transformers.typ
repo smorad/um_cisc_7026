@@ -403,12 +403,16 @@ class Transformer(nn.Module):
 = Positional Encoding
 
 ==
+
 Our transformer maps $T$ inputs to $T$ outputs #pause
+
+$ f: bb(R)^(T times d_x) times Theta |-> bb(R)^(T times d_y) $ #pause
+
 - $T$ words in a sentence #pause
 - $T$ pixels in an image #pause
 - $T$ amino acids in a protein #pause
 
-*Question:* Does the order of the $T$ inputs matter? #pause
+*Question:* Do we care about the order of the $T$ inputs? #pause
 
 *Answer:* In some tasks, yes! In others, no
 
@@ -468,11 +472,13 @@ $ P = mat(
 
 $ 
 ==
-#side-by-side[ $ f(bold(P)  vec(bold(x)_1, dots.v, bold(x)_n)) =  bold(P) f(vec(bold(x)_1, dots.v, bold(x)_n) ) $ #pause][$f$ is equivariant, order *does* matter] #pause
+#side-by-side[ $ f(bold(P)  vec(bold(x)_1, dots.v, bold(x)_n)) !=  bold(P) f(vec(bold(x)_1, dots.v, bold(x)_n) ) $ #pause][$f$ is equivariant, order *does* matter] #pause
 
 #side-by-side[ $ f(bold(P) vec(bold(x)_1, dots.v, bold(x)_n)) =  bold(P) f(vec(bold(x)_1, dots.v, bold(x)_n) ) $ #pause][$f$ is equivariant, order *does not* matter]
 
-Which is a transformer?
+Which is a transformer? #pause
+
+MLP is equivariant, but what about attention? #pause
 
 ==
 Recall dot product self attention #pause
@@ -487,6 +493,20 @@ bold(V) &= mat(bold(v)_1, bold(v)_2, dots, bold(v)_T) &&= mat(bold(theta)_V^top 
 $ #pause
 
 $ "attn"(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( (bold(Q) bold(K)^top) / sqrt(d_h)) bold(V) $ 
+
+==
+Permuting the inputs reorders $bold(Q), bold(K), bold(V)$ #pause
+
+$
+bold(P) bold(Q) &= mat(bold(q)_T, bold(q)_1, dots, bold(q)_2) &&= mat(bold(theta)_Q^top bold(x)_T, bold(theta)_Q^top bold(x)_1, dots, bold(theta)_Q^top bold(x)_2) \
+
+bold(P) bold(K) &= mat(bold(k)_T, bold(k)_1, dots, bold(k)_2) &&= mat(bold(theta)_K^top bold(x)_T, bold(theta)_K^top bold(x)_1, dots, bold(theta)_K^top bold(x)_2) \
+
+bold(P) bold(V) &= mat(bold(v)_T, bold(v)_1, dots, bold(v)_2) &&= mat(bold(theta)_V^top bold(x)_T, bold(theta)_V^top bold(x)_1, dots, bold(theta)_V^top bold(x)_2) quad
+
+$ #pause
+
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( ((bold(P) bold(Q)) (bold(P) bold(K))^top) / sqrt(d_h)) (bold(P) bold(V)) $ #pause
 
 ==
 $ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( ((bold(P) bold(Q)) (bold(P) bold(K))^top) / sqrt(d_h)) (bold(P) bold(V)) $ #pause
@@ -507,7 +527,13 @@ $ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P)  soft
 
 $ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P)  softmax( (bold(Q) bold(K)^top)  / sqrt(d_h) ) bold(P)^top (bold(P) bold(V)) $ #pause
 
-$ bold(P)^top bold(P) = bold(I); quad #pause "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P)  softmax( (bold(Q) bold(K)^top)  / sqrt(d_h) )  bold(V) $
+#side-by-side[$bold(P)$ swaps row $i$ and $j$ #pause][
+$bold(P)^T$ swaps row $j$ and $i$ #pause
+][
+    $bold(P)^top bold(P) = bold(I)$ #pause
+]
+
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P)  softmax( (bold(Q) bold(K)^top)  / sqrt(d_h) )  bold(V) $
 
 ==
 $ 
@@ -521,8 +547,13 @@ $ #pause
 *Answer:* Attention is equivariant, order *does not* matter
 
 ==
-Transformer cannot determine order of inputs! *Equivariant* to ordering #pause
+This makes sense, in our party example we never consider the order #pause
 
+#cimage("figures/lecture_11/composite_swift_einstein_attn_einstein.png") #pause
+
+Transformer cannot determine order of inputs! *Equivariant* to ordering 
+
+==
 The following sentences are the same to a transformer
 
 #side-by-side[
@@ -533,9 +564,122 @@ The following sentences are the same to a transformer
 
 This is a problem! For some tasks, we care about input order
 
+==
+*Question:* What are some ways we can introduce ordering? #pause
+
+*Answer 1:* We can introduce forgetting #pause
+
+*ALiBi:* _Press, Ofir, Noah Smith, and Mike Lewis. "Train Short, Test Long: Attention with Linear Biases Enables Input Length Extrapolation." International Conference on Learning Representations._ #pause
+
+*RoPE:* _Su, Jianlin, et al. "Roformer: Enhanced transformer with rotary position embedding." Neurocomputing._ #pause
+
+*Answer 2:* We can modify the inputs based on their ordering #pause
+
+We will focus on answer 2 because it is more common
+
+==
+
+#side-by-side[
+    $ "attn"(vec(bold(x)_1, bold(x)_2, dots.v, bold(x)_T), bold(theta)) $ #pause
+][
+    $ "attn"(vec(bold(x)_1, bold(x)_2, dots.v, bold(x)_T) + vec(f_"pos" (1), f_"pos" (2), dots.v, f_"pos" (3)), bold(theta)) $ #pause
+]
+
+Even if we permute the inputs, we still know the order! #pause
+
+$ "attn"(vec(bold(x)_T, bold(x)_1, dots.v, bold(x)_2) + vec(f_"pos" (T), f_"pos" (1), dots.v, f_"pos" (2)), bold(theta)) $ #pause
+
+==
+
+What is $f_"pos"$? #pause
+
+Easiest solution is just some random parameters #pause
+
+$ f(i) = vec(bold(theta)_1, bold(theta)_2, dots.v, bold(theta)_T)_i $ #pause
+
+If ordering matters, learn $bold(theta)$ to be different #pause
+
+If order does not matter, learn $bold(theta)$ to be the same/zero #pause
+
+In `torch`, this is called `nn.Embedding`
+
+==
+So, our final transformer is 
+
+```python
+class Transformer(nn.Module):
+    def __init__(self):
+        self.position_embedding = nn.Embedding(d_x)
+        self.block1 = TransformerBlock()
+        self.block2 = TransformerBlock()
+    
+    def forward(self, x):
+        x = x + embedding(torch.arange(x.shape[0]))
+        x = self.block1(x)
+        x = self.block2(x)
+        return x
+``` 
+
+= Applications
+
+==
+Now that we understand the transformer, how do we use it? #pause
+
+We can apply it to many domains, but today we will focus on text and images #pause
+
+
 = Text Transformers
+==
+In text transformers, we create a parameter for each word #pause
+
+We call these parameters *tokens* #pause
+
+The simple way is to create one parameter for each unique word in the dataset #pause
+
+Find unique words, and assign each one a parameter #pause
+
+$ "unique"(vec("John likes movies", "Mary likes movies", "I like dogs")) = mat("John", "likes", "movies", "Mary", "I", "dogs") $
+
+==
+Then assign a parameter to each word
+
+$ vec("John", "likes", "movies", "Mary", "I", "dogs") = vec(bold(theta)_1, bold(theta)_2, bold(theta)_3, bold(theta)_4,bold(theta)_5, bold(theta)_6) $
+
+$ mat(bold(theta)_1, bold(theta)_2, bold(theta)_3) = #pause "John likes movies" $
+
+$ mat(bold(theta)_4, bold(theta)_2, bold(theta)_1) = #pause "Mary likes John" $
+
+==
+```python
+unique_words = set(sentence.split(" ") for sentence in xs)
+tokens = {word: i for i, word in enumerate(unique_words)}
+embeddings = nn.Embedding(len(tokens), d_x)
+# Convert from words to parameters
+xs = []
+for sentence in sentences:
+    xs.append([])
+    for word in sentence:
+        index = embeddings[word]
+        token = tokens[index] 
+        xs.append(token)
+
+print(xs)
+>>> [[Tensor(...), Tensor(...), ...]]
+```
+===
+```python
+model = Transformer()
+for tokenized_sentence in xs:
+    # Convert list to tensor
+    x = torch.stack(tokenized_sentence)
+    y = model(x)
+
+```
+
 
 = Image Transformers
+
+==
 
 = Unsupervised Training
 
@@ -640,91 +784,6 @@ If you participated, come up
 // Do not understand time
 //
 // Transformers are an operation on *sets*
-
-#sslide[
-    *Question:* Do we care about the order of inputs $bold(x)_1, bold(x)_2, dots$ in attention? #pause
-
-    Let us see! #pause
-
-    Define a permutation matrix $bold(P) in {0, 1}^(T times T)$ #pause
-
-    *Example:*
-
-    $ P = mat(
-        1, 0, 0;
-        0, 1, 0;
-        0, 0, 1;
-    ); quad a = vec(3, 4, 5) $ #pause
-
-    $ P a = vec(3, 4, 5) $
-]
-
-#sslide[
-    *Example:*
-
-    $ P = mat(
-        0, 1, 0;
-        1, 0, 0;
-        0, 0, 1;
-    ); quad a = vec(3, 4, 5) $
-
-    $ P a = vec(4, 3, 5) $
-]
-
-#sslide[
-    Recall attention
-
-    $
-    bold(Q) = vec(bold(q)_1, bold(q)_2, dots.v, bold(q)_T) = vec(bold(theta)_Q^top bold(x)_1, bold(theta)_Q^top bold(x)_2, dots.v, bold(theta)_Q^top bold(x)_T) quad
-
-    bold(K) = vec(bold(k)_1, bold(k)_2, dots.v, bold(k)_T) = vec(bold(theta)_K^top bold(x)_1, bold(theta)_K^top bold(x)_2, dots.v, bold(theta)_K^top bold(x)_T) quad
-
-    bold(V) = vec(bold(v)_1, bold(v)_2, dots.v, bold(v)_T) = vec(bold(theta)_V^top bold(x)_1, bold(theta)_V^top bold(x)_2, dots.v, bold(theta)_V^top bold(x)_T) quad
-
-    $ #pause
-
-    $ "attn"(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( (bold(Q) bold(K)^top) / sqrt(d_h)) bold(V) $
-]
-
-#sslide[
-    What if we permute $mat(bold(x)_1, dots, bold(x)_T)^top$ by $bold(P)$? #pause
-
-    $ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( (bold(P) bold(Q) bold(P) bold(K)^top) / sqrt(d_h)) bold(P) bold(V) $
-
-    $
-    bold(P) bold(Q) = bold(P) vec(bold(q)_1, bold(q)_2, dots.v, bold(q)_T) quad
-
-    bold(P) bold(K) = bold(P) vec(bold(k)_1, bold(k)_2, dots.v, bold(k)_T)  quad
-
-    bold(P) bold(V) = bold(P) vec(bold(v)_1, bold(v)_2, dots.v, bold(v)_T)  quad
-
-    $ #pause
-
-]
-
-#sslide[
-    *Example:* #pause
-
-    $ "attn"(vec(bold(x)_T, bold(x)_1, dots.v, bold(x)_2), bold(theta)) = softmax( (bold(Q)_P bold(K)_P^top) / sqrt(d_h)) bold(V)_P $ #pause
-
-    $
-    bold(Q)_P = vec(bold(q)_T, bold(q)_1, dots.v, bold(q)_2) quad
-
-    bold(K)_P = vec(bold(k)_T, bold(k)_1, dots.v, bold(k)_2)  quad
-
-    bold(V)_P = vec(bold(v)_T, bold(v)_1, dots.v, bold(v)_2)  quad
-
-    $
-
-]
-
-#sslide[
-    $ bold(P) "attn"(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) $
-
-    Attention is *permutation equivariant* #pause
-
-    Order of the inputs does not matter
-]
 
 #sslide[
     This makes sense, in our party example with attention we never consider the order #pause
