@@ -7,6 +7,7 @@
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
 #let argmin = $op("arg min", limits: #true)$
+#let softmax= $op("softmax", limits: #true)$
 
 #let cimage(..args) = { 
   align(center + horizon, image(..args))

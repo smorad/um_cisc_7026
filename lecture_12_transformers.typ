@@ -348,35 +348,194 @@ Now, let's combine residual connections and layer norm and try our very deep net
 
 TODO COLAB
 
-==
-
-$ bold(z) = f_1 (bold(x), bold(theta)) = sum_(i=1)^(1000) 0.01 dot 1 = 10 $ #pause
-
-$ f_2 (bold(z), bold(theta)) = sum_(i=1)^(1000) 0.01 dot 10 = 100 $ #pause
-
-==
-Layer Norm
-
-Initialization and L2 normalization keep the weights small
-
-But the outputs of each layer can still be large or small
-
-Chain rule example
-
 = Transformers
 
 ==
-Now we have everything we need to implement a transformer
+Now we have everything we need to implement a transformer #pause
+- Attention #pause
+- MLP #pause
+- Residual connections #pause
+- Layer normalization
+
+A deep neural network consists of many layers #pause
+
+A transformer consists of many *transformer blocks*
+
+==
+```python
+class TransformerBlock(nn.Module):
+    def __init__(self):
+        self.attn = Attention()
+        self.mlp = Sequential(
+            Linear(d_h, d_h), LeakyReLU(), Linear(d_h, d_h))
+        self.norm1 = nn.LayerNorm(d_h)
+        self.norm2 = nn.LayerNorm(d_h)
+
+    def forward(self, x):
+        x = self.norm1(self.attn(x) + x)
+        x = self.norm2(self.mlp(x) + x)
+        return x
+```
+==
+```python
+class Transformer(nn.Module):
+    def __init__(self):
+        self.block1 = TransformerBlock()
+        self.block2 = TransformerBlock()
+        self.block3 = TransformerBlock()
+    
+    def forward(self, x):
+        x = self.block1(x)
+        x = self.block2(x)
+        x = self.block3(x)
+        return x
+``` #pause
+
+*Question:* What are the input/output shapes of the transformer? #pause
+
+*Answer:* $f: bb(R)^(T times d_x) |-> bb(R)^(T times d_h)$
+
+
 
 // Can use for all sorts of problems
 // x can be image, text etc
 
 = Positional Encoding
 
+==
+Our transformer maps $T$ inputs to $T$ outputs #pause
+- $T$ words in a sentence #pause
+- $T$ pixels in an image #pause
+- $T$ amino acids in a protein #pause
+
+*Question:* Does the order of the $T$ inputs matter? #pause
+
+*Answer:* In some tasks, yes! In others, no
+
+==
+
+*Question:* Detecting birds in an image of $T$ pixels, does order matter? #pause
+
+#cimage("figures/lecture_7/permute.jpg") #pause
+
+*Answer:* Yes! 
+
+==
+
+*Question:* $T$ robots searching for an object. Does order matter? #pause
+
+#cimage("figures/lecture_12/robomaster.png", height: 70%) #pause
+
+*Answer:* No!
+
+==
+
+*Question:* We translate a sentence containing $T$ words. Does order matter?
+
+#side-by-side[
+    $ vec(bold(x)_1, bold(x)_2, bold(x)_3, bold(x)_4, bold(x)_5) = vec("The", "dog", "licks", "the", "owner") $ #pause
+][
+    $ vec(bold(x)_1, #redm[$bold(x)_5$], bold(x)_3, bold(x)_4, #redm[$bold(x)_2$]) = vec("The", "owner", "licks", "the", "dog") $
+] #pause
+
+*Answer:* Yes!
+
+
+==
+For some tasks, we must know the order of the inputs #pause
+
+*Question:* Does the transformer know the order of the $T$ inputs? #pause
+
+Define a *permutation matrix* $bold(P) in {0, 1}^(T times T)$ that reorders the inputs #pause
+
+==
+
+*Example 1:*
+
+$ P = mat(
+    1, 0, 0;
+    0, 1, 0;
+    0, 0, 1;
+); quad a = vec(3, 4, 5); #pause quad P a = vec(3, 4, 5) $ #pause
+
+*Example 2:* 
+
+$ P = mat(
+    0, 1, 0;
+    1, 0, 0;
+    0, 0, 1;
+); quad a = vec(3, 4, 5); #pause quad P a = vec(4, 3, 5) $  $
+
+$ 
+==
+#side-by-side[ $ f(bold(P)  vec(bold(x)_1, dots.v, bold(x)_n)) =  bold(P) f(vec(bold(x)_1, dots.v, bold(x)_n) ) $ #pause][$f$ is equivariant, order *does* matter] #pause
+
+#side-by-side[ $ f(bold(P) vec(bold(x)_1, dots.v, bold(x)_n)) =  bold(P) f(vec(bold(x)_1, dots.v, bold(x)_n) ) $ #pause][$f$ is equivariant, order *does not* matter]
+
+Which is a transformer?
+
+==
+Recall dot product self attention #pause
+
+$
+bold(Q) &= mat(bold(q)_1, bold(q)_2, dots, bold(q)_T) &&= mat(bold(theta)_Q^top bold(x)_1, bold(theta)_Q^top bold(x)_2, dots, bold(theta)_Q^top bold(x)_T) \
+
+bold(K) &= mat(bold(k)_1, bold(k)_2, dots, bold(k)_T) &&= mat(bold(theta)_K^top bold(x)_1, bold(theta)_K^top bold(x)_2, dots, bold(theta)_K^top bold(x)_T) \
+
+bold(V) &= mat(bold(v)_1, bold(v)_2, dots, bold(v)_T) &&= mat(bold(theta)_V^top bold(x)_1, bold(theta)_V^top bold(x)_2, dots, bold(theta)_V^top bold(x)_T) quad
+
+$ #pause
+
+$ "attn"(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( (bold(Q) bold(K)^top) / sqrt(d_h)) bold(V) $ 
+
+==
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( ((bold(P) bold(Q)) (bold(P) bold(K))^top) / sqrt(d_h)) (bold(P) bold(V)) $ #pause
+
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( bold(P) (bold(Q) (bold(P) bold(K))^top) / sqrt(d_h)) (bold(P) bold(V)) $ #pause
+
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( bold(P) (bold(Q) (bold(K)^top bold(P)^top)) / sqrt(d_h)) (bold(P) bold(V)) $ #pause
+
+==
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( bold(P) (bold(Q) (bold(K)^top bold(P)^top)) / sqrt(d_h)) (bold(P) bold(V)) $ #pause
+
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( bold(P) (bold(Q) bold(K)^top)  / sqrt(d_h) bold(P)^top ) (bold(P) bold(V)) $ #pause
+
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P)  softmax( (bold(Q) bold(K)^top)  / sqrt(d_h) bold(P)^top ) (bold(P) bold(V)) $ #pause
+
+==
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P)  softmax( (bold(Q) bold(K)^top)  / sqrt(d_h) bold(P)^top ) (bold(P) bold(V)) $ #pause
+
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P)  softmax( (bold(Q) bold(K)^top)  / sqrt(d_h) ) bold(P)^top (bold(P) bold(V)) $ #pause
+
+$ bold(P)^top bold(P) = bold(I); quad #pause "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P)  softmax( (bold(Q) bold(K)^top)  / sqrt(d_h) )  bold(V) $
+
+==
+$ 
+"attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) & = bold(P)  softmax( (bold(Q) bold(K)^top)  / sqrt(d_h) )  bold(V) \  #pause
+
+f(bold(P) vec(bold(x)_1, dots.v, bold(x)_n)) &= bold(P) f(vec(bold(x)_1, dots.v, bold(x)_n) ) 
+$ #pause
+
+*Question:* What does this mean? #pause
+
+*Answer:* Attention is equivariant, order *does not* matter
+
+==
+Transformer cannot determine order of inputs! *Equivariant* to ordering #pause
+
+The following sentences are the same to a transformer
+
+#side-by-side[
+    $ vec(bold(x)_1, bold(x)_2, bold(x)_3, bold(x)_4, bold(x)_5) = vec("The", "dog", "licks", "the", "owner") $ #pause
+][
+    $ vec(bold(x)_1, #redm[$bold(x)_5$], bold(x)_3, bold(x)_4, #redm[$bold(x)_2$]) = vec("The", "owner", "licks", "the", "dog") $
+] #pause
+
+This is a problem! For some tasks, we care about input order
+
 = Text Transformers
 
 = Image Transformers
-
 
 = Unsupervised Training
 
@@ -442,7 +601,6 @@ If you participated, come up
             self.norm2 = nn.LayerNorm(d_h)
 
         def forward(self, x):
-            # Residual connection
             x = self.norm1(self.attn(x) + x)
             x = self.norm2(self.mlp(x) + x)
             return x
