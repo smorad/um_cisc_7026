@@ -834,46 +834,53 @@ What about text transformers?
     The Books3 dataset contains 200,000 books #pause
 
     We train the model to predict the ending of all these books
-
 ]
 
 ==
+We can apply this same concept to: #pause
+- Predict missing base pairs in a strand of DNA #pause
+- Predict missing audio from a song #pause
+- Predict the outcome of particle collisions at the Large Hadron Supercollider #pause
 
-But what about models like: #pause
-    - ChatGPT #pause
-    - DinoV2 #pause
-
-We train these differently
-
-==
-We often follow a two-step process: #pause
-
-- Learn the structure of the world (unsupervised learning) #pause
-- Learn to be helpful to humans (reinforcement learning) #pause
+All we need is a large enough dataset!
 
 ==
-Reading a book next token completion
+What if we put the model in a robot? #pause
+
+Give the model what the robot sees and what the robot does #pause
+
+Predict what the robot will see next #pause
+
+We call this a *world model* #pause
 
 ==
 
-
-World modeling
-
-But
-
-Generative pretraining
-
-RL 
+#cimage("figures/lecture_12/world_model.png")
 
 ==
-Predict the future
+Soon, I will apply for a grant to train a world model #pause
 
-= World Models
+If I win, I will need help creating a robot dataset #pause
+
+I will need some humans to control our robots in the world #pause
+
+If you are interested, give me your email after class
 
 ==
-What if transformers could interact with the world?
+These transformers learn and understand the structure of our world #pause
 
-==
+But their understanding is trapped #pause
+
+They can only finish sentences or complete pictures #pause
+
+How can we use this strong understanding to help humans? #pause
+- Identify pictures of cancer #pause
+- Make scientific discoveries #pause
+- Minimize human suffering #pause
+
+Today, we use *reinforcement learning*
+
+We will formally introduce reinforcement learning next lecture
 
 = Closing Remarks
 
@@ -895,7 +902,7 @@ We built up concepts until we reached the modern age #pause
 We learned about: #pause
     #side-by-side(align: left)[
         - Linear regression #pause
-        - Nonlinear/polynomial regression #pause
+        - Polynomial regression #pause
         - Biological neurons #pause
         - Artificial neurons #pause
         - Perceptrons #pause
@@ -903,9 +910,9 @@ We learned about: #pause
         - Gradient descent #pause
         - Classification #pause
         - Parameter initialization #pause
+        - Many activation functions #pause
     ][
         //- Deep neural networks #pause
-        - Many activation functions #pause
         - Stochastic gradient descent #pause
         - RMSProp and Adam #pause
         - Convolutional neural networks #pause
@@ -914,13 +921,16 @@ We learned about: #pause
         - Autoencoders #pause
         - Variational autoencoders #pause
         - Graph neural networks #pause
-        - Attention and transformers
+        - Attention and transformers #pause
+        - Generative pre-training 
     ]
 
 ==
-Now, you have the tools to continue studying deep learning #pause
+There are many more topics to cover! #pause
 
-You also have the ability to train neural networks and solve real problems
+Now, you have the tools to study deep learning #pause
+
+You have the tools to train neural networks for real problems
 
 ==
 In the first lecture, I asked everyone in this class for something #pause
@@ -928,8 +938,6 @@ In the first lecture, I asked everyone in this class for something #pause
 *Question:* Do you remember what it was? 
 
 ==
-  You are now experts at deep learning #pause
-
   Deep learning is a powerful tool #pause
 
   Like all powerful tools, deep learning can be used for good or evil #pause
@@ -941,7 +949,7 @@ In the first lecture, I asked everyone in this class for something #pause
   ][
     - Making DeepFakes #pause
     - Weapon guidance systems #pause
-    - Discrimination
+    - Discrimination #pause
   ]
 
   #v(2em)
@@ -958,9 +966,9 @@ Your feedback will impact future courses (and my job) #pause
 
 If you like the course, please say it! #pause
 
-Your likes/dislikes will filter into your future courses #pause
+Please be specific on what you like and do not like #pause
 
-If you are not comfortable writing English, write Chinese #pause
+Your likes/dislikes will change your future courses 
 
 == 
 
@@ -970,9 +978,11 @@ Please scan the QR code and complete the survey #pause
 
 Department has suggested 10 minutes #pause
 
-https://isw.um.edu.mo/siaweb
+I will return in 10 minutes #pause
+
+https://isw.um.edu.mo/siaweb 
 
 ==
-Research data labeling and collection
-
-If you participated, come up
+If you participated in class come see me after class #pause
+    - Answered a question #pause
+    - Asked a question
