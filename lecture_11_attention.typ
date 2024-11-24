@@ -916,7 +916,6 @@
     ][
     $ lambda(vec(bold(x)_1, dots.v, bold(x)_5), bold(theta)_lambda)_5 \ dot bold(theta)^top overline(bold(x))_5 $
     ] #pause
-
 ]
 
 

@@ -145,40 +145,143 @@ $ gamma^1 bold(theta)^top overline(bold(x))_4 $
 ][
 $ gamma^0 bold(theta)^top overline(bold(x))_5 $
 ] #pause
-With our current model, we forget Taylor Swift! #pause
+With composite memory, we forget Taylor Swift! #pause
 
 
-Our model of human memory is incomplete
-
-== 
-
+Our model of human memory was incomplete
 
 == 
-Last time we studied attention #pause
 
-Overview of transformer application and domains
+So we introduced *attention* #pause
+
+The attention we pay to person $i$ is
+
+$ lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i 
+= softmax(vec(
+    bold(theta)_lambda^top overline(bold(x))_1,
+    dots.v,
+    bold(theta)_lambda^top overline(bold(x))_T,
+))_i 
+= exp(bold(theta)^top_lambda overline(bold(x))_i) 
+    / (sum_(j=1)^T exp(bold(theta)^top_lambda overline(bold(x))_j)) 
+$
+
+==
+#cimage("figures/lecture_11/composite_swift.png") #pause
+
+#side-by-side[
+$ lambda(vec(bold(x)_1, dots.v, bold(x)_5), bold(theta)_lambda)_1 \ dot bold(theta)^top overline(bold(x))_1 $ #pause
+][
+$ lambda(vec(bold(x)_1, dots.v, bold(x)_5), bold(theta)_lambda)_2 \ dot bold(theta)^top overline(bold(x))_2 $ #pause
+][
+$ lambda(vec(bold(x)_1, dots.v, bold(x)_5), bold(theta)_lambda)_3 \ dot bold(theta)^top overline(bold(x))_3 $ #pause
+][
+$ lambda(vec(bold(x)_1, dots.v, bold(x)_5), bold(theta)_lambda)_4 \ dot bold(theta)^top overline(bold(x))_4 $ #pause
+][
+$ lambda(vec(bold(x)_1, dots.v, bold(x)_5), bold(theta)_lambda)_5 \ dot bold(theta)^top overline(bold(x))_5 $
+] 
+
+==
+#cimage("figures/lecture_11/composite_softmax.png") #pause
+
+#side-by-side[
+$ 0.70 dot bold(theta)^top overline(bold(x))_1 $ #pause
+][
+$ 0.04 dot bold(theta)^top overline(bold(x))_2 $ #pause
+][
+$ 0.03 dot bold(theta)^top overline(bold(x))_3 $ #pause
+][
+$ 0.20 dot bold(theta)^top overline(bold(x))_4 $ #pause
+][
+$ 0.03 dot bold(theta)^top overline(bold(x))_5 $
+] #pause
+
+$ 0.70 + 0.04 + 0.03 + 0.20 + 0.03 = 1.0 $
+
+==
+
+Then, we introduced *keys* and *queries* #pause
+
+*Query:* Which person will help me on my exam? #pause
+
+#only((3,4))[
+    #cimage("figures/lecture_11/composite_swift_einstein.svg")
+] #pause
+
+#side-by-side[Musician][Lawyer][Shopkeeper][Chef][Scientist] #pause
+
+#only(5)[#cimage("figures/lecture_11/composite_swift_einstein_attn_einstein.png")]
+
+==
+$ bold(K) 
+    = mat(bold(k)_1, bold(k)_2, dots, bold(k)_T) 
+    = mat(bold(theta)_K^top bold(x)_1, bold(theta)_K^top bold(x)_2, dots, bold(theta)_K^top bold(x)_T), 
+    quad bold(K) in bb(R)^(d_h times T) 
+$ #pause
+
+$ bold(q) = bold(theta)^top_Q bold(x)_q,  quad bold(theta)_Q in bb(R)^(d_x times d_h), quad bold(q) in bb(R)^(d_h) $ #pause
+
+$ lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) 
+    &= softmax(bold(q)^top bold(K)) 
+    = softmax(bold(q)^top mat(bold(k)_1, bold(k)_2, dots, bold(k)_T)) 
+    \ &= softmax(mat( 
+    bold(q)^top bold(k)_1,
+    bold(q)^top bold(k)_2,
+    dots,
+    bold(q)^top bold(k)_T,
+    //(bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_1),
+    //(bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_2),
+)) $ #pause
+
+We call this *dot-product attention* #pause
+
+Then we add attention back to the composite model
+
+==
+
+$ f(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = sum_(i=1)^T bold(theta)^top bold(x)_i dot lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i
+$ #pause
+
+We relabel $bold(theta)$ to $bold(theta)_V$
+
+$ f(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = sum_(i=1)^T bold(theta)_#redm[$V$]^top bold(x)_i dot lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i $ #pause
+
+In dot-product attention, we call $bold(theta)_V^top bold(x)_i$ the *value*
+==
+
+In *dot product self attention* we create queries for all inputs #pause
+
+$ bold(Q) = mat(bold(q)_1, bold(q)_2, dots, bold(q)_T) = mat(bold(theta)_Q^top bold(x)_1, bold(theta)_Q^top bold(x)_2, dots, bold(theta)_Q^top bold(x)_T), quad bold(Q) in bb(R)^(T times d_h) $ #pause
+
+==
+Attention looks messy, but we can rewrite it in matrix form #pause
+
+$
+bold(Q) &= mat(bold(q)_1, bold(q)_2, dots, bold(q)_T) &&= mat(bold(theta)_Q^top bold(x)_1, bold(theta)_Q^top bold(x)_2, dots, bold(theta)_Q^top bold(x)_T) \
+
+bold(K) &= mat(bold(k)_1, bold(k)_2, dots, bold(k)_T) &&= mat(bold(theta)_K^top bold(x)_1, bold(theta)_K^top bold(x)_2, dots, bold(theta)_K^top bold(x)_T) \
+
+bold(V) &= mat(bold(v)_1, bold(v)_2, dots, bold(v)_T) &&= mat(bold(theta)_V^top bold(x)_1, bold(theta)_V^top bold(x)_2, dots, bold(theta)_V^top bold(x)_T) quad
+
+$ #pause
+
+$ "attn"(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( (bold(Q) bold(K)^top) / sqrt(d_h)) bold(V) $ #pause
+
+This operation powers today's biggest models
 
 = Going Deeper
 
-==
-We previously reviewed training tricks #pause
-
-- Deeper networks #pause
-- Parameter initialization #pause
-- Stochastic gradient descent #pause
-- Adaptive optimization #pause
-- Weight decay #pause
-
-These methods empirically improve performance, but we do not always understand why 
 
 ==
 Modern transformers can be very deep #pause
 
-For this reason, they use two new training tricks to enable very deep models #pause
-- Residual connections #pause
-- Layer normalization #pause
+Very deep networks require two new training tricks #pause
 
-Let us introduce these tricks #pause
+We must understand these tricks before implementing the transformer #pause
+
+*Trick 1:* Residual connections #pause
+
+*Trick 2:* Layer normalization #pause
 
 We will start with the *residual connection*
 
@@ -191,8 +294,8 @@ This is only as the width of the network goes to infinity #pause
 
 For certain problems, we need deeper networks #pause
 
-==
 But there is a limit! #pause
+==
 
 Making the network too deep can hurt performance #pause
 
@@ -203,11 +306,13 @@ $ bold(y) = f_k ( dots f_2 ( f_1 (bold(x), bold(theta)_1), bold(theta_2)), dots,
 ==
 $ bold(y) = f_k ( dots f_2 ( f_1 (bold(x), bold(theta)_1), bold(theta_2)), dots, bold(theta)_k) $
 
-*Claim:* If the input information is present throughout the network, then we should be able to learn the identity function $f(x) = x$ #pause
+*Claim:* If the input information is present in all layers of the network, then we should be able to learn the identity function $f(x) = x$ #pause
 
 $ bold(x) = f_k ( dots f_2 ( f_1 (bold(x), bold(theta)_1), bold(theta_2)), dots, bold(theta)_k) $
 
 *Question:* We have seen a similar model, what was it? #pause
+
+*Answer:* Autoencoder! But it was just two functions, not $k$ functions #pause
 
 *Question:* Do you agree or disagree with the claim? #pause
 
@@ -218,7 +323,7 @@ $ bold(x) = f_k ( dots f_2 ( f_1 (bold(x), bold(theta)_1), bold(theta_2)), dots,
 
 Very deep networks struggle to learn the identity function #pause
 
-If the input information is available, then learning the identity function should be very easy!
+If the input information is available, then learning the identity function should be very easy! #pause
 
 *Question:* How can we prevent the input from getting lost?
 
@@ -262,35 +367,45 @@ $ #pause
 
 This allows information to flow around the layers #pause
 
-It requires much fewer parameters than a dense net, but also does not work as well #pause
+Fewer parameters than a DenseNet, but performs slightly worse #pause
+
+For very deep networks, we use ResNets over DenseNets
 
 ==
 
 We call $f(bold(x)) + bold(x)$ a *residual connection* #pause
 
-Instead of learning how to change $bold(x)$, $f$ learns what to add to $bold(x)$ #pause
+$ underbrace(f(bold(x)), "Residual") + bold(x) $  #pause
 
-For example, for an identity function we can easily learn 
-$ f(bold(x), bold(theta)) = 0; quad f(bold(x), bold(theta)) + x = x $ #pause
+Instead of learning how to change $bold(x)$, $f$ learns the residual of $bold(x)$ #pause
 
-This helps prevent information from getting lost in very deep networks
+Think of the residual as a small change to $f$ 
+
+$ f(bold(x), bold(theta)) + bold(x) = bold(epsilon) + bold(x) $ #pause
+
+This prevents the input $bold(x)$ from getting lost in very deep networks
+
+//For example, for an identity function we can easily learn 
+//$ f(bold(x), bold(theta)) = 0; quad f(bold(x), bold(theta)) + x = x $ #pause
+
 
 ==
 The second trick is called *layer normalization* #pause
 
-Recall that with parameter initialization and weight decay, we ensure the parameters are fairly small #pause
+With parameter initialization and weight decay, we ensure the parameters are fairly small #pause
 
 But we can still have very small or very large outputs from each layer #pause
 
 $ f_1 (bold(x), bold(theta)_1) = sum_(i=1)^(d_x) theta_(1, i) x_i $ #pause
 
 *Question:* If all $x_i = 1$, $theta_(1, i) = 0.01$ and $d_x = 1000$, what is the output?
+
 ==
 $ f_1 (bold(x), bold(theta)_1) = sum_(i=1)^(d_x) theta_(1, i) x_i $ #pause
 
 $ f_1 (bold(x), bold(theta)_1) = sum_(i=1)^(1000) 0.01 dot 1 = 10 $ #pause
 
-What if we add another layer with the same $d_x$ and $theta$?
+What if we add another layer with the same $d_x$ and $theta$? #pause
 
 $ f_2 (bold(z), bold(theta)_2) = sum_(i=1)^(1000) 0.01 dot 10 = 100 $ #pause
 
@@ -304,9 +419,9 @@ $ gradient_bold(theta_1) f_2( f_1(bold(x), bold(theta)_1), bold(theta)_2) &= #pa
 
 Can cause exploding or vanishing gradient #pause
 
-Deeper network $=>$ worse exploding/vanishing issues
+Deeper network $=>$ worse exploding/vanishing issues #pause
 
-*Question:* What can we do? #pause
+*Question:* What can we do? 
 
 ==
 
@@ -321,17 +436,16 @@ $ f(bold(x), bold(theta)) - mu $
 
 *Question:* What does this do? #pause
 
-*Answer:* Makes output have zero mean (both positive and negative values)  #pause
+*Answer:* Creates zero-mean output (both positive and negative values)  
 
 ==
-#side-by-side[$ mu = d_y sum_(i=1)^(d_y) f(bold(x), bold(theta))_i $][$ f(bold(x), bold(theta)) - mu $]
+#side-by-side[$ mu = d_y sum_(i=1)^(d_y) f(bold(x), bold(theta))_i $][$ f(bold(x), bold(theta)) - mu $] #pause
 
-Then, layer normalization *rescales* the outputs
+Then, layer normalization *rescales* the outputs #pause
 
-$ sigma = sqrt(sum_(i=1)^(d_y) f(bold(x), bold(theta)_i - mu)^2) / d_y $
+$ sigma = sqrt(sum_(i=1)^(d_y) f(bold(x), bold(theta)_i - mu)^2) / d_y $ #pause
 
-
-$ "LN"(f(bold(x), bold(theta))) = (f(bold(x), bold(theta)) - mu) / sigma $
+$ "LN"(f(bold(x), bold(theta))) = (f(bold(x), bold(theta)) - mu) / sigma $ #pause
 
 Now, the output of the layer is normally distributed
 
@@ -346,7 +460,7 @@ This helps prevent vanishing and exploding gradients
 
 Now, let's combine residual connections and layer norm and try our very deep network again
 
-TODO COLAB
+https://colab.research.google.com/drive/1qVIbQKpTuBYIa7FvC4IH-kJq-E0jmc0d#scrollTo=iQtXjGYiz5CD
 
 = Transformers
 
@@ -355,34 +469,33 @@ Now we have everything we need to implement a transformer #pause
 - Attention #pause
 - MLP #pause
 - Residual connections #pause
-- Layer normalization
+- Layer normalization #pause
 
-A deep neural network consists of many layers #pause
-
-A transformer consists of many *transformer blocks*
+A transformer consists of many *transformer layers*
 
 ==
 ```python
-class TransformerBlock(nn.Module):
+class TransformerLayer(nn.Module):
     def __init__(self):
         self.attn = Attention()
         self.mlp = Sequential(
             Linear(d_h, d_h), LeakyReLU(), Linear(d_h, d_h))
-        self.norm1 = nn.LayerNorm(d_h)
-        self.norm2 = nn.LayerNorm(d_h)
+        self.norm = nn.LayerNorm(
+            d_h, elementwise_affine=False)
 
     def forward(self, x):
-        x = self.norm1(self.attn(x) + x)
-        x = self.norm2(self.mlp(x) + x)
+        # Residual connection and layer norm
+        x = self.norm(self.attn(x) + x)
+        x = self.norm(self.mlp(x) + x)
         return x
 ```
 ==
 ```python
 class Transformer(nn.Module):
     def __init__(self):
-        self.block1 = TransformerBlock()
-        self.block2 = TransformerBlock()
-        self.block3 = TransformerBlock()
+        self.block1 = TransformerLayer()
+        self.block2 = TransformerLayer()
+        self.block3 = TransformerLayer()
     
     def forward(self, x):
         x = self.block1(x)
@@ -393,7 +506,7 @@ class Transformer(nn.Module):
 
 *Question:* What are the input/output shapes of the transformer? #pause
 
-*Answer:* $f: bb(R)^(T times d_x) |-> bb(R)^(T times d_h)$
+*Answer:* $f: bb(R)^(T times d_x) times Theta |-> bb(R)^(T times d_y)$
 
 
 
@@ -434,7 +547,7 @@ $ f: bb(R)^(T times d_x) times Theta |-> bb(R)^(T times d_y) $ #pause
 
 ==
 
-*Question:* We translate a sentence containing $T$ words. Does order matter?
+*Question:* We translate a sentence containing $T$ words. Does order matter? #pause
 
 #side-by-side[
     $ vec(bold(x)_1, bold(x)_2, bold(x)_3, bold(x)_4, bold(x)_5) = vec("The", "dog", "licks", "the", "owner") $ #pause
@@ -610,8 +723,8 @@ So, our final transformer is
 class Transformer(nn.Module):
     def __init__(self):
         self.position_embedding = nn.Embedding(d_x)
-        self.block1 = TransformerBlock()
-        self.block2 = TransformerBlock()
+        self.block1 = TransformerLayer()
+        self.block2 = TransformerLayer()
     
     def forward(self, x):
         x = x + embedding(torch.arange(x.shape[0]))
@@ -754,6 +867,30 @@ We can mask/hide part of the input, and train the model to predict the missing p
 Another name for this is *generative pre-training* (GPT) #pause
 
 This method is *extremely* powerful
+
+==
+
+We pose the following objective #pause
+
+$ argmin_bold(theta) cal(L)(vec(bold(x)_1, dots.v, bold(x)_(T-1)), bold(theta)) = argmin_bold(theta) [ -log P(bold(x)_T | bold(x)_1, dots, bold(x)_(T - 1); bold(theta)) ] $ #pause
+
+$ P(vec("movies", "mary", "dogs") mid(|) "John", "likes"; bold(theta)) = vec(0.5, 0.3, 0.2) $ #pause
+
+$ P("movies" | "John", "likes"; bold(theta)) = 0.5 $ #pause
+
+Update $bold(theta)$ so that $P("movies" | "John", "likes"; bold(theta)) = 1.0$ 
+
+==
+We pose the following loss function #pause
+
+$ argmin_bold(theta) cal(L)(vec(bold(x)_1, dots.v, bold(x)_(T-1)), bold(theta)) = argmin_bold(theta) [-log P(bold(x)_T | bold(x)_1, dots, bold(x)_(T - 1); bold(theta))] $ #pause
+
+For pixels, the square error represents a normal distribution over pixel values #pause
+
+$ argmin_bold(theta) [-log P("pixel_3" | "pixel_1", "pixel_2"; bold(theta))] \ 
+= argmin_bold(theta) (f(vec("pixel_1", "pixel_2"), bold(theta)) - "pixel_3" )^2 $
+
+
 
 ==
 
@@ -926,11 +1063,14 @@ We learned about: #pause
     ]
 
 ==
-There are many more topics to cover! #pause
+I hope you enjoyed the course! #pause
 
-Now, you have the tools to study deep learning #pause
+But there are many more topics to learn! #pause
 
-You have the tools to train neural networks for real problems
+Now, you have the tools to study deep learning on your own #pause
+
+You have the tools to train neural networks for real problems #pause
+
 
 ==
 In the first lecture, I asked everyone in this class for something #pause
