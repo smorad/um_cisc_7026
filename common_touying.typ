@@ -1,5 +1,6 @@
 #import "@preview/touying:0.5.3": *
 #import themes.university: *
+#import "@preview/cetz:0.3.1"
 #import "@preview/cetz:0.3.1": canvas, draw
 #import "@preview/cetz-plot:0.1.0": plot, chart
 
@@ -124,3 +125,23 @@
       )
     })
 })}
+
+#let draw_filter(x, y, cells, colors: none) = {
+  import cetz.draw: *
+  grid((x, y), (x + cells.len(), y + cells.at(0).len()))
+  for i in range(cells.len()) {
+    for j in range(cells.at(i).len()) {
+      if (colors != none)  {
+        let cell_color = colors.at(cells.at(i).len() - j - 1).at(i)
+        if (cell_color != none){
+          rect((i, j), (i + 1, j + 1), fill: cell_color)
+        }
+        content((x + i + 0.4, y + j + 0.8), (i + 0.3, j + 0.8), cells.at(cells.at(i).len() - j - 1).at(i))
+
+      } else {
+        content((x + i + 0.05, y + j + 1.5), (i + 0.05, j + 1.5), text(cells.at(cells.at(i).len() - j - 1).at(i)))
+      }
+
+      }
+  }
+}

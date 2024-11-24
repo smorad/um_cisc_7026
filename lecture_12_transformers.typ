@@ -620,6 +620,11 @@ class Transformer(nn.Module):
         return x
 ``` 
 
+==
+Let us code up the transformer in colab 
+
+https://colab.research.google.com/drive/1qVIbQKpTuBYIa7FvC4IH-kJq-E0jmc0d#scrollTo=iQtXjGYiz5CD
+
 = Applications
 
 ==
@@ -680,8 +685,185 @@ for tokenized_sentence in xs:
 = Image Transformers
 
 ==
+In image transformers, we treat a *patch* of pixels as an $bold(x)$ #pause
+
+$ X in [0, 1]^(16 times 16) $ #pause
+
+  #align(center, cetz.canvas({
+    import cetz.draw: *
+
+
+  let image_values = (
+    ($bold(x)_1$, $bold(x)_2$,$bold(x)_3$, $bold(x)_4$, $bold(x)_5$, $bold(x)_6$, $bold(x)_7$, $bold(x)_8$),
+    ($bold(x)_9$, $dots$, " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+  )
+  content((4, 4), image("figures/lecture_7/ghost_dog.svg", width: 8cm))
+  draw_filter(0, 0, image_values)
+  })) 
+
+  ==
+```python
+# Convert image into patches
+patches = []
+for i in range(0, x.shape[0] - k + 1, k):
+    for j in range(0, x.shape[1] - k + 1, k):
+        patches.append(
+            x[i: i + k , j: j + k]
+        )
+patches = stack(patches, axis=0)
+print(patches.shape)
+>>> (T, k, k)
+
+model = Transformer()
+y = model(patches)
+```
 
 = Unsupervised Training
+
+==
+*Question:* How do we train transformers? #pause
+
+*Answer:* Can train just like other neural networks #pause
+- Classification loss #pause
+- Regression loss #pause
+
+In practice, transformers require lots of training data #pause
+
+There is almost infinite empirical scaling -- add more data, model becomes stronger #pause
+
+Transformers are limited by the size of datasets today #pause
+
+There are not enough students to label training data!
+
+==
+
+*Question:* How can we train transformers if we cannot create big enough datasets? #pause 
+
+*Answer:* We can use *unsupervised learning* #pause
+
+The internet contains billions of unlabeled sentences and images #pause
+
+We can mask/hide part of the input, and train the model to predict the missing parts #pause
+
+Another name for this is *generative pre-training* (GPT) #pause
+
+This method is *extremely* powerful
+
+==
+
+#side-by-side[#cimage("figures/lecture_9/masked.png") #pause][
+    _He, Kaiming, et al. "Masked autoencoders are scalable vision learners." Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. 2022._ #pause
+]
+
+==
+Anyone familiar with Da Vinci's painting _The Last Supper_? #pause
+
+#cimage("figures/lecture_12/last_supper.jpg", width: 80%)
+
+==
+#cimage("figures/lecture_12/last_supper_mask.png", width: 80%) #pause
+
+*Question*: What concepts does the vision transformer need to understand to predict the missing pixels?
+
+==
+
+#place(center, cimage("figures/lecture_12/last_supper_mask.png", width: 100%))
+
+#text(fill: orange)[
+
+Concepts the model must understand: #pause
+- This is a picture of a painting #pause 
+- The painting style is from the renaissance era #pause
+- Renaissance artists often painted religious figures #pause
+- Jesus was a religious figure #pause
+- Jesus had twelve disciples at his last supper #pause
+- There are twelve people in the image #pause
+- The twelve people are eating dinner #pause
+- Jesus is often depicted in a robe and sash
+]
+
+==
+We train the model to fix the image #pause
+
+To fix the image, the model must understand so much of our world #pause
+
+This is the power of generative pre-training #pause
+
+What about text transformers?
+
+==
+#side-by-side(align: top)[
+    #cimage("figures/lecture_12/murder.jpg")
+][
+    This is a mystery novel #pause
+
+    Clues, intrigue, murder, etc #pause
+
+    "Ah, said inspector Poirot, the murderer must be $underline(#h(4em))$." #pause
+
+    To complete the sentence, the model must understand:
+]
+==
+
+#side-by-side(align: top)[
+    #cimage("figures/lecture_12/murder.jpg")
+][
+    To complete the sentence, the model must understand: #pause
+    - What a murder is #pause
+    - What it means to be alive #pause
+    - Emotions like anger, jealousy, betrayal, love #pause
+    - Personalities of each character #pause
+    - Why a human would murder another human #pause
+    - How humans react to emotions #pause
+    - How to tell if someone lies 
+]
+
+==
+
+#side-by-side(align: top)[
+    #cimage("figures/lecture_12/murder.jpg")
+][
+    To predict the murderer, the model must understand so much about humans and our society #pause
+
+    The Books3 dataset contains 200,000 books #pause
+
+    We train the model to predict the ending of all these books
+
+]
+
+==
+
+But what about models like: #pause
+    - ChatGPT #pause
+    - DinoV2 #pause
+
+We train these differently
+
+==
+We often follow a two-step process: #pause
+
+- Learn the structure of the world (unsupervised learning) #pause
+- Learn to be helpful to humans (reinforcement learning) #pause
+
+==
+Reading a book next token completion
+
+==
+
+
+World modeling
+
+But
+
+Generative pretraining
+
+RL 
 
 ==
 Predict the future
@@ -690,6 +872,80 @@ Predict the future
 
 ==
 What if transformers could interact with the world?
+
+==
+
+= Closing Remarks
+
+==
+This is the last in-person lecture #pause
+
+I will record a video on reinforcement learning next week #pause
+
+I will be here from 7:00PM on December 2 for questions/discussin on reinforcement learning
+
+==
+In this course, we started from Gauss in 1795 #pause
+
+We built up concepts until we reached the modern age #pause
+
+#cimage("figures/lecture_1/timeline.svg")
+
+==
+We learned about: #pause
+    #side-by-side(align: left)[
+        - Linear regression #pause
+        - Nonlinear/polynomial regression #pause
+        - Biological neurons #pause
+        - Artificial neurons #pause
+        - Perceptrons #pause
+        - Backpropagation #pause
+        - Gradient descent #pause
+        - Classification #pause
+        - Parameter initialization #pause
+    ][
+        //- Deep neural networks #pause
+        - Many activation functions #pause
+        - Stochastic gradient descent #pause
+        - RMSProp and Adam #pause
+        - Convolutional neural networks #pause
+        - Composite memory #pause
+        - Recurrent neural networks #pause
+        - Autoencoders #pause
+        - Variational autoencoders #pause
+        - Graph neural networks #pause
+        - Attention and transformers
+    ]
+
+==
+Now, you have the tools to continue studying deep learning #pause
+
+You also have the ability to train neural networks and solve real problems
+
+==
+In the first lecture, I asked everyone in this class for something #pause
+
+*Question:* Do you remember what it was? 
+
+==
+  You are now experts at deep learning #pause
+
+  Deep learning is a powerful tool #pause
+
+  Like all powerful tools, deep learning can be used for good or evil #pause
+
+  #side-by-side(align: left)[
+    - COVID-19 vaccine #pause
+    - Creating art #pause
+    - Autonomous driving #pause
+  ][
+    - Making DeepFakes #pause
+    - Weapon guidance systems #pause
+    - Discrimination
+  ]
+
+  #v(2em)
+  #align(center)[*Before training a model, think about whether it is good or bad for the world*]
 
 = Course Evaluation
 
@@ -700,7 +956,7 @@ We take this feedback seriously #pause
 
 Your feedback will impact future courses (and my job) #pause
 
-Be specific on what you like and do not like #pause
+If you like the course, please say it! #pause
 
 Your likes/dislikes will filter into your future courses #pause
 
@@ -720,152 +976,3 @@ https://isw.um.edu.mo/siaweb
 Research data labeling and collection
 
 If you participated, come up
-
-
-/*
-#aslide(ag, 4)
-#aslide(ag, 5)
-
-#sslide[
-    Once you understand attention, transformers are simple #pause
-
-    Each transformer consists of many "transformer blocks" #pause
-
-    A transformer block is attention and an MLP
-]
-
-#sslide[
-    ```python
-    class TransformerBlock(nn.Module):
-        def __init__(self):
-            self.attn = Attention()
-            self.mlp = Sequential(
-                Linear(d_h, d_h), LeakyReLU(), Linear(d_h, d_h))
-            self.norm1 = nn.LayerNorm(d_h)
-            self.norm2 = nn.LayerNorm(d_h)
-
-        def forward(self, x):
-            x = self.norm1(self.attn(x) + x)
-            x = self.norm2(self.mlp(x) + x)
-            return x
-    ```
-]
-
-#sslide[
-    ```python
-    class Transformer(nn.Module):
-        def __init__(self):
-            self.block1 = TransformerBlock()
-            self.block2 = TransformerBlock()
-            ...
-        
-        def forward(self, x):
-            x = self.block1(x)
-            x = self.block2(x)
-            ...
-            return x
-    ```
-]
-
-#sslide[
-    ```python
-    ```
-]
-
-
-#aslide(ag, 5)
-#aslide(ag, 6)
-*/
-/*
-// Transformer operates ons equences
-// Set operation
-// Permutation invariant
-// Equation
-// Do not understand time
-//
-// Transformers are an operation on *sets*
-
-#sslide[
-    This makes sense, in our party example with attention we never consider the order #pause
-
-    #cimage("figures/lecture_11/composite_swift_einstein_attn_einstein.png") #pause
-
-    *Question:* Any situations where input order matters?
-]
-
-#sslide[
-    What about language? #pause
-
-    #side-by-side[
-        $ vec(bold(x)_1, bold(x)_2, bold(x)_3, bold(x)_4, bold(x)_5) = vec("The", "dog", "licks", "the", "owner") $ #pause
-    ][
-        $ vec(bold(x)_1, #redm[$bold(x)_5$], bold(x)_3, bold(x)_4, #redm[$bold(x)_2$]) = vec("The", "owner", "licks", "the", "dog") $
-    ] #pause
-
-    *Question:* Do these have the same meaning? #pause
-
-    To attention, these have the same meaning! #pause
-
-    We want to *break* the permutation equivariance for certain tasks
-]
-
-#sslide[
-    *Question:* What are some ways we can introduce ordering? #pause
-
-    *Answer 1:* We can introduce forgetting #pause
-
-    *ALiBi:* _Press, Ofir, Noah Smith, and Mike Lewis. "Train Short, Test Long: Attention with Linear Biases Enables Input Length Extrapolation." International Conference on Learning Representations._ #pause
-
-    *RoPE:* _Su, Jianlin, et al. "Roformer: Enhanced transformer with rotary position embedding." Neurocomputing._ #pause
-
-    *Answer 2:* We can modify the inputs based on their ordering #pause
-
-    We will focus on answer 2 because it was used first
-]
-
-#sslide[
-    *Approach 2:* Modify inputs based on ordering #pause
-
-    #side-by-side[
-        $ "attn"(vec(bold(x)_1, bold(x)_2, dots.v, bold(x)_T), bold(theta)) $ #pause
-    ][
-        $ "attn"(vec(bold(x)_1, bold(x)_2, dots.v, bold(x)_T) + vec(f_"pos" (1), f_"pos" (2), dots.v, f_"pos" (3)), bold(theta)) $ #pause
-    ]
-
-    $
-    bold(Q) = vec(bold(theta)_Q^top bold(x)_1, bold(theta)_Q^top bold(x)_2, dots.v, bold(theta)_Q^top bold(x)_T) quad
-
-    bold(K) = vec(bold(theta)_K^top bold(x)_1, bold(theta)_K^top bold(x)_2, dots.v, bold(theta)_K^top bold(x)_T) quad
-
-    bold(V) = vec(bold(theta)_V^top bold(x)_1, bold(theta)_V^top bold(x)_2, dots.v, bold(theta)_V^top bold(x)_T) quad
-
-    $ #pause
-
-]
-#sslide[
-    Now, keys and values 
-
-    Now what happens if we permute the inputs? #pause
-
-    $ "attn"(vec(bold(x)_1, bold(x)_2, dots.v, bold(x)_T) + vec(f_"pos" (1), f_"pos" (2), dots.v, f_"pos" (3)), bold(theta)) $ #pause
-
-    
-]
-
-#sslide[
-    ```python
-    class PositionalTransformer(nn.Module):
-        def __init__(self):
-            self.f_pos = nn.Embedding(1024, d_x)
-            self.block1 = TransformerBlock()
-            self.block2 = TransformerBlock()
-        
-        def forward(self, x):
-            timesteps = torch.arange(x.shape[0])
-            x = x + self.embedding(timesteps)
-            x = self.block1(x)
-            x = self.block2(x)
-            return x
-    ```
-]
-/*
