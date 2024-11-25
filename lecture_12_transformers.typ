@@ -6,8 +6,29 @@
 #import "@preview/cetz:0.3.1"
 #import "@preview/fletcher:0.5.1" as fletcher: node, edge
 
+// TODO: Move permutation to attention slide
+// cast it as a function over sets
+
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
+
+#let patch = align(center, cetz.canvas({
+    import cetz.draw: *
+
+
+  let image_values = (
+    ($bold(x)_1$, $bold(x)_2$,$bold(x)_3$, $bold(x)_4$, $bold(x)_5$, $bold(x)_6$, $bold(x)_7$, $bold(x)_8$),
+    ($bold(x)_9$, $dots$, " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+    (" ", " ", " ", " ", " ", " ", " ", " "),
+  )
+  content((4, 4), image("figures/lecture_7/ghost_dog.svg", width: 8cm))
+  draw_filter(0, 0, image_values)
+  })) 
 
 #let forgetting = { 
     set text(size: 22pt)
@@ -70,7 +91,7 @@
 
 ==
 // Made a mistake, softmax should be axis=1
-Last time, we derived various forms of *attention*
+Last time, we derived various forms of *attention* #pause
 
 We started with composite memory #pause
 
@@ -78,7 +99,7 @@ $ f(bold(x), bold(theta)) = sum_(i=1)^T bold(theta)^top overline(bold(x))_i $ #p
 
 Given large enough $T$, we will eventually run out of storage space #pause
 
-The sum is a *lossy* operation that can store a limited amount of information #pause
+The sum is a *lossy* operation that can store a limited amount of information
 
 == 
 So we introduced a forgetting term $gamma$ #pause
@@ -113,7 +134,7 @@ $ gamma^2 bold(theta)^top overline(bold(x))_2 $ #pause
 $ gamma^1 bold(theta)^top overline(bold(x))_3 $ #pause
 ][
 $ gamma^0 bold(theta)^top overline(bold(x))_4 $
-] #pause
+] 
 
 ==
 But we encountered problems when Taylor Swift arrived at the party #pause
@@ -130,7 +151,7 @@ $ gamma^2 bold(theta)^top overline(bold(x))_3 $
 $ gamma^1 bold(theta)^top overline(bold(x))_4 $
 ][
 $ gamma^0 bold(theta)^top overline(bold(x))_5 $
-] #pause
+] 
 
 == 
 #cimage("figures/lecture_11/composite_swift_fade.png")
@@ -267,7 +288,15 @@ $ #pause
 
 $ "attn"(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( (bold(Q) bold(K)^top) / sqrt(d_h)) bold(V) $ #pause
 
-This operation powers today's biggest models
+With attention, we can create the *transformer* #pause
+
+==
+Why should we care about the transformer? #pause
+
+It is arguably the most powerful neural network architecture today #pause
+- AlphaFold (Nobel prize) #pause
+- ChatGPT, Qwen, LLaMA, etc #pause
+- DinoV2 #pause
 
 = Going Deeper
 
@@ -292,23 +321,28 @@ $ | f(bold(x), bold(theta)) - g(bold(x)) | < epsilon $ #pause
 
 This is only as the width of the network goes to infinity #pause
 
-For certain problems, we need deeper networks #pause
+It is often more efficient to create deeper networks instead #pause
 
-But there is a limit! #pause
+But there is a limit! 
 ==
 
 Making the network too deep can hurt performance #pause
 
-The theory is that the input information is *lost* somewhere in the network #pause
+$ bold(y) = f_k ( dots f_2 ( f_1 (bold(x), bold(theta)_1), bold(theta_2)), dots, bold(theta)_k) $ #pause
 
-$ bold(y) = f_k ( dots f_2 ( f_1 (bold(x), bold(theta)_1), bold(theta_2)), dots, bold(theta)_k) $
+//The theory is that the input information is *lost* somewhere in the network #pause
+
+At each layer, we lose a little bit of information #pause
+
+With enough layers, all the information in $bold(x)$ is lost! 
+
 
 ==
-$ bold(y) = f_k ( dots f_2 ( f_1 (bold(x), bold(theta)_1), bold(theta_2)), dots, bold(theta)_k) $
+$ bold(y) = f_k ( dots f_2 ( f_1 (bold(x), bold(theta)_1), bold(theta_2)), dots, bold(theta)_k) $ #pause
 
 *Claim:* If the input information is present in all layers of the network, then we should be able to learn the identity function $f(x) = x$ #pause
 
-$ bold(x) = f_k ( dots f_2 ( f_1 (bold(x), bold(theta)_1), bold(theta_2)), dots, bold(theta)_k) $
+$ bold(x) = f_k ( dots f_2 ( f_1 (bold(x), bold(theta)_1), bold(theta_2)), dots, bold(theta)_k) $ #pause
 
 *Question:* We have seen a similar model, what was it? #pause
 
@@ -323,13 +357,13 @@ $ bold(x) = f_k ( dots f_2 ( f_1 (bold(x), bold(theta)_1), bold(theta_2)), dots,
 
 Very deep networks struggle to learn the identity function #pause
 
-If the input information is available, then learning the identity function should be very easy! #pause
+If the information from $bold(x)$ is present in every layer, then learning the identity function should be very easy! #pause
 
-*Question:* How can we prevent the input from getting lost?
+*Question:* How can we prevent $bold(x)$ from getting lost?
 
 ==
 
-We can feed the input to each layer #pause
+We can feed $bold(x)$ to each layer #pause
 
 // $ bold(x) = f_k ( dots f_2 ( f_1 (bold(x), bold(theta)_1), bold(theta_2)), dots, bold(theta)_k) $ #pause
 
@@ -373,17 +407,21 @@ For very deep networks, we use ResNets over DenseNets
 
 ==
 
-We call $f(bold(x)) + bold(x)$ a *residual connection* #pause
+ResNets use a *residual connection* #pause
 
-$ underbrace(f(bold(x)), "Residual") + bold(x) $  #pause
+#only(2)[$ bold(z) = f(bold(x), bold(theta)) + bold(x) $] #pause
 
-Instead of learning how to change $bold(x)$, $f$ learns the residual of $bold(x)$ #pause
+#only("3-")[$ bold(z) = underbrace(f(bold(x), bold(theta)), "Residual") + bold(x) $]  #pause
 
-Think of the residual as a small change to $f$ 
+Think of the residual as a small change to $bold(x)$ #pause
 
 $ f(bold(x), bold(theta)) + bold(x) = bold(epsilon) + bold(x) $ #pause
 
-This prevents the input $bold(x)$ from getting lost in very deep networks
+//Instead of learning how to change $bold(x)$, $f$ learns the residual of $bold(x)$ #pause
+
+Each layer is a small perturbuation of $bold(x)$ #pause
+
+This prevents $bold(x)$ from getting lost in very deep networks
 
 //For example, for an identity function we can easily learn 
 //$ f(bold(x), bold(theta)) = 0; quad f(bold(x), bold(theta)) + x = x $ #pause
@@ -396,7 +434,9 @@ With parameter initialization and weight decay, we ensure the parameters are fai
 
 But we can still have very small or very large outputs from each layer #pause
 
-$ f_1 (bold(x), bold(theta)_1) = sum_(i=1)^(d_x) theta_(1, i) x_i $ #pause
+And the magnitude of the outputs impacts the gradient #pause
+
+$ f_1 (bold(x), bold(theta)_1) = sum_(i=1)^(d_x) theta_(1, i) dot x_i $ #pause
 
 *Question:* If all $x_i = 1$, $theta_(1, i) = 0.01$ and $d_x = 1000$, what is the output?
 
@@ -415,24 +455,26 @@ $ f_2 (bold(z), bold(theta)_2) = sum_(i=1)^(1000) 0.01 dot 10 = 100 $ #pause
 Let us look at the gradient #pause
 
 $ gradient_bold(theta_1) f_2( f_1(bold(x), bold(theta)_1), bold(theta)_2) &= #pause gradient_bold(theta)_1 [f_2] (f_1(bold(x), bold(theta)_1)) dot gradient_bold(theta)_1 [f_1](bold(x), bold(theta)_1) \ #pause 
-& approx 100 dot 10 $
+& approx 100 dot 10 $ #pause
 
 Can cause exploding or vanishing gradient #pause
 
 Deeper network $=>$ worse exploding/vanishing issues #pause
 
-*Question:* What can we do? 
+*Question:* What can we do? #pause
+
+*Answer:* We can normalize the output of each layer
 
 ==
 
-We can use *layer normalization* #pause
+*Layer normalization* normalizes the output of a layer #pause
 
 // Layer normalization *centers* and *rescales* the outputs of a layer #pause
 First, layer normalization *centers* the output of the layer #pause
 
-$ mu = d_y sum_(i=1)^(d_y) f(bold(x), bold(theta))_i $
+$ mu = 1 / d_y sum_(i=1)^(d_y) f(bold(x), bold(theta))_i $ #pause
 
-$ f(bold(x), bold(theta)) - mu $
+$ f(bold(x), bold(theta)) - mu $ #pause
 
 *Question:* What does this do? #pause
 
@@ -441,13 +483,13 @@ $ f(bold(x), bold(theta)) - mu $
 ==
 #side-by-side[$ mu = d_y sum_(i=1)^(d_y) f(bold(x), bold(theta))_i $][$ f(bold(x), bold(theta)) - mu $] #pause
 
-Then, layer normalization *rescales* the outputs #pause
+Then, layer normalization *rescales* the output by standard deviation #pause
 
-$ sigma = sqrt(sum_(i=1)^(d_y) f(bold(x), bold(theta)_i - mu)^2) / d_y $ #pause
+$ sigma = sqrt(sum_(i=1)^(d_y) (f(bold(x), bold(theta))_i - mu)^2) / d_y $ #pause
 
 $ "LN"(f(bold(x), bold(theta))) = (f(bold(x), bold(theta)) - mu) / sigma $ #pause
 
-Now, the output of the layer is normally distributed
+Layer norm makes the output normally distributed, $y_i tilde cal(N)(0, 1)$
 
 ==
 If the output is normally distrbuted: #pause
@@ -493,14 +535,14 @@ class TransformerLayer(nn.Module):
 ```python
 class Transformer(nn.Module):
     def __init__(self):
-        self.block1 = TransformerLayer()
-        self.block2 = TransformerLayer()
-        self.block3 = TransformerLayer()
+        self.layer1 = TransformerLayer()
+        self.layer2 = TransformerLayer()
+        self.layer3 = TransformerLayer()
     
     def forward(self, x):
-        x = self.block1(x)
-        x = self.block2(x)
-        x = self.block3(x)
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
         return x
 ``` #pause
 
@@ -527,7 +569,9 @@ $ f: bb(R)^(T times d_x) times Theta |-> bb(R)^(T times d_y) $ #pause
 
 *Question:* Do we care about the order of the $T$ inputs? #pause
 
-*Answer:* In some tasks, yes! In others, no
+$ f(vec(bold(x)_1, bold(x)_2), bold(theta)) #text(size: 48pt)[$eq.quest$] f(vec(bold(x)_2, bold(x)_1), bold(theta)) $ #pause
+
+*Answer:* It depends. In some tasks, yes. In others, no
 
 ==
 
@@ -559,42 +603,46 @@ $ f: bb(R)^(T times d_x) times Theta |-> bb(R)^(T times d_y) $ #pause
 
 
 ==
-For some tasks, we must know the order of the inputs #pause
+For certain tasks, the order of inputs matters #pause
 
-*Question:* Does the transformer know the order of the $T$ inputs? #pause
+*Question:* Does the order matter to the transformer? 
 
-Define a *permutation matrix* $bold(P) in {0, 1}^(T times T)$ that reorders the inputs #pause
+$ f(vec(bold(x)_1, bold(x)_2), bold(theta)) #text(size: 48pt)[$eq.quest$] f(vec(bold(x)_2, bold(x)_1), bold(theta)) $ #pause
+
+Let us find out! #pause
+
+First, define a *permutation matrix* $bold(P) in {0, 1}^(T times T)$ that reorders the inputs #pause
 
 ==
 
 *Example 1:*
 
-$ P = mat(
+$ bold(P) = mat(
     1, 0, 0;
     0, 1, 0;
     0, 0, 1;
-); quad a = vec(3, 4, 5); #pause quad P a = vec(3, 4, 5) $ #pause
+); quad bold(a) = vec(3, 4, 5); #pause quad bold(P a) = vec(3, 4, 5) $ #pause
 
 *Example 2:* 
 
-$ P = mat(
+$ bold(P) = mat(
     0, 1, 0;
     1, 0, 0;
     0, 0, 1;
-); quad a = vec(3, 4, 5); #pause quad P a = vec(4, 3, 5) $  $
+); quad bold(a) = vec(3, 4, 5); #pause quad bold(P a) = vec(4, 3, 5) $  $
 
 $ 
 ==
-#side-by-side[ $ f(bold(P)  vec(bold(x)_1, dots.v, bold(x)_n)) !=  bold(P) f(vec(bold(x)_1, dots.v, bold(x)_n) ) $ #pause][$f$ is equivariant, order *does* matter] #pause
+#side-by-side[ $ f(bold(P)  vec(bold(x)_1, dots.v, bold(x)_n)) !=  bold(P) f(vec(bold(x)_1, dots.v, bold(x)_n) ) $ #pause][Order *does* matter (not equivariant)] #pause
 
-#side-by-side[ $ f(bold(P) vec(bold(x)_1, dots.v, bold(x)_n)) =  bold(P) f(vec(bold(x)_1, dots.v, bold(x)_n) ) $ #pause][$f$ is equivariant, order *does not* matter]
+#side-by-side[ $ f(bold(P) vec(bold(x)_1, dots.v, bold(x)_n)) =  bold(P) f(vec(bold(x)_1, dots.v, bold(x)_n) ) $ #pause][Order *does not* matter (equivariant)] #pause
 
-Which is a transformer? #pause
-
-MLP is equivariant, but what about attention? #pause
+Which is a transformer? 
 
 ==
 Recall dot product self attention #pause
+
+$ "attn"(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( (bold(Q) bold(K)^top) / sqrt(d_h)) bold(V) $ #pause
 
 $
 bold(Q) &= mat(bold(q)_1, bold(q)_2, dots, bold(q)_T) &&= mat(bold(theta)_Q^top bold(x)_1, bold(theta)_Q^top bold(x)_2, dots, bold(theta)_Q^top bold(x)_T) \
@@ -602,13 +650,13 @@ bold(Q) &= mat(bold(q)_1, bold(q)_2, dots, bold(q)_T) &&= mat(bold(theta)_Q^top 
 bold(K) &= mat(bold(k)_1, bold(k)_2, dots, bold(k)_T) &&= mat(bold(theta)_K^top bold(x)_1, bold(theta)_K^top bold(x)_2, dots, bold(theta)_K^top bold(x)_T) \
 
 bold(V) &= mat(bold(v)_1, bold(v)_2, dots, bold(v)_T) &&= mat(bold(theta)_V^top bold(x)_1, bold(theta)_V^top bold(x)_2, dots, bold(theta)_V^top bold(x)_T) quad
+$ 
 
-$ #pause
-
-$ "attn"(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( (bold(Q) bold(K)^top) / sqrt(d_h)) bold(V) $ 
 
 ==
 Permuting the inputs reorders $bold(Q), bold(K), bold(V)$ #pause
+
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( ((bold(P) bold(Q)) (bold(P) bold(K))^top) / sqrt(d_h)) (bold(P) bold(V)) $ #pause
 
 $
 bold(P) bold(Q) &= mat(bold(q)_T, bold(q)_1, dots, bold(q)_2) &&= mat(bold(theta)_Q^top bold(x)_T, bold(theta)_Q^top bold(x)_1, dots, bold(theta)_Q^top bold(x)_2) \
@@ -616,24 +664,22 @@ bold(P) bold(Q) &= mat(bold(q)_T, bold(q)_1, dots, bold(q)_2) &&= mat(bold(theta
 bold(P) bold(K) &= mat(bold(k)_T, bold(k)_1, dots, bold(k)_2) &&= mat(bold(theta)_K^top bold(x)_T, bold(theta)_K^top bold(x)_1, dots, bold(theta)_K^top bold(x)_2) \
 
 bold(P) bold(V) &= mat(bold(v)_T, bold(v)_1, dots, bold(v)_2) &&= mat(bold(theta)_V^top bold(x)_T, bold(theta)_V^top bold(x)_1, dots, bold(theta)_V^top bold(x)_2) quad
+$ 
 
-$ #pause
-
-$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( ((bold(P) bold(Q)) (bold(P) bold(K))^top) / sqrt(d_h)) (bold(P) bold(V)) $ #pause
 
 ==
 $ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( ((bold(P) bold(Q)) (bold(P) bold(K))^top) / sqrt(d_h)) (bold(P) bold(V)) $ #pause
 
 $ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( bold(P) (bold(Q) (bold(P) bold(K))^top) / sqrt(d_h)) (bold(P) bold(V)) $ #pause
 
-$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( bold(P) (bold(Q) (bold(K)^top bold(P)^top)) / sqrt(d_h)) (bold(P) bold(V)) $ #pause
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( bold(P) (bold(Q) (bold(K)^top bold(P)^top)) / sqrt(d_h)) (bold(P) bold(V)) $ 
 
 ==
 $ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( bold(P) (bold(Q) (bold(K)^top bold(P)^top)) / sqrt(d_h)) (bold(P) bold(V)) $ #pause
 
 $ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( bold(P) (bold(Q) bold(K)^top)  / sqrt(d_h) bold(P)^top ) (bold(P) bold(V)) $ #pause
 
-$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P)  softmax( (bold(Q) bold(K)^top)  / sqrt(d_h) bold(P)^top ) (bold(P) bold(V)) $ #pause
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P)  softmax( (bold(Q) bold(K)^top)  / sqrt(d_h) bold(P)^top ) (bold(P) bold(V)) $ 
 
 ==
 $ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P)  softmax( (bold(Q) bold(K)^top)  / sqrt(d_h) bold(P)^top ) (bold(P) bold(V)) $ #pause
@@ -657,17 +703,17 @@ $ #pause
 
 *Question:* What does this mean? #pause
 
-*Answer:* Attention is equivariant, order *does not* matter
+*Answer:* Attention/transformer *does not* understand order. Equivariant, order *does not* matter to the transformer.
 
 ==
-This makes sense, in our party example we never consider the order #pause
+This makes sense, in our party attention example we never consider the order #pause
 
 #cimage("figures/lecture_11/composite_swift_einstein_attn_einstein.png") #pause
 
 Transformer cannot determine order of inputs! *Equivariant* to ordering 
 
 ==
-The following sentences are the same to a transformer
+The following sentences are the same to a transformer #pause
 
 #side-by-side[
     $ vec(bold(x)_1, bold(x)_2, bold(x)_3, bold(x)_4, bold(x)_5) = vec("The", "dog", "licks", "the", "owner") $ #pause
@@ -675,12 +721,14 @@ The following sentences are the same to a transformer
     $ vec(bold(x)_1, #redm[$bold(x)_5$], bold(x)_3, bold(x)_4, #redm[$bold(x)_2$]) = vec("The", "owner", "licks", "the", "dog") $
 ] #pause
 
-This is a problem! For some tasks, we care about input order
+This is a problem! For some tasks, we care about input order #pause
+
+Can we make the transformer care about order?
 
 ==
 *Question:* What are some ways we can introduce ordering? #pause
 
-*Answer 1:* We can introduce forgetting #pause
+*Answer 1:* We can introduce forgetting (function of time) #pause
 
 *ALiBi:* _Press, Ofir, Noah Smith, and Mike Lewis. "Train Short, Test Long: Attention with Linear Biases Enables Input Length Extrapolation." International Conference on Learning Representations._ #pause
 
@@ -693,28 +741,34 @@ We will focus on answer 2 because it is more common
 ==
 
 #side-by-side[
-    $ "attn"(vec(bold(x)_1, bold(x)_2, dots.v, bold(x)_T), bold(theta)) $ #pause
+    $ "attn"(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) $ #pause
 ][
-    $ "attn"(vec(bold(x)_1, bold(x)_2, dots.v, bold(x)_T) + vec(f_"pos" (1), f_"pos" (2), dots.v, f_"pos" (3)), bold(theta)) $ #pause
+    $ "attn"(vec(bold(x)_1, dots.v, bold(x)_T) + vec(f_"pos" (1), dots.v, f_"pos" (T)), bold(theta)) $ #pause
 ]
+
+Add ordering information to the inputs #pause
 
 Even if we permute the inputs, we still know the order! #pause
 
-$ "attn"(vec(bold(x)_T, bold(x)_1, dots.v, bold(x)_2) + vec(f_"pos" (T), f_"pos" (1), dots.v, f_"pos" (2)), bold(theta)) $ #pause
+$ "attn"(vec(bold(x)_T, bold(x)_1, dots.v, bold(x)_2) + vec(f_"pos" (T), f_"pos" (1), dots.v, f_"pos" (2)), bold(theta)) $ 
 
 ==
 
 What is $f_"pos"$? #pause
 
-Easiest solution is just some random parameters #pause
+Easy solution is just some random parameters #pause
 
-$ f(i) = vec(bold(theta)_1, bold(theta)_2, dots.v, bold(theta)_T)_i $ #pause
+$ f_"pos" (i) = vec(bold(theta)_1, bold(theta)_2, dots.v, bold(theta)_T)_i $ #pause
 
-If ordering matters, learn $bold(theta)$ to be different #pause
+//If ordering matters, learn $bold(theta)$ to be different #pause
 
-If order does not matter, learn $bold(theta)$ to be the same/zero #pause
+//If order does not matter, learn $bold(theta)$ to be the same/zero #pause
 
-In `torch`, this is called `nn.Embedding`
+We call this a *positional encoding* #pause
+
+In `torch`, this is called `nn.Embedding` #pause
+
+Now, let us rewrite the transformer with the positional encoding 
 
 ==
 So, our final transformer is 
@@ -722,14 +776,14 @@ So, our final transformer is
 ```python
 class Transformer(nn.Module):
     def __init__(self):
-        self.position_embedding = nn.Embedding(d_x)
-        self.block1 = TransformerLayer()
-        self.block2 = TransformerLayer()
+        self.f_pos = nn.Embedding(d_x, T)
+        self.layer1 = TransformerLayer()
+        self.layer2 = TransformerLayer()
     
     def forward(self, x):
-        x = x + embedding(torch.arange(x.shape[0]))
-        x = self.block1(x)
-        x = self.block2(x)
+        x = x + f_pos(torch.arange(x.shape[0]))
+        x = self.layer1(x)
+        x = self.layer2(x)
         return x
 ``` 
 
@@ -743,51 +797,109 @@ https://colab.research.google.com/drive/1qVIbQKpTuBYIa7FvC4IH-kJq-E0jmc0d#scroll
 ==
 Now that we understand the transformer, how do we use it? #pause
 
-We can apply it to many domains, but today we will focus on text and images #pause
+We can apply a transformer to many types of problems #pause
+
+But today we will focus on text and images #pause
+
+Let us see how to create inputs for our transformers
 
 
 = Text Transformers
-==
-In text transformers, we create a parameter for each word #pause
 
-We call these parameters *tokens* #pause
-
-The simple way is to create one parameter for each unique word in the dataset #pause
-
-Find unique words, and assign each one a parameter #pause
-
-$ "unique"(vec("John likes movies", "Mary likes movies", "I like dogs")) = mat("John", "likes", "movies", "Mary", "I", "dogs") $
 
 ==
-Then assign a parameter to each word
+Consider a dataset of sentences 
 
-$ vec("John", "likes", "movies", "Mary", "I", "dogs") = vec(bold(theta)_1, bold(theta)_2, bold(theta)_3, bold(theta)_4,bold(theta)_5, bold(theta)_6) $
+$ vec("John likes movies", "Mary likes movies", "I like dogs") $ #pause
 
-$ mat(bold(theta)_1, bold(theta)_2, bold(theta)_3) = #pause "John likes movies" $
+This is a vector of sentences, but a transformer input is $bb(R)^(T times d_x)$ #pause
 
-$ mat(bold(theta)_4, bold(theta)_2, bold(theta)_1) = #pause "Mary likes John" $
+What if we represent a sentence like this
+
+$ underbrace(vec(
+    "John",
+    "likes",
+    "movies",
+), d_x) lr(} #v(3em)) T
+$
+
+==
+$ underbrace(vec(
+    "John",
+    "likes",
+    "movies",
+), d_x) lr(} #v(3em)) T
+$ #pause
+
+But these are words, the transformer needs the input to be numbers #pause
+
+What if we create a vector to represent each word? #pause
+
+$ vec(
+    "John",
+    "likes",
+    "movies",
+) = underbrace(vec(
+    bold(theta)_1,
+    bold(theta)_2,
+    bold(theta)_3,
+), d_x) lr(} #v(3em)) T
+$ 
+
+==
+
+#side-by-side(align: left)[
+*Step 1:* Find all unique words in the dataset #pause
+
+$ "unique"(vec("John likes movies", "Mary likes movies", "I like dogs")) 
+\ = mat("John", "likes", "movies", "Mary", "I", "dogs") $ #pause
+][
+*Step 2:* Create a vector representation for each unique word #pause
+
+$ vec("John", "likes", "movies", "Mary", "I", "dogs") = vec(bold(theta)_1, bold(theta)_2, bold(theta)_3, bold(theta)_4,bold(theta)_5, bold(theta)_6) $ #pause
+]
+
+*Step 3:* Replace words with vector representations
+
+==
+*Example:* Convert the sentence to vector representations #pause
+
+#side-by-side[ $ vec("John", "likes", "movies", "Mary", "I", "dogs") = vec(bold(theta)_1, bold(theta)_2, bold(theta)_3, bold(theta)_4,bold(theta)_5, bold(theta)_6) $ #pause][
+
+
+
+$ "John likes movies" = #pause mat(bold(theta)_1, bold(theta)_2, bold(theta)_3)^top $ #pause
+
+$ "Mary likes John" = #pause mat(bold(theta)_4, bold(theta)_2, bold(theta)_1)^top $
+] #pause
+
+Now, let us write some pseudocode
 
 ==
 ```python
 unique_words = set(sentence.split(" ") for sentence in xs)
-tokens = {word: i for i, word in enumerate(unique_words)}
+word_index = {word: i for i, word in enumerate(unique_words)}
 embeddings = nn.Embedding(len(tokens), d_x)
 # Convert from words to parameters
 xs = []
 for sentence in sentences:
     xs.append([])
     for word in sentence:
-        index = embeddings[word]
-        token = tokens[index] 
-        xs.append(token)
+        index = word_index[word]
+        representation = embeddings[word_index]
+        xs.append(representation)
 
 print(xs)
 >>> [[Tensor(...), Tensor(...), ...]]
 ```
-===
+
+==
+
+Now, feed our dataset to the transformer #pause
+
 ```python
 model = Transformer()
-for tokenized_sentence in xs:
+for sentence_representation in xs:
     # Convert list to tensor
     x = torch.stack(tokenized_sentence)
     y = model(x)
@@ -800,27 +912,20 @@ for tokenized_sentence in xs:
 ==
 In image transformers, we treat a *patch* of pixels as an $bold(x)$ #pause
 
-$ X in [0, 1]^(16 times 16) $ #pause
+$ X in [0, 1]^(3 times 16 times 16) $ #pause
 
-  #align(center, cetz.canvas({
-    import cetz.draw: *
+#patch
+
+==
+#patch
+
+#side-by-side(align: left)[Then, feed a sequence of patches to the transformer #pause][
+    $ f(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) $
+]
 
 
-  let image_values = (
-    ($bold(x)_1$, $bold(x)_2$,$bold(x)_3$, $bold(x)_4$, $bold(x)_5$, $bold(x)_6$, $bold(x)_7$, $bold(x)_8$),
-    ($bold(x)_9$, $dots$, " ", " ", " ", " ", " ", " "),
-    (" ", " ", " ", " ", " ", " ", " ", " "),
-    (" ", " ", " ", " ", " ", " ", " ", " "),
-    (" ", " ", " ", " ", " ", " ", " ", " "),
-    (" ", " ", " ", " ", " ", " ", " ", " "),
-    (" ", " ", " ", " ", " ", " ", " ", " "),
-    (" ", " ", " ", " ", " ", " ", " ", " "),
-  )
-  content((4, 4), image("figures/lecture_7/ghost_dog.svg", width: 8cm))
-  draw_filter(0, 0, image_values)
-  })) 
+==
 
-  ==
 ```python
 # Convert image into patches
 patches = []
@@ -848,23 +953,25 @@ y = model(patches)
 
 In practice, transformers require lots of training data #pause
 
-There is almost infinite empirical scaling -- add more data, model becomes stronger #pause
+Transformer scale very well -- add more data, model becomes stronger #pause
 
-Transformers are limited by the size of datasets today #pause
+Today, dataset size limits transformers #pause
 
-There are not enough students to label training data!
+There are not enough graduate students to label training data!
 
 ==
 
-*Question:* How can we train transformers if we cannot create big enough datasets? #pause 
+*Question:* How can we train transformers with finite students/datasets? #pause 
 
 *Answer:* We can use *unsupervised learning* #pause
 
 The internet contains billions of unlabeled sentences and images #pause
 
-We can mask/hide part of the input, and train the model to predict the missing parts #pause
+Mask/hide part of the input, train the model to predict the missing part #pause
 
 Another name for this is *generative pre-training* (GPT) #pause
+
+We *generate* the missing data #pause
 
 This method is *extremely* powerful
 
