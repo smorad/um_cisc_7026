@@ -942,7 +942,7 @@ model = Transformer()
 y = model(patches)
 ```
 
-= Unsupervised Training
+= Generative Pre-Training
 
 ==
 *Question:* How do we train transformers? #pause
@@ -977,33 +977,40 @@ This method is *extremely* powerful
 
 ==
 
-We pose the following objective #pause
-
-$ argmin_bold(theta) cal(L)(vec(bold(x)_1, dots.v, bold(x)_(T-1)), bold(theta)) = argmin_bold(theta) [ -log P(bold(x)_T | bold(x)_1, dots, bold(x)_(T - 1); bold(theta)) ] $ #pause
-
-$ P(vec("movies", "mary", "dogs") mid(|) "John", "likes"; bold(theta)) = vec(0.5, 0.3, 0.2) $ #pause
-
-$ P("movies" | "John", "likes"; bold(theta)) = 0.5 $ #pause
-
-Update $bold(theta)$ so that $P("movies" | "John", "likes"; bold(theta)) = 1.0$ 
-
-==
-We pose the following loss function #pause
-
-$ argmin_bold(theta) cal(L)(vec(bold(x)_1, dots.v, bold(x)_(T-1)), bold(theta)) = argmin_bold(theta) [-log P(bold(x)_T | bold(x)_1, dots, bold(x)_(T - 1); bold(theta))] $ #pause
-
-For pixels, the square error represents a normal distribution over pixel values #pause
-
-$ argmin_bold(theta) [-log P("pixel_3" | "pixel_1", "pixel_2"; bold(theta))] \ 
-= argmin_bold(theta) (f(vec("pixel_1", "pixel_2"), bold(theta)) - "pixel_3" )^2 $
-
-
-
-==
-
-#side-by-side[#cimage("figures/lecture_9/masked.png") #pause][
+#side-by-side[#cimage("figures/lecture_9/masked.png")][
     _He, Kaiming, et al. "Masked autoencoders are scalable vision learners." Proceedings of the IEEE/CVF conference on computer vision and pattern recognition. 2022._ #pause
 ]
+
+==
+
+In GPT, we optimize the following objective #pause
+
+$ argmin_bold(theta) cal(L)(vec(bold(x)_1, dots.v, bold(x)_(T)), bold(theta)) = argmin_bold(theta) [ -log P(bold(x)_(T) | bold(x)_1, dots, bold(x)_(T - 1); bold(theta)) ] $ #pause
+
+$ P(vec("movies", "Mary", "dogs") mid(|) "John", "likes"; bold(theta)) = vec(0.5, 0.3, 0.2) $ #pause
+
+#side-by-side[ $bold(x)_T$ = "movies" #pause][$ P("movies" | "John", "likes"; bold(theta)) = 0.5 $] #pause
+
+Update $bold(theta)$ so that $P("movies" | "John", "likes"; bold(theta)) = 0.6$ 
+
+==
+#side-by-side(align: left)[What about for images? #pause][ Use the same objective #pause]
+
+$ argmin_bold(theta) cal(L)(vec(bold(x)_1, dots.v, bold(x)_(T)), bold(theta)) = argmin_bold(theta) [-log P(bold(x)_T | bold(x)_1, dots, bold(x)_(T - 1); bold(theta))] $ #pause
+
+$ = argmin_bold(theta) [-log P("pixel_3" | "pixel_1", "pixel_2"; bold(theta))] $ #pause
+
+The square error represents a normal distribution over pixel values #pause
+
+$ = argmin_bold(theta) (f(vec("pixel_1", "pixel_2"), bold(theta)) - "pixel_3" )^2 $
+
+==
+
+Why does this work so well? #pause
+
+Let us see what the models learn with a GPT loss #pause
+
+Let us start with the image transformer
 
 ==
 Anyone familiar with Da Vinci's painting _The Last Supper_? #pause
@@ -1095,11 +1102,20 @@ Give the model what the robot sees and what the robot does #pause
 
 Predict what the robot will see next #pause
 
-We call this a *world model* #pause
+Call this a *world model* because it models the structure of our world #pause
 
 ==
 
 #cimage("figures/lecture_12/world_model.png")
+
+==
+The world model must understand: #pause
+- How to control the robot #pause
+- How to pet a dog #pause
+- Dogs have feelings #pause
+- Petting makes dogs happy #pause
+- Dogs smile when happy
+
 
 ==
 Soon, I will apply for a grant to train a world model #pause
@@ -1223,9 +1239,7 @@ I must leave the room to let you fill out this form #pause
 
 Please scan the QR code and complete the survey #pause
 
-Department has suggested 10 minutes #pause
-
-I will return in 10 minutes #pause
+I will return in 10 minutes to see if everyone has finished #pause
 
 https://isw.um.edu.mo/siaweb 
 
