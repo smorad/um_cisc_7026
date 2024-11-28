@@ -1000,7 +1000,12 @@ $ argmin_bold(theta) cal(L)(vec(bold(x)_1, dots.v, bold(x)_(T)), bold(theta)) = 
 
 $ = argmin_bold(theta) [-log P("pixel_3" | "pixel_1", "pixel_2"; bold(theta))] $ #pause
 
-The square error represents a normal distribution over pixel values #pause
+//We can imagine the model outputs the mean of a normal distribution, then minimizing the square error is equivalent to minimizing the log probability
+
+Minimizing the square error is equivalent to minimizing the (Gaussian) negative log probability
+
+//Minimizing the square error is equivalent to matching two normal distributions #pause
+//The square error represents a normal distribution over pixel values #pause
 
 $ = argmin_bold(theta) (f(vec("pixel_1", "pixel_2"), bold(theta)) - "pixel_3" )^2 $
 
@@ -1026,7 +1031,7 @@ Anyone familiar with Da Vinci's painting _The Last Supper_? #pause
 
 #place(center, cimage("figures/lecture_12/last_supper_mask.png", width: 100%))
 
-#text(fill: orange)[
+#text(fill: white)[
 
 Concepts the model must understand: #pause
 - This is a picture of a painting #pause 
@@ -1149,7 +1154,7 @@ This is the last in-person lecture #pause
 
 I will record a video on reinforcement learning next week #pause
 
-I will be here from 7:00PM on December 2 for questions/discussin on reinforcement learning
+I will be here from 7:00PM on December 2 for questions/discussion on reinforcement learning
 
 ==
 In this course, we started from Gauss in 1795 #pause
@@ -1244,6 +1249,8 @@ I will return in 10 minutes to see if everyone has finished #pause
 https://isw.um.edu.mo/siaweb 
 
 ==
-If you participated in class come see me after class #pause
-    - Answered a question #pause
+If you participated in class, come see me after class
+    - Answered a question 
     - Asked a question
+
+If you would like to collect data for a world model, come see me after class 

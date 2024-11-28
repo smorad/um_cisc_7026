@@ -1003,11 +1003,6 @@
     For each input, we create a key $bold(k)$ #pause
 
     $ bold(k)_j = bold(theta)^top_K bold(x)_j, quad bold(theta)_K in bb(R)^(d_x times d_h), quad bold(k)_j in bb(R)^(d_h) $ #pause
-
-    //Create keys for all inputs #pause
-
-    //$ bold(K) = vec(bold(k)_1, bold(k)_2, dots.v, bold(k)_T) = vec(bold(theta)_K^top bold(x)_1, bold(theta)_K^top bold(x)_2, dots.v, bold(theta)_K^top bold(x)_T), quad bold(K) in bb(R)^(T times d_h) $
-    // $ bold(K) = mat(bold(k)_1, bold(k)_2, dots, bold(k)_T) = mat(bold(theta)_K^top bold(x)_1, bold(theta)_K^top bold(x)_2, dots, bold(theta)_K^top bold(x)_T), quad bold(K) in bb(R)^(d_h times T) $
 ]
 
 #sslide[
