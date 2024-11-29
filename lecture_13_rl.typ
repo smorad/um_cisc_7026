@@ -300,6 +300,15 @@ for update in range(num_updates):
 #components.adaptive-columns(
     outline(title: none, indent: 1em, depth: 1)
 )
+
+= Admin
+
+==
+The final assignment is just an assignment #pause
+
+Your lowest assignment score will not count #pause
+
+If you already have 100% on all other assignments, the final project will not change your score
   
 ==
   *Lecture Goal*: Provide a proper understanding of the theoretical foundations of reinforcement learning
@@ -1215,7 +1224,21 @@ Given enough time and data, we can learn the best possible policy #pause
   #side-by-side[#link("https://youtu.be/VIwGxOdXGfw?si=A-CVLI6vEJHOxrvx&t=478")][MK]
 
 
-= Resources
+==
+How do we use RL with LLMs? #pause
+
+$ bold(s) = vec("Help", "me", "with", 2 + 2) quad #pause
+
+bold(a)_1 &= vec("Wow", "you", "are", "stupid") quad #pause
+
+bold(a)_2 = vec("Sure", 2 + 2, "is", 4) quad dots #pause \
+
+Q(bold(s), bold(a)_1, theta) &= -1 + max_(a') Q(bold(s)', bold(a)', theta) #pause \
+
+Q(bold(s), bold(a)_2, theta) &= 1 + max_(a') Q(bold(s)', bold(a)', theta) \
+$ #pause
+
+LLMs get reward for helping humans
 
 ==
   + Reinforcement Learning, an Introduction (2018, Sutton and Barto) 
