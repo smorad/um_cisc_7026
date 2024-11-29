@@ -215,15 +215,15 @@
     ])
 })
 
-#let q_function_return = $ Q_pi (s_0, a_0) = bb(E) [r_0 | a_0] + bb(E)[sum_(t=1)^oo gamma^(t) r_t | a_t tilde pi(s_t)] $
-#let qstar_function_return = $ Q_(pi_*) (s_0, a_0) = bb(E) [r_0 | a_0] + bb(E)[sum_(t=1)^oo gamma^(t) r_t | a_t tilde pi_(*)(s_t)] $
-#let qstar_function_return2 = $ Q_* (s_0, a_0) = bb(E) [r_0 | a_0] + bb(E)[sum_(t=1)^oo gamma^(t) r_t | a_t tilde pi_(*)(s_t)] $
+#let q_function_return = $ Q_pi (s_0, a_0) = bb(E) [r_0 mid(|) a_0] + bb(E)[sum_(t=1)^oo gamma^(t) r_t mid(|) a_t tilde pi(s_t)] $
+#let qstar_function_return = $ Q_(pi_*) (s_0, a_0) = bb(E) [r_0 mid(|) a_0] + bb(E)[sum_(t=1)^oo gamma^(t) r_t mid(|) a_t tilde pi_(*)(s_t)] $
+#let qstar_function_return2 = $ Q_* (s_0, a_0) = bb(E) [r_0 mid(|) a_0] + bb(E)[sum_(t=1)^oo gamma^(t) r_t mid(|) a_t tilde pi_(*)(s_t)] $
 #let qstar_action_policy = $ pi_* (s) = op("argmax", limits: #true)_(a in A) Q_* (s, a) $
-#let qstar_argmax_return = $ Q_(*) (s_0, a_0) = bb(E) [r_0 | a_0] + bb(E)[sum_(t=1)^oo gamma^(t) r_t | a_t tilde pi_* (s_t)] $
-#let qstar_argmax_intractable = $ Q_(*) (s_0, a_0) = bb(E) [r_0 | a_0] + bb(E)[underbrace(sum_(t=1)^oo gamma^(t) r_t, "Very annoying") | a_t tilde pi_* (s_t)] $
+#let qstar_argmax_return = $ Q_(*) (s_0, a_0) = bb(E) [r_0 mid(|) a_0] + bb(E)[sum_(t=1)^oo gamma^(t) r_t mid(|) a_t tilde pi_* (s_t)] $
+#let qstar_argmax_intractable = $ Q_(*) (s_0, a_0) = bb(E) [r_0 mid(|) a_0] + bb(E)[underbrace(sum_(t=1)^oo gamma^(t) r_t, "Very annoying") mid(|) a_t tilde pi_* (s_t)] $
 #let standard_q = $ Q (s, a) = r + gamma dot max_{a' in A} Q (s', a') $
-#let reward_dist = $ R(s_(t+1)) T(s_(t+1) | s_(t),a_(t)) pi(a_(t) | s_(t)) $
-#let reward_dist_labeled = $ underbrace(R(s_(t+1)), "reward fn") overbrace(T(s_(t+1) | s_(t),a_(t)), "state trans. probs") underbrace(pi(a_(t) | s_(t)), "action probs") $
+#let reward_dist = $ R(s_(t+1)) T(s_(t+1) mid(|) s_(t),a_(t)) pi(a_(t) mid(|) s_(t)) $
+#let reward_dist_labeled = $ underbrace(R(s_(t+1)), "reward fn") overbrace(T(s_(t+1) mid(|) s_(t),a_(t)), "state trans. probs") underbrace(pi(a_(t) mid(|) s_(t)), "action probs") $
 
 #let ml_train_loop = ```python
 dataset = load_dataset()
@@ -337,11 +337,11 @@ $ f: X times Theta |-> Y $ #pause
 
 $ X in "Position of pieces on the board" $ #pause
 
-$ Y in "Where to put piece" $ #pause
+$ Y in "Where to put piece" $ 
 
 ==
 #side-by-side[$ X in "Position of pieces on the board" $][
-    $ Y in "Where to put piece" $ #pause
+    $ Y in "Where to put piece" $ 
 ] #pause
 
 #cimage("figures/lecture_13/chess.png", height: 85%)
@@ -349,7 +349,12 @@ $ Y in "Where to put piece" $ #pause
 ==
 #cimage("figures/lecture_13/chess.png", height: 85%) #pause
 
-#side-by-side[We do not know the answer #pause][But RL can tell us!]
+#side-by-side[What is the correct answer? #pause][We do not know the answer]//[But RL can tell us!]
+
+==
+#cimage("figures/lecture_13/chess.png", height: 85%) #pause
+
+#side-by-side[No answer, no supervised learning#pause][RL can train without the answer!]//[But RL can tell us!]
 
 ==
 #cimage("figures/lecture_13/chess.png", height: 85%) #pause
@@ -357,17 +362,18 @@ $ Y in "Where to put piece" $ #pause
 #side-by-side[An answer gives us just one move #pause][We need many moves to win]
 
 ==
-RL gives us the best sequence of moves to achieve a result #pause
+RL gives us the best *sequence* of moves to achieve a result #pause
 
 - Win a game of chess #pause
 - Drive a customer to the store #pause
 - Cook a tasty meal #pause
-- Surgically remove cancer from the patient #pause
+- Treat a sick patient #pause
 - Prevent climate change #pause
 - Reduce human suffering #pause
 - Find your own purpose (achieve conciousness)
 
 ==
+Real applications of RL: #pause
 #grid(
 columns: 2,
 column-gutter: 1em,
@@ -379,7 +385,7 @@ link("https://www.youtube.com/watch?v=eHipy_j29Xw"), "DoTA"
 
 
 ==
-  Real applications of RL: #pause
+  Other real applications of RL: #pause
 
   - Autonomous vehicles #pause
   - Video game NPCs #pause
@@ -392,7 +398,7 @@ link("https://www.youtube.com/watch?v=eHipy_j29Xw"), "DoTA"
     - Where you *change* the world by *interacting* with it
 
 == 
-RL is more complicated than supervised learning #pause
+RL is more complex than supervised learning #pause
 
 Instead of a model and dataset, we have an *agent* and *environment* #pause
 
@@ -408,7 +414,7 @@ grid(
 )
 
 ==
-#side-by-side[
+#side-by-side(align: left)[
     The agent receives a positive reward for doing good #pause
 
     And a negative reward for doing bad #pause
@@ -422,7 +428,7 @@ Eventually, the agent only does good behaviors
 ==
 Humans learn by reinforcement learning too #pause
 
-#side-by-side[
+#side-by-side(align: left)[
     #cimage("figures/lecture_13/baby.jpg", height: 60%) #pause
 ][
     When the baby cries, they will receive hugs (reward) #pause
@@ -455,6 +461,15 @@ There are a set of rules that govern what you can do #pause
 - You come to this specific location to attend lecture #pause
 - You get good grades (your parents make rules too) #pause
 
+==
+The *state* describes the agent in the environment #pause
+
+If you are the agent, maybe your state contains: #pause
+- Your physical location (x, y, z coordinates)
+- The time #pause
+- Who is in the room with you #pause
+- If you are hungry or thirsty #pause
+
 Now that you understand the agent, rewards, and environment, we will get more technical
 
 ==
@@ -465,16 +480,21 @@ Now that you understand the agent, rewards, and environment, we will get more te
     - Actions change the environment *state*, producing an new state and *reward* #pause
     - The cycle continues for $t=0, 1, dots$ #pause
     - Goal is to maximize the *cumulative reward*
+      - Sum of rewards over *all* timestep
   ]
 
 ==
   //The environment defines the task we are trying to solve. #pause
 
-  By definition, RL solves *Markov Decision Processes (MDPs)*. #pause
-  
-  To solve a problem using RL, we first must convert the problem into an MDP. We call this converted problem the *environment*. #pause
+  By definition, RL solves *Markov Decision Processes (MDPs)* #pause
 
-  How you structure your problem is *critical* -- more important than which algorithms you use, how much compute you have, etc.
+  To solve a problem, we must convert it into an MDP #pause
+
+  We call the MDP the environment #pause
+  
+  How you structure your problem is *critical* -- more important than which algorithms you use, how much compute you have, etc. #pause
+
+  Let us formally introduce the MDP
 
 
 = Markov Decision Processes
@@ -522,7 +542,7 @@ Now that you understand the agent, rewards, and environment, we will get more te
 
     "Rules" of the environment, determine the (stochastic) evolution of the environment #pause
 
-    #side-by-side[$ T( underbrace( 
+    #side-by-side(align: left)[$ T( underbrace( 
     vec(delim: "[", x_1, y_1, x_2, y_2, dots.v), "state"
     ), space 
     underbrace(
@@ -532,7 +552,7 @@ Now that you understand the agent, rewards, and environment, we will get more te
     underbrace(Delta vec(delim: "[", x_1, y_1, x_2, y_2, dots.v), "next state dist."
     ) $#pause][
 
-    This is a *Markov* decision process because transition dynamics are *conditionally independent* of past states and actions
+    *Markov* decision process because transition dynamics are *conditionally independent* of past states and actions
 
     $ T(s_t, a_t | s_(t-1), a_(t-1), dots, s_(0), a_(0)) = T(s_t, a_t) $
     ]
@@ -590,7 +610,7 @@ Now that you understand the agent, rewards, and environment, we will get more te
     #text(size: 24pt)[
     *State Space ($S$)*? #pause
 
-      - Mario position/velocity $(x,y, dot(x), dot(y))$ #pause
+      - Mario position/velocity $(bold(r), dot(bold(r)))$ #pause
       - Score #pause
       - Number of coins collected #pause
       - The time remaining #pause
@@ -631,8 +651,8 @@ Now that you understand the agent, rewards, and environment, we will get more te
     #cimage("figures/lecture_13/mario.png", width: 100%)
   ][
     *Action Space ($A$)*? #pause
-      - Acceleration of Mario $dot.double(bold(x))$ #pause
-        - But when playing Mario, we cannot explicitly set $dot.double(bold(x))$
+      - Acceleration of Mario $dot.double(bold(r))$ #pause
+        - But when playing Mario, we cannot explicitly set $dot.double(bold(r))$
   ]
 
 ==
@@ -654,9 +674,9 @@ Now that you understand the agent, rewards, and environment, we will get more te
     #cimage("figures/lecture_13/mario.png", width: 100%)
   ][
       *Transition Function ($T$)*? #pause
-        - $T("pixel_state", "right")$ #pause
-          - Move the Mario pixels right, unless a wall
-          - Difficult to write down
+        - $T(bold(s)_"pixel", arrow.r)$ #pause
+          - Move the Mario pixels right, unless a wall #pause
+          - Difficult to write down #pause
           - Deterministic
 
   ]
@@ -666,8 +686,8 @@ Now that you understand the agent, rewards, and environment, we will get more te
     #cimage("figures/lecture_13/mario.png", width: 100%)
   ][
       *Transition Function ($T$)*? #pause
-        - $T("pos_vel_state", "right")$ #pause
-          - Changes Mario's $(x, y, dot(x), dot(y))$ in game memory
+        - $T(bold(s)_"r", arrow.r)$ #pause
+          - Changes Mario's $(bold(r), dot(bold(r)))$ in game memory #pause
           - Human understandable, easier to implement for game developers
   ]
 
@@ -686,14 +706,14 @@ Now that you understand the agent, rewards, and environment, we will get more te
     #side-by-side(align: left)[
     #cimage("figures/lecture_13/mario.png", width: 100%)
   ][
-  #text(size: 22pt)[
+  #text(size: 24pt)[
     *Question:* Why do we need velocity in the state? #pause
   
     *Answer:* If we don't have it, Markov property is violated
   
-    $T(s_t, a_t)$: Mario is going up, down, left or right
+    $T(s_t, a_t)$: Mario is moving $arrow.t, arrow.b, arrow.l, arrow.r$ 
   
-    $T(s_t, a_t | s_(t-1))$: Mario is going right with velocity 1 m/s #pause
+    $T(s_t, a_t | s_(t-1))$: Mario is moving $arrow.r$ at 1 m/s #pause
   
     Not conditionally independent! $T(s_t, a_t | s_(t-1), a_(t-1), dots, s_(0), a_(0)) != T(s_t, a_t) $
   ]
@@ -717,10 +737,10 @@ Now that you understand the agent, rewards, and environment, we will get more te
 // The objective we are trying to solve
 
 ==
-  - $S checkmark$
-  - $A checkmark$
-  - $T checkmark$
-  - $R checkmark$
+  - $S checkmark$ #pause
+  - $A checkmark$ #pause
+  - $T checkmark$ #pause
+  - $R checkmark$ #pause
   - $gamma ?$
 
 // 34 mins
@@ -745,7 +765,9 @@ Now that you understand the agent, rewards, and environment, we will get more te
   
   $ G = sum_(t=0)^oo gamma^t r_t = r_0 + gamma r_1 + gamma^2 r_2 + dots \
    0 <= gamma <= 1
-  $
+  $ #pause
+
+  Where have we seen this before?
 
 
 ==
@@ -795,9 +817,9 @@ Now that you understand the agent, rewards, and environment, we will get more te
   
   $pi: S arrow Delta A$ is a mapping from states to actions (or action probabilities), determining agent behavior in the MDP. #pause
 
-  $ a_t tilde pi(s_t) $
+  #side-by-side[$ a_t tilde pi(s_t) $][Sample action from the policy] #pause
 
-  $ pi(a_t | s_t) $
+  #side-by-side[$ pi(a_t | s_t) $][Probability of taking each action]
 
 ==
 
@@ -806,28 +828,34 @@ Now that you understand the agent, rewards, and environment, we will get more te
 
   $ pi_* = max_(pi) sum_(t=0)^oo gamma^t r_t  $ #pause
 
-  Even though the reward function is deterministic, the state transition function and policy influencing it are stochastic. The optimal policy must take this uncertainty into account. #pause
+  Reward function $R$ is deterministic #pause
+
+  State transition function and policy are stochastic, we must consider this! #pause
 
   $ r_t tilde [ #reward_dist_labeled ]  $
   ]
 
 
 ==
-  $ r_t tilde [ #reward_dist_labeled ]  $
+  $ r_t tilde [ #reward_dist_labeled ]  $ #pause
 
-  (Many) RL researchers are afraid of distributions #pause
+  I think many of you might be afraid of distributions #pause
 
-  $ bb(E)[r_t] = integral_S integral_A #reward_dist_labeled d a_(t) d s_(t+1) $
+  (Many) RL researchers are also afraid of distributions #pause
+
+  Often, we get rid of the distribution using the *expectation* #pause
+
+  $ bb(E)[r_t] = integral_S integral_A #reward_dist_labeled dif a_(t) dif s_(t+1) $
 
 ==
 
-  $ pi_* = max_(pi) sum_(t=0)^oo gamma^t r_t; quad bb(E)[r_t] = integral_S integral_A R(s_(t+1)) T(s_(t+1) | s_(t),a_(t)) pi(a_(t) | s_(t)) d a_(t) d s_(t+1) $
+  $ pi_* = max_(pi) sum_(t=0)^oo gamma^t r_t; quad bb(E)[r_t] = integral_S integral_A R(s_(t+1)) T(s_(t+1) | s_(t),a_(t)) pi(a_(t) | s_(t)) dif a_(t) dif s_(t+1) $
 
-  *In English:* We need to consider the action distribution combined with our state transition distribution when computing the reward/return #pause
+  *In English:* The optimal must consider the action distribution combined and state transition distribution to compute the reward/return #pause
 
-  We write the return as the *expectation* given our policy actions.
+  We write the return as the expectation given our policy actions
   
-  $ pi_* = max_(pi) space bb(E) [ sum_(t=0)^oo gamma^t r_t | a_t tilde pi (s_t)] $ #pause
+  $ pi_* = max_(pi) space bb(E) [ sum_(t=0)^oo gamma^t r_t mid(|) a_t tilde pi (s_t)] $ #pause
 
   Now, our policy is truly optimal
   
@@ -886,17 +914,17 @@ Now that you understand the agent, rewards, and environment, we will get more te
 ==
   Recall the discounted return for a specific policy $pi$
   
-  $ G_pi = bb(E) [sum_(t=0)^oo gamma^t r_t | a_t tilde pi(s_t)] $ #pause
+  $ G_pi = bb(E) [sum_(t=0)^oo gamma^t r_t mid(|) a_t tilde pi(s_t)] $ #pause
 
   *In English:* At each timestep, we take an action $a_t tilde pi(s_t)$ #pause
-  
+
   follow the state transition function $s_(t+1) tilde T(s_t, a_t)$ #pause
 
   and get a reward $r_t = R(s_(t+1))$ 
 
 
 ==
-  $ G_pi = bb(E) [sum_(t=0)^oo gamma^t r_t | a_t tilde pi(s_t)] $ #pause
+  $ G_pi = bb(E) [sum_(t=0)^oo gamma^t r_t mid(|) a_t tilde pi(s_t)] $ #pause
 
   *Question:* Where does $s_0$ come from? #pause
 
@@ -906,13 +934,13 @@ Now that you understand the agent, rewards, and environment, we will get more te
 
 
 ==
-  $ G_pi = bb(E) [sum_(t=0)^oo gamma^t r_t | a_t tilde pi(s_t)] $
+  $ G_pi = bb(E) [sum_(t=0)^oo gamma^t r_t mid(|) a_t tilde pi(s_t)] $
 
-  What if we defined the return starting from a specific state? #pause
+  What if we defined the return starting from a specific state $s_0$? #pause
 
-  $ V_pi (s_0) = bb(E) [sum_(t=0)^oo gamma^(t) r_t | a_t tilde pi(s_t)] $ #pause
+  $ V_pi (s_0) = bb(E) [sum_(t=0)^oo gamma^(t) r_t mid(|) a_t tilde pi(s_t)] $ #pause
 
-  Measures the value of a state (how good is it to be in this state?), for a given policy $pi$
+  Measures the *value* of a state (how good is it to be in this state?), for a given policy $pi$
 
   We call this the *Value Function ($V_pi$)*   $quad V_pi: S arrow bb(R)$
 
@@ -926,22 +954,22 @@ Now that you understand the agent, rewards, and environment, we will get more te
 
   
 ==
-$ V_pi (s_0) = bb(E) [sum_(t=0)^oo gamma^(t) r_t | a_t tilde pi(s_t)] $ #pause
+$ V_pi (s_0) = bb(E) [sum_(t=0)^oo gamma^(t) r_t mid(|) a_t tilde pi(s_t)] $ #pause
   
 Let's go one step further. What if we parameterize the value function with an initial action? #pause
 
 Pull the first term out of the sum #pause
 
-$ V_pi (s_0) = bb(E) [r_0 | a_0 tilde pi(s_0)] + bb(E)[sum_(t=1)^oo gamma^(t) r_t | a_t tilde pi(s_t)] $
+$ V_pi (s_0) = bb(E) [r_0 mid(|) a_0 tilde pi(s_0)] + bb(E)[sum_(t=1)^oo gamma^(t) r_t mid(|) a_t tilde pi(s_t)] $
 
 
 ==
   #text(size: 24pt)[
-    $ V_pi (s_0) = bb(E) [r_0 | a_0 tilde pi(s_0)] + bb(E)[sum_(t=1)^oo gamma^(t) r_t | a_t tilde pi(s_t)] $
+    $ V_pi (s_0) = bb(E) [r_0 mid(|) a_0 tilde pi(s_0)] + bb(E)[sum_(t=1)^oo gamma^(t) r_t mid(|) a_t tilde pi(s_t)] $
     
     Now, rewrite $V_(pi)$ as a function of an action $a_0$ #pause
     
-    $ V_pi (s_0, a_0) = bb(E) [r_0 | a_0] + bb(E)[sum_(t=1)^oo gamma^(t) r_t | a_t tilde pi(s_t)] $ #pause
+    $ V_pi (s_0, a_0) = bb(E) [r_0 mid(|) a_0] + bb(E)[sum_(t=1)^oo gamma^(t) r_t mid(|) a_t tilde pi(s_t)] $ #pause
     
     When $V$ depends on a specific action, we call it the *Q function*: 
     
@@ -963,7 +991,7 @@ $ V_pi (s_0) = bb(E) [r_0 | a_0 tilde pi(s_0)] + bb(E)[sum_(t=1)^oo gamma^(t) r_
 ==
     #q_function_return
 
-  *Example:* You have summer school offers from Cambridge and Oxford #pause
+  *Example:* You have PhD offers from Cambridge and Oxford #pause
 
   $ a_0 = {"Oxford", "Cambridge"} $ #pause 
 
@@ -1016,7 +1044,9 @@ $ V_pi (s_0) = bb(E) [r_0 | a_0 tilde pi(s_0)] + bb(E)[sum_(t=1)^oo gamma^(t) r_
 
   $ pi(s) = op("argmax", limits: #true)_(a in A) Q(s, a) $ #pause
 
-  Make it a degenerate distribution 
+  We said that $pi(s)$ is a distribution  #pause
+
+  We can rewrite it as a degenerate distribution #pause
 
   $ pi(s) = "Deg"[ op("argmax", limits: #true)_(a in A) Q(s, a) ] $ #pause
 
@@ -1073,7 +1103,6 @@ $ V_pi (s_0) = bb(E) [r_0 | a_0 tilde pi(s_0)] + bb(E)[sum_(t=1)^oo gamma^(t) r_
 
 
 ==
-  #text(size: 20pt)[   
     #qstar_argmax_return #pause
 
     //, by factoring out $gamma$ and changing $r_t$ to $r_(t+1)$ 
@@ -1081,46 +1110,34 @@ $ V_pi (s_0) = bb(E) [r_0 | a_0 tilde pi(s_0)] + bb(E)[sum_(t=1)^oo gamma^(t) r_
     
     Shift the sum so it starts at $t=0$
     
-    $ Q_(*) (s_0, a_0) = bb(E) [r_0 | a_0] + bb(E)[sum_(t=0)^oo gamma^(t+1) r_(t+1) | a_(t+1) tilde pi_* (s_(t+1)) ] $ #pause
+    $ Q_(*) (s_0, a_0) = bb(E) [r_0 | a_0] + bb(E)[sum_(t=0)^oo gamma^(t+1) r_(t+1) mid(|) a_(t+1) tilde pi_* (s_(t+1)) ] $ #pause
 
     Factor out $gamma$
 
-    $ Q_(*) (s_0, a_0) = bb(E) [r_0 | a_0] + gamma dot bb(E)[sum_(t=0)^oo gamma^t r_(t+1) | a_(t+1) tilde pi_* (s_(t+1)) ] $
-  ]
-
+    $ Q_(*) (s_0, a_0) = bb(E) [r_0 | a_0] + gamma dot bb(E)[sum_(t=0)^oo gamma^t r_(t+1) mid(|) a_(t+1) tilde pi_* (s_(t+1)) ] $
 
 ==
-  #text(size: 20pt)[   
+#only((1, "3-"))[$ Q_(*) (s_0, a_0) = bb(E) [r_0 | a_0] + gamma dot bb(E)[sum_(t=0)^oo gamma^t r_(t+1) mid(|) a_(t+1) tilde pi_* (s_(t+1)) ] $] #pause
 
-    #only((1,4,5))[
-      $ Q_(*) (s_0, a_0) = bb(E) [r_0 | a_0] + gamma dot bb(E)[sum_(t=0)^oo gamma^t r_(t+1) | a_(t+1) tilde pi_* (s_(t+1)) ] $
-    ]
+#only((2))[      
+  $ Q_(*) (s_0, a_0) = bb(E) [r_0 | a_0] + gamma dot underbrace(bb(E)[sum_(t=0)^oo gamma^t r_(t+1) | a_(t+1) tilde pi_* (s_(t+1)) ], #cimage("figures/lecture_13/mr-krabs-tired.gif", height: 6em)) $
+] #pause
 
-    #only((2,3))[      
-      $ Q_(*) (s_0, a_0) = bb(E) [r_0 | a_0] + gamma dot underbrace(bb(E)[sum_(t=0)^oo gamma^t r_(t+1) | a_(t+1) tilde pi_* (s_(t+1)) ], #cimage("figures/lecture_13/mr-krabs-tired.gif", height: 6em)) $
-    ]
+This is the value function for the policy $pi_*$ starting at $s_1$ #pause
 
+$ Q_(*) (s_0, a_0) = bb(E) [r_0 | a_0] + gamma dot V_(*)(s_1) $  #pause
+==
+This is the value function for the policy $pi_*$ starting at $s_1$
 
-    #only((3,4,5))[
-      This is the value function for the policy $pi_*$ starting at $s_1$
+$ Q_(*) (s_0, a_0) = bb(E) [r_0 | a_0] + gamma dot V_(*)(s_1) $  #pause
 
-      $ Q_(*) (s_0, a_0) = bb(E) [r_0 | a_0] + gamma dot V_(*)(s_1) $ 
-    ]
+  We can rewrite $V$ as $Q$, removing the dependence on $V$ #pause
 
-    #only((4,5))[
-      We can rewrite $V$ as $Q$, removing the dependence on $V$
+  $ Q_(*) (s_0, a_0) = bb(E) [r_0 | a_0] + gamma dot Q_(*)(s_1, pi_* (s_1)) $ #pause
 
-      $ Q_(*) (s_0, a_0) = bb(E) [r_0 | a_0] + gamma dot Q_(*)(s_1, pi_* (s_1)) $
-    ]
-
-    #only(5)[
-      The policy $pi_*$ takes the $op("argmax")$ over Q, which reduces to 
-      
-      $ Q_*(s_0, a_0) = bb(E) [r_0 | a_0] + gamma dot max_{a in A} Q_*(s_1, a) $
-    ]
-  ]
-
-
+  The policy $pi_*$ takes the $op("argmax")$ over Q, which reduces to 
+  
+  $ Q_*(s_0, a_0) = bb(E) [r_0 | a_0] + gamma dot max_{a in A} Q_*(s_1, a) $
 
 ==
   $ Q_*(s_0, a_0) = bb(E) [r_0 | a_0] + gamma dot max_{a in A} Q_*(s_1, a) $ #pause
@@ -1147,10 +1164,32 @@ $ V_pi (s_0) = bb(E) [r_0 | a_0 tilde pi(s_0)] + bb(E)[sum_(t=1)^oo gamma^(t) r_
 
   $ Q(s, a, theta) - (r + gamma dot max_{a' in A} Q(s', a', theta)) = 0 $ #pause
 
-  $ min_theta (Q(s, a, theta) - (r + gamma dot max_{a' in A} Q(s', a', theta)))^2 $
+  $ argmin_theta (Q(s, a, theta) - (r + gamma dot max_{a' in A} Q(s', a', theta)))^2 $
+
+==
+$ argmin_theta cal(L)(s, a, r, s', theta) = argmin_theta (Q(s, a, theta) - (r + gamma dot max_{a' in A} Q(s', a', theta)))^2 $ #pause
 
 
+At the start of lecture, I said we do not know the answer in RL #pause
 
+However, we can define this objective/loss function #pause
+
+If we optimize this objective, we will find the optimal Q function #pause
+
+$ lim_(cal(L) -> 0) Q(s, a, theta) = Q_* (s, a) $ 
+
+==
+If we optimize this objective, we will find the optimal Q function 
+
+$ lim_(cal(L) -> 0) Q(s, a, theta) = Q_* (s, a) $ #pause
+
+What does this mean? #pause
+
+Given enough time and data, we can learn the best possible policy #pause
+- Best chess player #pause
+- Best driver #pause
+- Best chef #pause
+- Best surgeon
 
 ==
   #text(size: 25pt)[
@@ -1169,18 +1208,14 @@ $ V_pi (s_0) = bb(E) [r_0 | a_0 tilde pi(s_0)] + bb(E)[sum_(t=1)^oo gamma^(t) r_
 
 
 ==
-  *Question:* How do we model the Q function? #pause
-
-  *Answer:* Today, we use deep neural networks #pause
-
-  The Q learning approach we covered today is sufficient to learn superhuman policies on many video games #pause
+  Q learning learns superhuman policies on many video games #pause
 
   #side-by-side[#link("https://www.youtube.com/watch?v=O2QaSh4tNVw")][SMB]
 
   #side-by-side[#link("https://youtu.be/VIwGxOdXGfw?si=A-CVLI6vEJHOxrvx&t=478")][MK]
 
 
-
+= Resources
 
 ==
   + Reinforcement Learning, an Introduction (2018, Sutton and Barto) 
@@ -1196,7 +1231,7 @@ $ V_pi (s_0) = bb(E) [r_0 | a_0 tilde pi(s_0)] + bb(E)[sum_(t=1)^oo gamma^(t) r_
   + CleanRL
     - Verified, single-file implementations of many RL algorithms #pause
 
-  #align(center)[*Questions?* #link("sm2558@cam.ac.uk")]
+  + Special Topics in AI (Winter/Spring 2025)
 
 // 1h15m without videos
 // with videos, maybe 1h25?
