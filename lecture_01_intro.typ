@@ -33,9 +33,9 @@
 
 = Course Timeline
 ==
-We will be following the history of machine learning #pause
+This course follows the history of deep learning #pause
 
-#cimage("figures/lecture_1/timeline.svg", height: 70%)
+#cimage("figures/lecture_1/timeline.svg")
 
 
 = Deep Learning Successes
