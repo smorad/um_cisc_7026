@@ -1,7 +1,7 @@
-#import "@preview/polylux:0.3.1": *
+#import "@preview/touying:0.6.1": *
 #import themes.university: *
-#import "@preview/cetz:0.2.2": canvas, draw, plot
-#import "@preview/cetz:0.2.2"
+#import "@preview/cetz:0.4.0": canvas, draw
+#import "@preview/cetz-plot:0.1.2": plot
 
 #set text(size: 25pt)
 #set math.vec(delim: "[")
@@ -27,13 +27,6 @@
   grid(columns: columns, gutter: gutter, align: align, ..bodies)
 }
 
-#let slide_template(doc) = {
-  set text(size: 25pt)
-  set math.vec(delim: "[")
-  set math.mat(delim: "[")
-  doc
-}
-
 #let redm(x) = {
   text(fill: color.red, $#x$)
 }
@@ -46,38 +39,6 @@
   text(fill: color.green, $#x$)
 }
 
-// Agenda
-#let slide_state = state("current_section", none)
-#let agenda(ag, index) = {
-  /*
-  ag should be list of sections
-  ([Review], [Intro])
-  index can be none or int
-  */
-  for i in range(ag.len()){
-    if index == i {
-      enum.item(i + 1)[#text(weight: "bold", ag.at(i))]
-      {context slide_state.update(ag.at(i))}
-    } else {
-      enum.item(i + 1)[#ag.at(i)]
-    }
-  }
-}
-
-// Slide with preset section
-#let sslide(content) = { 
-  let title = {context slide_state.get()}
-  slide(title: [#title])[
-    #content
-  ]
-}
-
-// Agenda slide
-#let aslide(ag, index) = { 
-  slide(title: [Agenda])[
-    #{ context agenda(ag, index) }
-  ]
-}
 
 // Plots of activation functions
 #let sigmoid = { 
