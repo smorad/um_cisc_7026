@@ -30,6 +30,12 @@
 
 #title-slide()
 
+= Outline <touying:hidden>
+
+#components.adaptive-columns(
+    outline(title: none, indent: 1em, depth: 1)
+)
+
 
 = Course Timeline
 ==
