@@ -3,6 +3,7 @@
 #import "@preview/cetz:0.4.0"
 #import "@preview/fletcher:0.5.8" as fletcher: node, edge
 #import "common.typ": *
+#import "@preview/pinit:0.2.2": *
 
 // For students: you may want to change this to true
 // otherwise you will get one slide for each new line
@@ -91,6 +92,7 @@
     $ y = "You good?", quad Y = "English sentences" $
   ]
 
+/*
 ==
   Create vectors, matrices, or tensors in `jax`
 
@@ -185,10 +187,278 @@
   z = torch.tensor([[1, 2], [3, 4]]).reshape((4,))
   print(z) # torch.tensor([1, 2, 3, 4])
   ```
+*/
+
+= Set Notation
+
+==
+Before we go any futher, we need to agree on math notation #pause
+
+If you ever get confused, come back to these slides #pause
+
+#side-by-side(align: horizon)[
+  Vectors
+][
+  $ bold(x) = vec(x_1, x_2, dots.v, x_n) $
+] #pause
+
+#side-by-side(align: horizon)[
+  Matrices
+][
+  $ bold(X) = mat(
+    x_(1,1), x_(1,2), dots, x_(1,n); 
+    x_(2,1), x_(2,2), dots, x_(2,n); 
+    dots.v, dots.v, dots.down, dots.v;
+    x_(m,1), x_(m,2), dots, x_(m,n); 
+  ) $
+]
+
+==
+We will represent *tensors* as nested vectors or matrices #pause
+
+#side-by-side(align: horizon)[
+  Tensor
+][
+  $ bold(x) = vec(bold(x)_1, bold(x)_2, dots.v, bold(x)_n) $
+] #pause
+
+Each $bold(x)_i$ is a vector 
+
+==
+Same for matrices
+
+#side-by-side(align: horizon)[
+  Tensor of matrices
+][
+  $ bold(X) = mat(
+    bold(x)_(1,1), bold(x)_(1,2), dots, bold(x)_(1,n); 
+    bold(x)_(2,1), bold(x)_(2,2), dots, bold(x)_(2,n); 
+    dots.v, dots.v, dots.down, dots.v;
+    bold(x)_(m,1), bold(x)_(m,2), dots, bold(x)_(m,n); 
+  ) $
+]
+
+==
+*Question:* What is the difference between the following?
+
+$ bold(X) = mat(
+  x_(1,1), x_(1,2), dots, x_(1,n); 
+  x_(2,1), x_(2,2), dots, x_(2,n); 
+  dots.v, dots.v, dots.down, dots.v;
+  x_(m,1), x_(m,2), dots, x_(m,n); 
+) $
+
+$ bold(X) = mat(
+  bold(x)_(1,1), bold(x)_(1,2), dots, bold(x)_(1,n); 
+  bold(x)_(2,1), bold(x)_(2,2), dots, bold(x)_(2,n); 
+  dots.v, dots.v, dots.down, dots.v;
+  bold(x)_(m,1), bold(x)_(m,2), dots, bold(x)_(m,n); 
+) $
+
+==
+Capital letters will often refer to *sets* #pause
+
+$ X = {1, 2, 3, 4} $ #pause
+
+We will represent important sets with blackboard font #pause
+
+#side-by-side[$ bb(R) $][Set of all real numbers ${1, 2.03, pi, dots}$] #pause
+#side-by-side[$ bb(Z) $][Set of all integers ${-2, -1, 0, 1, 2, dots}$] #pause
+#side-by-side[$ bb(Z)_+ $][Set of all *positive* integers ${1, 2, dots}$]
+
+==
+#side-by-side[
+  $ [0, 1] $
+][
+  Closed interval $0.0, 0.01, 0.00 dots 1, 0.99, 1.0$
+] #pause
+#side-by-side[
+  $ (0, 1) $
+][
+  Open interval $0.01, 0.00 dots 1, 0.99$
+] #pause
+#side-by-side[
+  $ {0, 1} $
+][
+  Set of two numbers (boolean)
+] #pause
+
+#side-by-side[
+  $ [0, 1]^k $
+][
+  A vector of $k$ numbers between 0 and 1
+] #pause
+
+#side-by-side[
+  $ {0, 1}^(k times k) $
+][
+  A matrix of boolean values of shape $k$ by $k$
+]
+
+==
+We will use various set operations #pause
+
+#side-by-side[$ A subset.eq B $][$A$ is a subset of $B$] #pause
+#side-by-side[$ A subset B $][$A$ is a strict subset of $B$] #pause
+#side-by-side[$ a in A $][$a$ is an element of $A$] #pause
+#side-by-side[$ b in.not A $][$b$ is not an element of $A$] #pause
+#side-by-side[$ A union B $][The union of sets $A$ and $B$] #pause
+#side-by-side[$ A inter B $][The intersection of sets $A$ and $B$] 
+
+==
+We will often use *set builder* notation #pause
+
+$ { #pin(1) x + 1 #pin(2) | #pin(3) x in Z #pin(4) } $ #pause
+
+#pinit-highlight(1, 2)
+#pinit-point-from((1,2), pin-dx: 0pt, offset-dx: 0pt)[Function]
+
+#pinit-highlight(3, 4, fill: blue.transparentize(80%))
+#pinit-point-from((3,4),)[Domain] #pause
+
+#v(2em)
+
+You can think of this as a for loop 
+
+```python
+  output = {} # Set
+  for x in Z:
+    output.insert(x + 1)
+```  #pause
+
+
+#v(2em)
+
+```python
+  output = {x + 1 for x in Z}
+```
 
 = Function Notation
+
 ==
-TODO
+We define *functions* or *maps* between sets
+
+$ #pin(1) f #pin(2) : #pin(3) bb(R) #pin(4) |-> #pin(5) bb(Z) #pin(6) $ #pause
+
+#pinit-highlight(1, 2)
+#pinit-point-from((1,2), pin-dx: 0pt, offset-dx: 0pt)[Name] #pause
+
+#pinit-highlight(3, 4, fill: blue.transparentize(80%))
+#pinit-point-from((3,4),)[Input] #pause
+
+#pinit-highlight(5, 6, fill: green.transparentize(80%))
+#pinit-point-from((5,6),)[Output] #pause
+
+#v(2em)
+
+A function $f$ maps a real number to an integer #pause
+
+*Question:* What functions could $f$ be? #pause
+
+$ "round": bb(R) |-> bb(Z) $ 
+
+==
+
+Functions can have multiple inputs
+
+$ f: X times Theta |-> Y  $ #pause
+
+The function $f$ maps elements from sets $X$ and $Theta$ to set $Y$ #pause
+
+I will define variables when possible 
+
+#side-by-side[$ X in bb(R)^n; Theta in bb(R)^(m times n); Y in [0, 1]^(n times m) $] #pause
+
+==
+Finally, functions can have a function as input or output #pause
+
+*Question:* Any examples? #pause
+
+$ dif / (dif x): underbrace((f: bb(R) |-> bb(R)), "Input function") |-> underbrace((f': bb(R) |-> bb(R)), "Output function") $ #pause
+
+$ dif / (dif x) x^2 = 2x $
+
+/*
+== // 15:00
+The $max$ function returns the maximum of a function over a domain #pause
+
+$ max: (f: X |-> Y) times (Z subset.eq X) |-> Y $ #pause
+
+$ max_(x in Z) f(x) $ #pause
+
+
+The $argmax$ operator returns the input that maximizes a function #pause
+
+$ argmax: (f: X |-> Y) times (Z subset.eq X) |-> Z $ #pause
+
+$ argmax_(x in Z) f(x) $ 
+
+==
+
+We also have the $min$ and $argmin$ operators, which minimize $f$ 
+
+$ min: (f: X |-> Y) times (Z subset.eq X) |-> Y $ #pause
+
+$ min_(x in Z) f(x) $ #pause
+
+$ argmin: (f: X |-> Y) times (Z subset.eq X) |-> Z $ #pause
+
+$ argmin_(x in Z) f(x) $ #pause
+
+We want to make optimal decisions, so we will often take the minimum or maximum of functions
+*/
+
+
+= Notation Exercises
+== // 20:00 + 2
+
+#side-by-side[$ bb(R)^n $ #pause][Set of all vectors containing $n$ real numbers #pause]
+#side-by-side[$ {3, 4, dots, 31} $ #pause][Set of all integers between 3 and 31 #pause]
+#side-by-side[$ [0, 1]^n $ #pause][Set of all vectors of length $n$ with values between 0 and 1 #pause] 
+#side-by-side[$ {0, 1}^n $ #pause][Set of all boolean vectors of length $n$]
+
+/*
+==
+#side-by-side[
+$ f(x) = -(x + 1)^2 $ #pause
+][
+    #align(center)[
+        #canvas(length: 1cm, {
+        plot.plot(size: (8, 6),
+            x-tick-step: 1,
+            y-tick-step: 1,
+            y-min: -4,
+            y-max: 1,
+            y-label: $ f(x) $,
+            {
+            plot.add(
+                domain: (-3, 3), 
+                style: (stroke: (thickness: 5pt, paint: red)),
+                x => -calc.pow(x + 1, 2)
+            )
+            })
+        })
+    ] #pause
+]
+#side-by-side[
+  $ max_(x in bb(R)) f(x) ? $ #pause
+][
+  $ argmax_(x in bb(R)) f(x) ? $ #pause
+][
+  $ argmax_(x in bb(Z)_+) f(x) ? $ #pause
+]
+
+#side-by-side[$ 0 $ #pause][$ -1 $ #pause][$ 1 $]
+*/
+==
+
+$ {x^(1/2) | x in bb(R)_+} $ #pause
+
+*Question:* What is this? #pause
+
+*Answer:* #pause
+- An infinitely large set #pause
+- The results of evaluating $f(x) = sqrt(x)$ for all positive real numbers
 
 // Review 8 mins
 
@@ -228,21 +498,8 @@ Neural networks share many similarities with linear regression
   + Define a loss function $cal(L)$ #pause
   + Use $cal(L)$ to learn the parameters $theta$ of $f$ #pause
   + Solve the example problem
-  + Expand to nonlinear models
-  + Discuss overfitting
-  + Interactive discussion
-  + Homework summary
 
-==
-+ *Define an example problem*
-+ Define our linear model $f$
-+ Define a loss function $cal(L)$
-+ Use $cal(L)$ to learn the parameters $theta$ of $f$
-+ Solve the example problem
-+ Expand to nonlinear models
-+ Discuss overfitting
-+ Interactive discussion
-+ Homework summary
+= Linear Regression - Example Problem <touying:hidden>
 
 ==
   The World Health Organization (WHO) has collected data on life expectancy #pause
@@ -275,9 +532,9 @@ There are studies showing a causal effect of education on health #pause
 ==
 *Task:* Given your education, predict your life expectancy #pause
 
-$X in bb(R)_+:$ Years in school #pause
+$X = bb(R)_+:$ Years in school #pause
 
-$Y in bb(R)_+:$ Age of death #pause
+$Y = bb(R)_+:$ Age of death #pause
 
 Each $x in X$ and $y in Y$ represent a single person #pause
 
@@ -289,26 +546,7 @@ $ f(x, theta) = y; quad x in X, y in Y $ #pause
 ==
 
 // 40:00 
-==
-  + *Define an example problem*
-  + Define our linear model $f$
-  + Define a loss function $cal(L)$
-  + Use $cal(L)$ to learn the parameters $theta$ of $f$
-  + Solve the example problem
-  + Expand to nonlinear models
-  + Discuss overfitting
-  + Interactive discussion
-  + Homework summary
-==
-  + Define an example problem
-  + *Define our linear model $f$*
-  + Define a loss function $cal(L)$
-  + Use $cal(L)$ to learn the parameters $theta$ of $f$
-  + Solve the example problem
-  + Expand to nonlinear models
-  + Discuss overfitting
-  + Interactive discussion
-  + Homework summary
+= Linear Regression - Model <touying:hidden>
 ==
 
 Soon, $f$ will be a deep neural network #pause
@@ -326,28 +564,7 @@ For now, it is easier if we make $f$ a *linear function* #pause
 Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that makes $f(x, bold(theta)) = y$
 //   To do this, we will need to find a *loss function* $cal(L)$
 
-==
-  + Define an example problem
-  + *Define our linear model $f$*
-  + Define a loss function $cal(L)$
-  + Use $cal(L)$ to learn the parameters $theta$ of $f$
-  + Solve the example problem
-  + Expand to nonlinear models
-  + Discuss overfitting
-  + Interactive discussion
-  + Homework summary
-
-==
-  + Define an example problem
-  + Define our linear model $f$
-  + *Define a loss function $cal(L)$*
-  + Use $cal(L)$ to learn the parameters $theta$ of $f$
-  + Solve the example problem
-  + Expand to nonlinear models
-  + Discuss overfitting
-  + Interactive discussion
-  + Homework summary
-
+= Linear Regression - Loss Function <touying:hidden>
 ==
   Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that make $f(x, bold(theta)) = y$ #pause
 
@@ -396,7 +613,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
   #side-by-side[
     $ "error"(f(x, bold(theta)), y) = (f(x, bold(theta)) - y)^2 $
   ][ 
-  ] 
+  ]
 
 ==
   We can write the loss function for a single datapoint $x_i, y_i$ as
@@ -426,28 +643,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
 // 50 mins
 
-==
-  + Define an example problem
-  + Define our linear model $f$
-  + *Define a loss function $cal(L)$*
-  + Use $cal(L)$ to learn the parameters $theta$ of $f$
-  + Solve the example problem
-  + Expand to nonlinear models
-  + Discuss overfitting
-  + Interactive discussion
-  + Homework summary
-
-==
-  + Define an example problem
-  + Define our linear model $f$
-  + Define a loss function $cal(L)$
-  + *Use $cal(L)$ to learn the parameters $theta$ of $f$*
-  + Solve the example problem
-  + Expand to nonlinear models
-  + Discuss overfitting
-  + Interactive discussion
-  + Homework summary
-
+= Linear Regression - Optimization <touying:hidden>
 ==
   Here is our loss function:
 
@@ -534,36 +730,15 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
 // 55:00, maybe 60:00 with more slides?
 
-==
-  + Define an example problem
-  + Define our linear model $f$
-  + Define a loss function $cal(L)$
-  + *Use $cal(L)$ to learn the parameters $theta$ of $f$*
-  + Solve the example problem
-  + Expand to nonlinear models
-  + Discuss overfitting
-  + Interactive discussion
-  + Homework summary
-
-==
-  + Define an example problem
-  + Define our linear model $f$
-  + Define a loss function $cal(L)$
-  + Use $cal(L)$ to learn the parameters $theta$ of $f$
-  + *Solve the example problem*
-  + Expand to nonlinear models
-  + Discuss overfitting
-  + Interactive discussion
-  + Homework summary
-
+= Linear Regression - Example Problem <touying:hidden>
 ==
   Back to the example... #pause
 
   *Task:* Given your education, predict your life expectancy #pause
 
-  $X in bb(R)_+:$ Years in school #pause
+  $X = bb(R)_+:$ Years in school #pause
   
-  $Y in bb(R)_+:$ Age of death #pause
+  $Y = bb(R)_+:$ Age of death #pause
 
   *Approach:* Learn the parameters $theta$ such that 
 
@@ -609,27 +784,8 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
   But can we do better?
 
-==
-  + Define an example problem 
-  + Define our linear model $f$ 
-  + Define a loss function $cal(L)$ 
-  + Use $cal(L)$ to learn the parameters $theta$ of $f$
-  + *Solve the example problem*
-  + Expand to nonlinear models
-  + Discuss overfitting
-  + Interactive discussion
-  + Homework summary
+= Polynomial Regression
 
-==
-  + Define an example problem 
-  + Define our linear model $f$ 
-  + Define a loss function $cal(L)$ 
-  + Use $cal(L)$ to learn the parameters $theta$ of $f$
-  + Solve the example problem
-  + *Expand to nonlinear models*
-  + Discuss overfitting
-  + Interactive discussion
-  + Homework summary
 ==
   *Question:* #pause
   #side-by-side[

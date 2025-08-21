@@ -84,11 +84,12 @@ There are many tasks that humans do not like to do, that robots can do #pause
 #align(center)[What do you want to learn? Why?]
 
 ==
-I started the Behavior Optimization and Learning Theory (BOLT) Lab #pause 
+I lead the Behavior Optimization and Learning Theory (BOLT) Lab #pause 
 
 I am looking for research students focusing on deep reinforcement learning and robotics #pause
 
-If you finish the course and find it too easy, send me an email!
+If the course is too easy, send me an email or come to office hours #pause
+- I give all applicants a 3-4 week project to measure their capabilities
 
 = Course Information
 ==
@@ -112,17 +113,20 @@ Most communication will happen over Moodle #pause
 
 ==
 *Good to Know:* #pause
-- Probability #pause
+- Probability and statistics #pause
   - Bayes rule, conditional probabilities $P(a | b) = (P(b | a) P(a)) / P(b)$
 
+- Numerical/array programming #pause
+  - Numpy, matlab, octave, etc.
+
 ==
-  *Grading (subject to change):* #pause
+  *Grading:* #pause
 - 30% assignments #pause
 - 30% exams #pause
 - 30% final project #pause
-- 10% attendance and participation #pause
+- 10% participation #pause
   - 5% group participation #pause
-  - 5% individual participation #pause
+  - 5% individual participation 
 
 ==
 5% individual participation #pause
@@ -132,16 +136,16 @@ Most communication will happen over Moodle #pause
 
 Some of you are shy or have poor English skills #pause
   - To succeed today in deep learning, you need two things: #pause
-    - Confidence - not afraid to speak your ideas
-    - English - all best papers/conferences currently in English
-      - Maybe in 10 years, best papers will be in Chinese, *but not today*
+    - Confidence - not afraid to speak your ideas #pause
+    - English - all best papers/conferences currently in English #pause
+      - Maybe in 10 years, best papers will be in Chinese, *but not today* #pause
   - Andrew Ng, Yann LeCun, Yoshua Bengio, Geoffrey Hinton, etc #pause
-    - Many great researchers forgotten without confidence or English #pause
+    - Many great researchers forgotten without confidence 
 
 ==
-*Office Hours:* TODO #pause
+*Office Hours:* Thursday 10:00-12:00 #pause
 
-Review assignments early, so you can attend Tuesday office hours #pause
+Review assignments early, so you can attend office hours #pause
 
 Office hours may be crowded before deadlines #pause
 - You will not have much time if you have not started!
@@ -157,32 +161,67 @@ I designed all the course material myself #pause
 - I will upload slides to moodle after lecture 
 
 ==
+*Planned topics:*
+
+#side-by-side(align: left)[
+    - (08.22): Course Introduction
+    - (08.29): Linear Regression
+    - (09.05): Neural Networks 
+    - (09.12): Backpropagation and Optimization
+    - (09.19): Exam 1
+    - (09.26): Classification
+    - (10.03): Training Tricks 
+    - (10.10): Convolutional Neural Networks
+
+][
+    - (10.17): Exam 2
+    - (10.24): Recurrent Neural Networks
+    - (10.31): Autoencoders and Generative Models
+    - (11.07): Diffusion Models 
+    - (11.14): Attention and Transformers
+    - (11.21): Exam 3 
+    - (11.28): Foundation Models 
+]
+
+==
+*Homework assignments:* #pause
+
+- (08.22 - 08.29): (Optional) Array Programming
+- (08.29 - 09.12): Linear Regression
+- (09.12 - 09.26): Neural Networks and Backpropagation
+- (09.26 - 10.10): MLP Regression
+- (10.10 - 10.24): Convolutional MNIST Classification
+- (10.24 - 11.07): RNN Stock Market Prediction 
+- (10.31 - 11.07): Final Project Plan
+- (11.07 - 12.05): Final Project
+
+
+
+==
 If you do not like my teaching style, it is ok #pause
 
 You can instead follow the  _Dive into Deep Learning_ textbook #pause
 - Available for free online at https://d2l.ai #pause
 - Syllabus contains corresponding textbook chapter #pause
-- Also available in Chinese at https://zh.d2l.ai #pause
-
-We will start from the basics and learn the theory behind Deep Learning #pause
-
-Your assignments will teach you two popular Deep Learning libraries: #pause
-- PyTorch #pause
-- JAX
+- Also available in Chinese at https://zh.d2l.ai 
 
 ==
 //32 mins very slow
 First time I taught this course, all lectures were 3 hours #pause
 - Students hate this #pause
 - Stop paying attention around 2 hours #pause
-- Want to go home and sleep #pause
+- After exam students cannot learn #pause
 
 I will try to keep lectures less than 2.5 hours #pause
+- I will always stay later to answer questions #pause
+- After exam there will be no lecture, you can go sleep #pause
 
-I will also provide short breaks #pause
+I might also provide short breaks #pause
 - Leave the classroom #pause
 - Use the toilet #pause
-- Walk around #pause
 - Ask me questions
 
 = Questions or Comments?
+==
+https://ummoodle.um.edu.mo/pluginfile.php/1298433/mod_resource/content/7/syllabus.pdf
+// Approx 30 mins total (2025/2026)

@@ -6,7 +6,7 @@
 
 // For students: you may want to change this to true
 // otherwise you will get one slide for each new line
-#let handout = true
+#let handout = false
 
 // cetz and fletcher bindings for touying
 #let cetz-canvas = touying-reducer.with(reduce: cetz.canvas, cover: cetz.draw.hide.with(bounds: true))
@@ -37,12 +37,6 @@
 )
 
 
-= Course Timeline
-==
-This course follows the history of deep learning #pause
-
-#cimage("figures/lecture_1/timeline.svg")
-
 
 = Deep Learning Successes
 ==
@@ -67,7 +61,7 @@ Deep learning is becoming very popular worldwide
 ][
   Hassabis (DeepMind), Jumper, and Baker won the 2024 Nobel prize in chemistry #pause
 
-  Also for their work on deep learning #pause
+  Also for their work on deep learning
 ]
 
 
@@ -79,8 +73,6 @@ Deep learning is becoming very popular worldwide
 ][
   #cimage("figures/lecture_1/ai_generated.png")
 ]
-
-
 
 ==
 It beat the world champions at difficult video games like DotA 2
@@ -140,7 +132,10 @@ Deep learning is a powerful tool #pause
 Like all powerful tools, deep learning can be used for evil #pause
 
 #v(2em)
-#align(center)[*Request:* Before you train a deep model, ask yourself whether it is good or bad for the world]
+#align(center)[*Request:* 
+
+_Before you train a deep model, consider if it is good or bad for the world_
+]
 
 
 = What is Deep Learning?
@@ -151,10 +146,11 @@ It consists of four parts:
 + Dataset
 + Deep neural network
 + Loss function
-+ Optimization procedure
++ Optimization 
 
 ==
-The *dataset* provides a set inputs and associated outputs
+The *dataset* provides a set inputs and associated outputs #pause
+
 #align(center)[
   #grid(
     columns: 2,
@@ -168,7 +164,7 @@ The *dataset* provides a set inputs and associated outputs
 ]
 
 ==
-The *deep neural network* maps inputs to outputs
+The *deep neural network* maps inputs to outputs #pause
 
 #cimage("figures/lecture_1/dog_to_caption_nn.png", height: 80%)
 
@@ -178,7 +174,7 @@ The *loss function* describes how "wrong" the neural network is. We call this "w
 #cimage("figures/lecture_1/loss_function_nn.png", height: 70%)
 
 ==
-The *optimization procedure* changes the neural network to reduce the loss #pause
+*Optimization* changes the neural network to reduce the loss #pause
 
 #cimage("figures/lecture_1/optimizer_nn.png", height: 70%)
 
@@ -188,7 +184,7 @@ Deep learning consists of four parts:
 + Dataset
 + Deep neural network
 + Loss function
-+ Optimization procedure #pause
++ Optimization #pause
 
 In this course, we will cover these parts in detail
 
@@ -292,6 +288,13 @@ $ f: X, Theta |-> Y $
 + Machine learning provides a framework to solve difficult problems #pause
   - We learn the parameters $theta$ for some function $f(x, theta) = y$
 
+= Course Timeline
+==
+This course follows the history of deep learning #pause
+
+#cimage("figures/lecture_1/timeline.svg")
+
+= Programming
 ==
 You will use Python with machine learning libraries in this course #pause
 
