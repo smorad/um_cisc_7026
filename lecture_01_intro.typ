@@ -4,6 +4,9 @@
 #import "@preview/fletcher:0.5.8" as fletcher: node, edge
 #import "common.typ": *
 
+#set math.vec(delim: "[")
+#set math.mat(delim: "[")
+
 // For students: you may want to change this to true
 // otherwise you will get one slide for each new line
 #let handout = false
@@ -201,7 +204,7 @@ Machine learning defines *what* we are trying to do #pause
 
 Deep learning defines *how* we do it #pause
 
-Before we can understand deep learning, we must become familiar with machine learning
+To understand deep learning, we must first understand machine learning
 ]
 
 = Machine Learning
@@ -210,7 +213,7 @@ Before we can understand deep learning, we must become familiar with machine lea
 
 *Question:* How would you program this? #pause
 
-#cimage("figures/lecture_1/dog_muffin.jpeg", width: 50%) #pause
+#cimage("figures/lecture_1/dog_muffin.jpeg", width: 60%) #pause
 
 Would your method still work? #pause
 
@@ -226,13 +229,13 @@ In other words, we tell an ML model *what* we want it to do #pause
 And it learns *how* to do it
 
 ==
-We often know *what* we want, but we do not know *how* #pause
+Often know *what* we want, but we do not know *how* #pause
 
-We have many pictures of either dogs or muffins $x in X$ #pause
+Have many pictures of either dogs or muffins $x in X$ #pause
 
-We want to know if the picture is [dog | muffin] $y in Y$ #pause
+Want to know if the picture is [dog | muffin] $y in Y$ #pause
 
-We learn a function or mapping from $X$ to $Y$ #pause
+In ML, we learn a function or mapping $f$ from $X$ to $Y$ #pause
 
 $ f: X |-> Y $ #pause
 
@@ -253,18 +256,34 @@ $ f: "voice command" |-> "robot action" $ #pause
 *Question:* Can anyone suggest other interesting functions?
 
 ==
-Why do we call it machine *learning*? #pause
+Usually, functions are defined once and static: $f(x) = x^2$ #pause
 
-We learn the function $f$ from the *data* $x in X, y in Y$ #pause
+But in machine learning, we will *learn* the function #pause
 
-More specifically, we learn function *parameters* $Theta$ #pause
+The function $f$ will change over time #pause
 
-$ f: X, Theta |-> Y $
+To avoid confusion, we introduce the *function parameters* 
+
+#side-by-side[
+  $ theta in Theta $ #pause
+][
+  $ f: X times Theta |-> Y $ #pause
+]
+
+Now, $f$ remains fixed and we can learn the parameters #pause
+
+#side-by-side[
+  $ f(x, theta) = x^theta $ #pause
+][
+
+  $ f(x, 2) = x^2 $ #pause
+][
+  $ f(x, 3) = x^3 $ 
+]
+
 
 ==
-More specifically, we learn function *parameters* $Theta$
-
-$ f: X, Theta |-> Y $
+$ f: X times Theta |-> Y $
 
 #only(2)[$ f("你好吗", vec(theta_1, theta_2, dots.v)) = "You good?" $]
 
@@ -278,15 +297,17 @@ $ f: X, Theta |-> Y $
   $ f("Dog", vec(theta_1, theta_2, dots.v) ) = #image("figures/lecture_1/dog.png", height: 20%) $ 
 ]
 #only(6)[
-  Machine learning learns the parameters that solve difficult problems
+  Machine learning finds the parameters that solve difficult problems
 ]
 
 ==
-*Summary:* #pause
+To summarize: #pause
+
 + Certain problems are difficult to solve with programming #pause
   - Dog or muffin? #pause
 + Machine learning provides a framework to solve difficult problems #pause
-  - We learn the parameters $theta$ for some function $f(x, theta) = y$
+  - We know *what* we want to do, ML tells us *how* to do it #pause
+  - The *how* is encoded in function parameters $theta$
 
 = Course Timeline
 ==
@@ -438,11 +459,7 @@ TypeError: dot_general requires contracting dimensions to have the same shape, g
 
 *Homework:* #pause
 - Review linear algebra if you are not familiar #pause
-- Install `pytorch` and `jax` onto your computer, or use Google Colab #pause
-- Play around with them #pause
-  - What does `@` do if you have a `(3, 3, 3)` tensor? #pause
-  - What does `*` do if one tensor has fewer dimensions? #pause
-  - How do you invert a matrix? #pause
-  - What does `jnp.arange, jnp.zeros, jnp.full` do? #pause
-    - `torch.arange, torch.zeros, torch.full` #pause
-- Read the documentation #pause
+- Complete assignment 0 on Moodle (optional, ungraded) #pause
+  - If you know `torch` or `jax` it should take 5 minutes #pause
+  - If you don't know `torch` or `jax` it is important you learn #pause
+  - Read the documentation for `jax` and `torch` -- it is very good!

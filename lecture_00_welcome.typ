@@ -128,22 +128,53 @@ Most communication will happen over Moodle #pause
   - 5% group participation #pause
   - 5% individual participation 
 
+
+==
+Turn in assignments on time to Moodle! #pause
+
+Late penalties:
+  - -25% 0-1 days late
+  - -50% 1-2 days late
+  - -75% 2-3 days late
+  - -100% 3+ days late 
+
+==
+There are 3 exams in this course, I will only score your best two exams #pause
+
+*Example 1:* You are sick and miss exam 2, but you take exam 1 and 3 #pause
+
+#side-by-side[Exam 1: 70/100][Exam 2: 0/100][Exam 3: 90/100][Score: 80/100] #pause
+
+*Example 2:* You take all three exams #pause
+
+#side-by-side[Exam 1: 70/100][Exam 2: 80/100][Exam 3: 90/100][Score: 85/100] #pause
+
+*Example 3:* If you are very smart you can skip exam 3 #pause
+
+#side-by-side[Exam 1: 100/100][Exam 2: 100/100][Exam 3: 0/100][Score: 100/100]
+
+
 ==
 5% individual participation #pause
   - For asking questions or answering questions in class #pause
-  - If you never talk in class, *you will get 0 points* #pause
-  - Better learning when you answer questions (especially if wrong) #pause
+  - If you never talk in class, *you will get 0 participation points* #pause
 
-Some of you are shy or have poor English skills #pause
-  - To succeed today in deep learning, you need two things: #pause
-    - Confidence - not afraid to speak your ideas #pause
-    - English - all best papers/conferences currently in English #pause
+It is my job to prepare you for success in deep learning #pause
+  - Some of you are shy or have poor English skills #pause
+  - To succeed, you need *confidence* and *English skills* #pause
       - Maybe in 10 years, best papers will be in Chinese, *but not today* #pause
-  - Andrew Ng, Yann LeCun, Yoshua Bengio, Geoffrey Hinton, etc #pause
-    - Many great researchers forgotten without confidence 
-
+    - Andrew Ng, Yann LeCun, and Yoshua Bengio #pause
+      - Learned English as a second language and confident speakers #pause 
+      - Other great scientists are forgotten 
 ==
-*Office Hours:* Thursday 10:00-12:00 #pause
+Final project instructions already on Moodle #pause
+- Listen to lectures to understand deep learning #pause
+- Form of a group of 4 or 5 members #pause
+- Think of an interesting deep learning project #pause
+- Create and submit your project plan #pause
+- Submit your final project
+==
+*Office Hours:* Thursday 14:00-16:00 #pause
 
 Review assignments early, so you can attend office hours #pause
 
@@ -220,6 +251,31 @@ I might also provide short breaks #pause
 - Leave the classroom #pause
 - Use the toilet #pause
 - Ask me questions
+
+= Cheating
+==
+I take cheating *very seriously* #pause
+
+If caught, you get a 0 in the course and *fail the course* #pause
+  - Will drop your GPA, and may cause removal from Master program #pause
+
+I failed cheating students last year, it is not worth it #pause
+  - I already drop your lowest exam score
+
+==
+
+The value of education is in learning, not the degree #pause
+- Just study and do your best #pause
+
+Cheating is not possible for Baidu/DeepSeek/etc interview #pause
+- Invite you on-campus for 5-hour whiteboard interview #pause
+- Cannot cheat, cannot get lucky #pause
+- Only way to succeed is to understand the material
+
+==
+#cimage("figures/lecture_1/interview2.png")
+==
+#cimage("figures/lecture_1/interview.png")
 
 = Questions or Comments?
 ==
