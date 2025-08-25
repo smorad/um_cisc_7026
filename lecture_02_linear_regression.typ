@@ -7,7 +7,7 @@
 
 // For students: you may want to change this to true
 // otherwise you will get one slide for each new line
-#let handout = true
+#let handout = false
 
 // cetz and fletcher bindings for touying
 #let cetz-canvas = touying-reducer.with(reduce: cetz.canvas, cover: cetz.draw.hide.with(bounds: true))
@@ -236,7 +236,12 @@ Same for matrices
     dots.v, dots.v, dots.down, dots.v;
     bold(x)_(m,1), bold(x)_(m,2), dots, bold(x)_(m,n); 
   ) $
-]
+] #pause
+
+I use square brackets for data index #pause
+
+$x_([i], j, k)$ indexes a 3D tensor, where the first dimension is the dataset #pause
+-  Dataset of matrices (2D)
 
 ==
 *Question:* What is the difference between the following?
@@ -308,7 +313,7 @@ We will use various set operations #pause
 ==
 We will often use *set builder* notation #pause
 
-$ { #pin(1) x + 1 #pin(2) | #pin(3) x in Z #pin(4) } $ #pause
+$ { #pin(1) x + 1 #pin(2) | #pin(3) x in bb(Z) #pin(4) } $ #pause
 
 #pinit-highlight(1, 2)
 #pinit-point-from((1,2), pin-dx: 0pt, offset-dx: 0pt)[Function]
@@ -367,7 +372,7 @@ The function $f$ maps elements from sets $X$ and $Theta$ to set $Y$ #pause
 
 I will define variables when possible 
 
-#side-by-side[$ X in bb(R)^n; Theta in bb(R)^(m times n); Y in [0, 1]^(n times m) $] #pause
+#side-by-side[$ X = bb(R)^n  $][$ Theta = bb(R)^(m times n) $][$ Y = [0, 1]^(n times m) $] 
 
 ==
 Finally, functions can have a function as input or output #pause
@@ -376,7 +381,7 @@ Finally, functions can have a function as input or output #pause
 
 $ dif / (dif x): underbrace((f: bb(R) |-> bb(R)), "Input function") |-> underbrace((f': bb(R) |-> bb(R)), "Output function") $ #pause
 
-$ dif / (dif x) x^2 = 2x $
+$ dif / (dif x) [x^2] = 2x $
 
 /*
 == // 15:00
@@ -458,7 +463,13 @@ $ {x^(1/2) | x in bb(R)_+} $ #pause
 
 *Answer:* #pause
 - An infinitely large set #pause
-- The results of evaluating $f(x) = sqrt(x)$ for all positive real numbers
+- The results of evaluating $f(x) = sqrt(x)$ for all positive real numbers #pause
+
+$ {2x | x in bb(Z)_+} $ #pause
+
+*Question:* What is this? #pause
+
+*Answer:* Set of all positive even integers
 
 // Review 8 mins
 
@@ -493,16 +504,18 @@ Neural networks share many similarities with linear regression
 ==
   Today, we will come up with a regression problem and then solve it! #pause
 
-  + Define an example problem #pause
+  Remember the four parts of each machine learning algorithm! #pause
+  + Define an example problem and dataset #pause
   + Define our linear model $f$ #pause
   + Define a loss function $cal(L)$ #pause
-  + Use $cal(L)$ to learn the parameters $theta$ of $f$ #pause
-  + Solve the example problem
+  + Find parameters using $cal(L)$ (optimization) #pause
+
+  We will combine these to solve the example problem
 
 = Linear Regression - Example Problem <touying:hidden>
 
 ==
-  The World Health Organization (WHO) has collected data on life expectancy #pause
+  The World Health Organization (WHO) collected data on life expectancy #pause
 
   #cimage("figures/lecture_2/who.png", height: 60%)
 
@@ -510,7 +523,7 @@ Neural networks share many similarities with linear regression
   ] 
 
 ==
-  The WHO collected data from roughly 3,000 people from 193 countries #pause
+  The data comes from roughly 3,000 people from 193 countries #pause
 
   For each person, they recorded: #pause
   - Home country #pause
@@ -551,7 +564,9 @@ $ f(x, theta) = y; quad x in X, y in Y $ #pause
 
 Soon, $f$ will be a deep neural network #pause
 
-For now, it is easier if we make $f$ a *linear function* #pause
+The core of all neural networks are *linear functions*
+
+For now, we let $f$ be a linear function #pause
 
 #align(center, grid(
   columns: 2,
@@ -616,26 +631,26 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
   ]
 
 ==
-  We can write the loss function for a single datapoint $x_i, y_i$ as
+  We can write the loss function for a single datapoint $x_[i], y_[i]$ as
 
-  $ cal(L)(x_i, y_i, bold(theta)) = "error"(f(x_i, bold(theta)),  y_i) = (f(x_i, bold(theta)) - y_i)^2 $ #pause
+  $ cal(L)(x_[i], y_[i], bold(theta)) = "error"(f(x_[i], bold(theta)),  y_[i]) = (f(x_[i], bold(theta)) - y_[i])^2 $ #pause
 
   *Question:* Will this $cal(L)$ give us a good prediction for all possible $x$? #pause
 
-  *Answer:* No! We only consider a single datapoint $x_i, y_i$. We want to learn $bold(theta)$ for the entire dataset, for all $x in X, y in Y$
+  *Answer:* No! We only consider a single datapoint $x_[i], y_[i]$. We want to learn $bold(theta)$ for the entire dataset, for all $x in X, y in Y$
 
 ==
-  For a single $x_i, y_i$:
+  For a single $x_[i], y_[i]$:
   $ 
-   cal(L)(x_i, y_i, bold(theta)) = "error"(f(x_i, bold(theta)),  y_i) = (f(x_i, bold(theta)) - y_i)^2 
+   cal(L)(x_[i], y_[i], bold(theta)) = "error"(f(x_[i], bold(theta)),  y_[i]) = (f(x_[i], bold(theta)) - y_[i])^2 
   $ #pause
 
   For the entire dataset: 
-  $ bold(x) = mat(x_1, x_2, dots, x_n)^top, bold(y) = mat(y_1, y_2, dots, y_n)^top $ #pause
+  $ bold(x) = mat(x_[1], x_[2], dots, x_[n])^top, bold(y) = mat(y_[1], y_[2], dots, y_[n])^top $ #pause
 
   #text(size: 22pt)[
     $ 
-    cal(L)(bold(x), bold(y), bold(theta)) = sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) = sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
+    cal(L)(bold(x), bold(y), bold(theta)) = sum_(i=1)^n "error"(f(x_[i], bold(theta)),  y_[i]) = sum_(i=1)^n (f(x_[i], bold(theta)) - y_[i])^2 
     $
   ] #pause
 
@@ -647,7 +662,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 ==
   Here is our loss function:
 
-  $ cal(L)(bold(x), bold(y), bold(theta)) = sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) = sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 $ #pause
+  $ cal(L)(bold(x), bold(y), bold(theta)) = sum_(i=1)^n "error"(f(x_[i], bold(theta)),  y_[i]) = sum_(i=1)^n (f(x_[i], bold(theta)) - y_[i])^2 $ #pause
 
   When $cal(L)(bold(x), bold(y), bold(theta))$ is small, then $f(x, bold(theta)) approx y$ for the whole dataset! #pause
 
@@ -668,13 +683,13 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 ==
   Formally, our objective is to find the $argmin$ of the loss
   $ 
-   argmin_bold(theta) cal(L)(bold(x), bold(y), bold(theta)) &= argmin_bold(theta) sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) \ &= argmin_bold(theta) sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
+   argmin_bold(theta) cal(L)(bold(x), bold(y), bold(theta)) &= argmin_bold(theta) sum_(i=1)^n "error"(f(x_[i], bold(theta)),  y_[i]) \ &= argmin_bold(theta) sum_(i=1)^n (f(x_[i], bold(theta)) - y_[i])^2 
   $ 
 
 
 ==
   $ 
-   argmin_bold(theta) cal(L)(bold(x), bold(y), bold(theta)) &= argmin_bold(theta) sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) \ &= argmin_bold(theta) sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
+   argmin_bold(theta) cal(L)(bold(x), bold(y), bold(theta)) &= argmin_bold(theta) sum_(i=1)^n "error"(f(x_[i], bold(theta)),  y_[i]) \ &= argmin_bold(theta) sum_(i=1)^n (f(x_[i], bold(theta)) - y_[i])^2 
   $ #pause
 
   *Question:* How do we evaluate this expression to find $bold(theta)$? #pause
@@ -686,26 +701,26 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
   We will go over the steps to find $bold(theta)$ 
 
 ==
-  First, we will construct a *design matrix* $bold(X)_D$ containing input data $x$ #pause
+  First, we will construct a *design matrix* $overline(bold(X))$ containing input data $x$ #pause
 
-  $ bold(X)_D = mat(bold(x), bold(1)) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) $
+  $ overline(bold(X)) = mat(bold(x), bold(1)) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) $
 
 ==
   #text(size: 22pt)[
-  We add the column of ones so that we can multiply $bold(X)_D$ with $bold(theta)$ to get a linear function $theta_1 x + theta_0$ evaluated at each data point
+  We add the column of ones so that we can multiply $overline(bold(X))$ with $bold(theta)$ to get a linear function $theta_1 x + theta_0$ evaluated at each data point
 
-  $ bold(X)_D bold(theta) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) vec(theta_1, theta_0) = underbrace(vec(theta_1 x_1 + theta_0, theta_1 x_2 + theta_0, dots.v, theta_1 x_n + theta_0), "Predicted" y) $
+  $ overline(bold(X)) bold(theta) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) vec(theta_1, theta_0) = underbrace(vec(theta_1 x_1 + theta_0, theta_1 x_2 + theta_0, dots.v, theta_1 x_n + theta_0), "Predicted" y) $
 
   We can also evaluate our model for new datapoints #pause
 
-  $ bold(X)_D bold(theta) = mat(x_"Steven", 1) vec(theta_1, theta_0) = underbrace(vec(theta_1 x_"Steven" + theta_0), "Predicted" y) $ 
+  $ overline(bold(X)) bold(theta) = mat(x_"Steven", 1) vec(theta_1, theta_0) = underbrace(vec(theta_1 x_"Steven" + theta_0), "Predicted" y) $ 
   ]
 
 ==
   #side-by-side[
-    With our design matrix $bold(X)_D$ and desired output $bold(y)$,
+    With our design matrix $overline(bold(X))$ and desired output $bold(y)$,
   ][  
-  $ bold(X)_D = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1), bold(y) = vec(y_1, y_2, dots.v, y_n) $
+  $ overline(bold(X)) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1), bold(y) = vec(y_1, y_2, dots.v, y_n) $
   ] #pause
   
   #side-by-side[
@@ -714,18 +729,18 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
   #v(2em)
 
-  #side-by-side[$ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ ][(Magic!) We can find the parameters that minimize $cal(L)$]
+  #side-by-side[$ bold(theta) = (overline(bold(X))^top overline(bold(X)) )^(-1) overline(bold(X))^top bold(y) $ ][(Magic!) We can find the parameters that minimize $cal(L)$]
 
 ==
   To summarize: #pause
 
   The $bold(theta)$ given by
 
-  $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ #pause
+  $ bold(theta) = (overline(bold(X))^top overline(bold(X)) )^(-1) overline(bold(X))^top bold(y) $ #pause
 
   Provide the solution to 
   $ 
-   argmin_bold(theta) cal(L)(bold(x), bold(y), bold(theta)) &= argmin_bold(theta) sum_(i=1)^n "error"(f(x_i, bold(theta)),  y_i) \ &= argmin_bold(theta) sum_(i=1)^n (f(x_i, bold(theta)) - y_i)^2 
+   argmin_bold(theta) cal(L)(bold(x), bold(y), bold(theta)) &= argmin_bold(theta) sum_(i=1)^n "error"(f(x_[i], bold(theta)),  y_[i]) \ &= argmin_bold(theta) sum_(i=1)^n (f(x_[i], bold(theta)) - y_[i])^2 
   $ 
 
 // 55:00, maybe 60:00 with more slides?
@@ -805,20 +820,20 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
   *Trick:* Change of variables to make $f$ nonlinear: $x_"new" = log(1 + x_"data")$ #pause
 
-  $ bold(X)_D = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => bold(X)_D = mat(log(1 + x_1), 1; log(1 + x_2), 1; dots.v, dots.v; log(1 + x_n), 1) $
+  $ overline(bold(X)) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => overline(bold(X)) = mat(log(1 + x_1), 1; log(1 + x_2), 1; dots.v, dots.v; log(1 + x_n), 1) $
 
   Now, $f$ is a linear function of $log(1 + x)$ -- a nonlinear function of $x$!
 
 ==
   New design matrix...
-  $ bold(X)_D = mat(log(1 + x_1), 1; log(1 + x_2), 1; dots.v, dots.v; log(1 + x_n), 1) $
+  $ overline(bold(X)) = mat(log(1 + x_1), 1; log(1 + x_2), 1; dots.v, dots.v; log(1 + x_n), 1) $
 
   #side-by-side[
   New function...
   $ f(x, vec(theta_1, theta_0)) = theta_1 log(1 + x) + theta_0 $#pause
   ][
   Same solution...
-  $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
+  $ bold(theta) = (overline(bold(X))^top overline(bold(X)) )^(-1) overline(bold(X))^top bold(y) $
   ]
 
 ==
@@ -842,7 +857,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 ==
   Expand $x$ to a multi-dimensional input space... #pause
 
-  $ bold(X)_D = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => bold(X)_D = mat(
+  $ overline(bold(X)) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => overline(bold(X)) = mat(
     x_1^m, x_1^(m-1), dots, x_1, 1; 
     x_2^m, x_2^(m-1), dots, x_2, 1; 
     dots.v, dots.v, dots.down; 
@@ -856,7 +871,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
 ==
   #text(size:22pt)[
-  $ bold(X)_D bold(theta) = underbrace(mat(
+  $ overline(bold(X)) bold(theta) = underbrace(mat(
     x_1^m, x_1^(m-1), dots, x_1, 1; 
     x_2^m, x_2^(m-1), dots, x_2, 1; 
     dots.v, dots.v, dots.down; 
@@ -873,7 +888,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
   $ "New function... " quad f(x, bold(theta)) = theta_m x^m + theta_(m - 1) x^(m-1), dots, theta_1 + x^1 + theta_0 $ #pause
 
-  $ "Same solution... "quad bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
+  $ "Same solution... "quad bold(theta) = (overline(bold(X))^top overline(bold(X)) )^(-1) overline(bold(X))^top bold(y) $
 
 ==
   $ f(x, bold(theta)) = theta_m x^m + theta_(m - 1) x^(m-1), dots, theta_1 + x^1 + theta_0 $ #pause
