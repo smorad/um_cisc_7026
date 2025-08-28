@@ -6,7 +6,7 @@
 
 // For students: you may want to change this to true
 // otherwise you will get one slide for each new line
-#let handout = false
+#let handout = true
 
 // cetz and fletcher bindings for touying
 #let cetz-canvas = touying-reducer.with(reduce: cetz.canvas, cover: cetz.draw.hide.with(bounds: true))
@@ -39,8 +39,6 @@
 
 ==
 
-This is my second time teaching this course at UM #pause
-
 Please provide feedback privately to me #pause
 - Email smorad at um.edu.mo
 - Chat after class #pause
@@ -62,9 +60,9 @@ It will help me alter the course towards your goals
   #side-by-side[#cimage("figures/lecture_1/az.jpg", height: 60%)][#cimage("figures/lecture_1/speer.png", height: 60%)]
 
 ==
-  After school, I realized much of the classical robotics that we learn in school *does not work* in reality #pause
+  Most of the classical robotics learned in school *does not work* in reality #pause
 
-  #cimage("figures/lecture_1/curiosity.jpg", height: 50%) #pause
+  #cimage("figures/lecture_1/curiosity.jpg", height: 70%) #pause
 
   Today's robots are stupid -- important robots are human controlled
 ==
@@ -76,30 +74,27 @@ Robots that *learn* from their mistakes
 
 // 16 mins when I blab
 ==
-I am interested in *deep learning* because I want to make smarter robots #pause
 
-There are many tasks that humans do not like to do, that robots can do #pause
+There are many tasks that humans do not like, but must be done #pause
+- We can solve these tasks with intelligent robots #pause
+- Humans can focus on passions like sports, art, studies, etc #pause
+
+I am interested in *deep learning* because I believe it is the only way to create intelligent robots that learn from their mistakes #pause 
 
 #v(2em)
-#align(center)[What do you want to learn? Why?]
+#align(center)[*Question:* Why are you interested in deep learning?]
 
 ==
 I lead the Behavior Optimization and Learning Theory (BOLT) Lab #pause 
 
-I am looking for research students focusing on deep reinforcement learning and robotics #pause
+I am looking for a research student focusing on deep reinforcement learning and robotics *with a strong mathematical background* #pause
 
 If the course is too easy, send me an email or come to office hours #pause
 - I give all applicants a 3-4 week project to measure their capabilities
 
-= Course Information
-==
-Most communication will happen over Moodle #pause
-- I will try and post lecture slides after each lecture #pause
-- Assignments #pause
-- Grading
+= Prerequisites
 
 ==
-*Prerequisites*: #pause
 - Programming in python #pause
   - Should be able to implement a stack, etc #pause
   - GPT/DeepSeek is *not enough*, you will fail #pause
@@ -119,8 +114,9 @@ Most communication will happen over Moodle #pause
 - Numerical/array programming #pause
   - Numpy, matlab, octave, etc.
 
+
+= Grading
 ==
-  *Grading:* #pause
 - 30% assignments #pause
 - 30% exams #pause
 - 30% final project #pause
@@ -129,8 +125,9 @@ Most communication will happen over Moodle #pause
   - 5% individual participation 
 
 
+= Grading - Assignments <touying:hidden>
 ==
-Turn in assignments on time to Moodle! #pause
+Turn in assignments on time! #pause
 
 Late penalties:
   - -25% 0-1 days late
@@ -138,6 +135,7 @@ Late penalties:
   - -75% 2-3 days late
   - -100% 3+ days late 
 
+= Grading - Exams <touying:hidden>
 ==
 There are 3 exams in this course, I will only score your best two exams #pause
 
@@ -154,10 +152,22 @@ There are 3 exams in this course, I will only score your best two exams #pause
 #side-by-side[Exam 1: 100/100][Exam 2: 100/100][Exam 3: 0/100][Score: 100/100]
 
 
+= Grading - Final Project <touying:hidden>
 ==
-5% individual participation #pause
-  - For asking questions or answering questions in class #pause
-  - If you never talk in class, *you will get 0 participation points* #pause
+Final project instructions already on Moodle #pause
+- Listen to lectures to understand deep learning #pause
+- Form of a group of 4 or 5 members #pause
+- Think of an interesting deep learning project #pause
+- Create and submit your project plan #pause
+- Submit your final project
+// 26 mins blabbing
+
+= Grading - Participation <touying:hidden>
+==
+5% group participation, 5% individual participation #pause
+  - All students share group score, work together! #pause
+  - Individual participation for asking/answering questions in class #pause
+  - If you never speak, *you will get 0 individiual participation points* #pause
 
 It is my job to prepare you for success in deep learning #pause
   - Some of you are shy or have poor English skills #pause
@@ -166,13 +176,9 @@ It is my job to prepare you for success in deep learning #pause
     - Andrew Ng, Yann LeCun, and Yoshua Bengio #pause
       - Learned English as a second language and confident speakers #pause 
       - Other great scientists are forgotten 
-==
-Final project instructions already on Moodle #pause
-- Listen to lectures to understand deep learning #pause
-- Form of a group of 4 or 5 members #pause
-- Think of an interesting deep learning project #pause
-- Create and submit your project plan #pause
-- Submit your final project
+
+= Course Structure
+= Course Structure - Office Hours <touying:hidden>
 ==
 *Office Hours:* Thursday 14:00-16:00 #pause
 
@@ -181,19 +187,9 @@ Review assignments early, so you can attend office hours #pause
 Office hours may be crowded before deadlines #pause
 - You will not have much time if you have not started!
 
-// 26 mins blabbing
 
-= Course Structure
+= Course Structure - Planned Topics <touying:hidden>
 ==
-I designed all the course material myself #pause
-- Assignments and content inspired by Prof. Dingqi Yang #pause
-- You can view presentation source code online 
-  - https://github.com/smorad/um_cisc_7026 #pause
-- I will upload slides to moodle after lecture 
-
-==
-*Planned topics:*
-
 #side-by-side(align: left)[
     - (08.22): Course Introduction
     - (08.29): Linear Regression
@@ -214,9 +210,8 @@ I designed all the course material myself #pause
     - (11.28): Foundation Models 
 ]
 
+= Course Structure - Homework Assigments <touying:hidden>
 ==
-*Homework assignments:* #pause
-
 - (08.22 - 08.29): (Optional) Array Programming
 - (08.29 - 09.12): Linear Regression
 - (09.12 - 09.26): Neural Networks and Backpropagation
@@ -227,6 +222,18 @@ I designed all the course material myself #pause
 - (11.07 - 12.05): Final Project
 
 
+= Course Structure - Resources <touying:hidden>
+==
+Most communication will happen over Moodle #pause
+- I will try and post lecture slides after each lecture #pause
+- Assignments #pause
+- Grading
+==
+I designed the course material myself #pause
+- Assignments inspired by Prof. Dingqi Yang #pause
+- You can view presentation source code online 
+  - https://github.com/smorad/um_cisc_7026 #pause
+- I will upload slides to moodle after lecture 
 
 ==
 If you do not like my teaching style, it is ok #pause
@@ -236,6 +243,7 @@ You can instead follow the  _Dive into Deep Learning_ textbook #pause
 - Syllabus contains corresponding textbook chapter #pause
 - Also available in Chinese at https://zh.d2l.ai 
 
+= Course Structure - Breaks <touying:hidden>
 ==
 //32 mins very slow
 First time I taught this course, all lectures were 3 hours #pause
@@ -281,3 +289,5 @@ Cheating is not possible for Baidu/DeepSeek/etc interview #pause
 ==
 https://ummoodle.um.edu.mo/pluginfile.php/1298433/mod_resource/content/7/syllabus.pdf
 // Approx 30 mins total (2025/2026)
+
+= Introduction to Deep Learning

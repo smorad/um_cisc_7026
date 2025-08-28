@@ -47,6 +47,8 @@
   plot.plot(size: (8, 6),
     x-tick-step: 1,
     y-tick-step: 2,
+    x-label: $ x $,
+    y-label: $ f(x) $,
     {
       plot.add(
         domain: (-2, 2), 
@@ -65,6 +67,32 @@
 )
 
 
+= Announcements
+==
+Homework 0 was ok? #pause
+
+Homework 1 released, due in ~2 weeks (see Moodle) #pause
+- Discuss more at the end of class #pause
+
+I am getting married, and will be away 09.12 and 09.19 #pause
+- Yutao will lecture 09.12 #pause
+- My students will proctor exam 1 on 09.19 #pause
+
+==
+
+Currently writing exam 1, probably 5 questions: #pause
+- 1 question function notation
+- 1 question set notation
+- 1 question linear regression (make sure you can invert matrices)
+- 1 question neural networks (neurons)
+- 1 question gradient descent (know how to take derivatives, no need to memorize formulas) #pause
+
+Bring a pen/pencil/eraser to exam, you need nothing else #pause
+
+You will have 3 hours to finish the exam #pause
+- Probably takes most students 1-1.5 hours #pause
+- No rush, take as long as you need
+
 = Review
 ==
   We often know *what* we want, but we do not know *how* #pause
@@ -75,121 +103,25 @@
 
   We learn a function or mapping from $X$ to $Y$
 
+  $ f: X times |-> Y $ 
 
 ==
-  #text(size: 23pt)[
-    Why do we call it machine *learning*? #pause
 
-    We learn the function $f$ from the *data* $x in X, y in Y$ #pause
+Usually, functions are defined once and static: $f(x) = x^2$ #pause
 
-    More specifically, we learn function *parameters* $Theta$ #pause
+But in machine learning, we must *learn* the function #pause
 
-    $ f: X times Theta |-> Y $ #pause
+To avoid confusion, we introduce the *function parameters* 
 
-    $ f("你好吗", vec(theta_1, theta_2, dots.v)) = "You good?" $ #pause
+#side-by-side[
+  $ theta in Theta $ #pause
+][
+  $ f: X times Theta |-> Y $ #pause
+]
 
-    $ x = "你好吗", quad X = "Chinese sentences" $ #pause
-    $ y = "You good?", quad Y = "English sentences" $
-  ]
+= Math Notation
 
-/*
-==
-  Create vectors, matrices, or tensors in `jax`
-
-  ```python
-    import jax.numpy as jnp
-    a = jnp.array(1) # Scalar
-    b = jnp.array([1, 2]) # Vector
-    C = jnp.array([[1,2], [3,4]]) # 2x2 Matrix
-    D = jnp.ones((3,3,3)) # 3x3x3 Tensor
-  ```
-
-  You can determine the dimensions of a variable using `shape`
-
-  ```python
-    b.shape # Prints (2,)
-    C.shape # Prints (2,2)
-    D.shape # prints (3,3,3)
-  ```
-
-==
-  Create vectors, matrices, or tensors in `pytorch`
-
-  ```python
-    import torch
-    a = torch.tensor(1) # Scalar
-    b = torch.tensor([1, 2]) # Vector
-    C = torch.tensor([[1,2], [3,4]]) # 2x2 Matrix
-    D = torch.ones((3,3,3)) # 3x3x3 Tensor
-  ```
-
-  You can determine the dimensions of a variable using `shape`
-
-  ```python
-    b.shape # Prints (2,)
-    C.shape # Prints (2,2)
-    D.shape # prints (3,3,3)
-  ```
-
-==
-  ```python
-    import jax.numpy as jnp
-    
-    s = 5 * jnp.array([1, 2])
-    print(s) # jnp.array(5, 10)
-    x = jnp.array([1, 2]) + jnp.array([3, 4])
-    print(x) # jnp.array([4, 6])
-    y = jnp.array([1, 2]) * jnp.array([3, 4]) # Careful!
-    print(y) # jnp.array([3, 8])
-    z = jnp.array([[1], [2]]) @ jnp.array([[3, 4]])
-    print(z) # A^t B (dot product), jnp.array([[11]])
-
-  ```
-
-==
-  `pytorch` is very similar to `jax`
-
-  ```python
-    import torch
-
-    s = 5 * torch.tensor([1, 2])
-    print(s) # torch.tensor(5, 10)
-    x = torch.tensor([1, 2]) + torch.tensor([3, 4])
-    print(x) # torch.tensor([4, 6])
-    y = torch.tensor([1, 2]) * torch.tensor([3, 4]) # Careful!
-    print(y) # torch.tensor([3, 8])
-    z = torch.tensor([[1], [2]]) @ torch.tensor([[3, 4]])
-    print(z) # A^t B (dot product), torch.tensor([[11]])
-  ```
-
-==
-  You can also call various methods on arrays/tensors
-  ```python
-  import jax.numpy as jnp
-
-  x = jnp.array([[1, 2], [3, 4]]).sum(axis=0) 
-  print(x) # Sum across leading axis, array([4, 6])
-  y = jnp.array([[1, 2], [3, 4]]).mean()
-  print(y) # Mean across all axes, array(2.5)
-  z = jnp.array([[1, 2], [3, 4]]).reshape((4,))
-  print(z) # jnp.array([1, 2, 3, 4])
-  ```
-
-==
-  Same thing for `pytorch`
-  ```python
-  import torch
-
-  x = torch.tensor([[1, 2], [3, 4]]).sum(axis=0) 
-  print(x) # Sum across leading axis, array([4, 6])
-  y = torch.tensor([[1, 2], [3, 4]]).mean()
-  print(y) # Mean across all axes, array(2.5)
-  z = torch.tensor([[1, 2], [3, 4]]).reshape((4,))
-  print(z) # torch.tensor([1, 2, 3, 4])
-  ```
-*/
-
-= Set Notation
+= Math Notation - Sets <touying:hidden>
 
 ==
 Before we go any futher, we need to agree on math notation #pause
@@ -198,13 +130,13 @@ If you ever get confused, come back to these slides #pause
 
 #side-by-side(align: horizon)[
   Vectors
-][
+][bold small latin letters][
   $ bold(x) = vec(x_1, x_2, dots.v, x_n) $
 ] #pause
 
 #side-by-side(align: horizon)[
   Matrices
-][
+][bold big latin letters][
   $ bold(X) = mat(
     x_(1,1), x_(1,2), dots, x_(1,n); 
     x_(2,1), x_(2,2), dots, x_(2,n); 
@@ -261,13 +193,20 @@ $ bold(X) = mat(
 ) $
 
 ==
+*Exception:* I will always write the parameters $theta$ lowercase #pause
+- We introduce a scalar parameter $theta$ #pause
+- Then introduce a parameter vector $bold(theta)$ #pause
+- But later it becomes a matrix $bold(theta)$ #pause
+- And then a tensor (vector of matrices) $bold(theta)$
+
+==
 Capital letters will often refer to *sets* #pause
 
 $ X = {1, 2, 3, 4} $ #pause
 
 We will represent important sets with blackboard font #pause
 
-#side-by-side[$ bb(R) $][Set of all real numbers ${1, 2.03, pi, dots}$] #pause
+#side-by-side[$ bb(R) $][Set of all real numbers ${-1, 2.03, pi, dots}$] #pause
 #side-by-side[$ bb(Z) $][Set of all integers ${-2, -1, 0, 1, 2, dots}$] #pause
 #side-by-side[$ bb(Z)_+ $][Set of all *positive* integers ${1, 2, dots}$]
 
@@ -313,7 +252,7 @@ We will use various set operations #pause
 ==
 We will often use *set builder* notation #pause
 
-$ { #pin(1) x + 1 #pin(2) | #pin(3) x in bb(Z) #pin(4) } $ #pause
+$ { #pin(1) x + 1 #pin(2) | #pin(3) x in {1, 2, 3, 4} #pin(4) } $ #pause
 
 #pinit-highlight(1, 2)
 #pinit-point-from((1,2), pin-dx: 0pt, offset-dx: 0pt)[Function]
@@ -327,7 +266,7 @@ You can think of this as a for loop
 
 ```python
   output = {} # Set
-  for x in Z:
+  for x in {1, 2, 3, 4}:
     output.insert(x + 1)
 ```  #pause
 
@@ -335,10 +274,10 @@ You can think of this as a for loop
 #v(2em)
 
 ```python
-  output = {x + 1 for x in Z}
+  output = {x + 1 for x in {1, 2, 3, 4}}
 ```
 
-= Function Notation
+= Math Notation - Functions <touying:hidden>
 
 ==
 We define *functions* or *maps* between sets
@@ -356,7 +295,7 @@ $ #pin(1) f #pin(2) : #pin(3) bb(R) #pin(4) |-> #pin(5) bb(Z) #pin(6) $ #pause
 
 #v(2em)
 
-A function $f$ maps a real number to an integer #pause
+This function $f$ maps a real number to an integer #pause
 
 *Question:* What functions could $f$ be? #pause
 
@@ -461,9 +400,7 @@ $ {x^(1/2) | x in bb(R)_+} $ #pause
 
 *Question:* What is this? #pause
 
-*Answer:* #pause
-- An infinitely large set #pause
-- The results of evaluating $f(x) = sqrt(x)$ for all positive real numbers #pause
+*Answer:* The results of evaluating $f(x) = sqrt(x)$ for all positive real numbers #pause
 
 $ {2x | x in bb(Z)_+} $ #pause
 
@@ -497,14 +434,14 @@ Neural networks share many similarities with linear regression
   *Classification* asks which one #pause
   - Is this image of a dog or muffin? #pause
   - Given the rain today, will it rain tomorrow? Yes or no? #pause
-  - Given a camera image, what color is this object? Yellow, blue, red, ... ? #pause
+  - Given a camera image, what color is this object? Yellow, blue, red? #pause
 
   Let us start with regression
 
 ==
   Today, we will come up with a regression problem and then solve it! #pause
 
-  Remember the four parts of each machine learning algorithm! #pause
+  Remember the four steps of machine learning #pause
   + Define an example problem and dataset #pause
   + Define our linear model $f$ #pause
   + Define a loss function $cal(L)$ #pause
@@ -543,7 +480,7 @@ There are studies showing a causal effect of education on health #pause
   - By staying in school, you are likely to live longer 
 
 ==
-*Task:* Given your education, predict your life expectancy #pause
+*Task:* Predict life expectancy #pause
 
 $X = bb(R)_+:$ Years in school #pause
 
@@ -564,7 +501,7 @@ $ f(x, theta) = y; quad x in X, y in Y $ #pause
 
 Soon, $f$ will be a deep neural network #pause
 
-The core of all neural networks are *linear functions*
+The core of all neural networks are *linear functions* #pause
 
 For now, we let $f$ be a linear function #pause
 
@@ -583,26 +520,28 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 ==
   Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that make $f(x, bold(theta)) = y$ #pause
 
-  How do we find $bold(theta)$? (Hint: We want $f(x, bold(theta)) = y$) #pause
-
-  We will minimize the *loss* (error) between $f(x, bold(theta))$ and $y$, for all
+  *Question:* How do we choose $bold(theta)$? #pause
   
-  $ x in X, y in Y $
+  *Answer:* $bold(theta)$ that makes $f(x, bold(theta)) = y; quad x in X, y in Y$ #pause
+
+  + Find a loss function #pause
+  + Choose $bold(theta)$ with the smallest loss #pause
 
 ==
-  We compute the loss using the *loss function* #pause
+  The loss function computes the loss for the given parameters and data #pause
   
   $ cal(L): X^n times Y^n times Theta |-> bb(R) $ #pause
 
   // $ cal(L)(x, y, bold(theta)) $ #pause
 
-  The loss function tells us how close $f(x, bold(theta))$ is to $y$ #pause
+  The loss function should tell us how close $f(x, bold(theta))$ is to $y$ #pause
 
   By *minimizing* the loss function, we make $f(x, bold(theta)) = y$ #pause
 
   There are many possible loss functions, but for regression we often use the *square error* #pause
 
   $ "error"(y, hat(y)) = (y - hat(y))^2 $
+/*
 ==
 
   Let's derive the error function #pause
@@ -629,7 +568,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
     $ "error"(f(x, bold(theta)), y) = (f(x, bold(theta)) - y)^2 $
   ][ 
   ]
-
+*/
 ==
   We can write the loss function for a single datapoint $x_[i], y_[i]$ as
 
@@ -645,7 +584,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
    cal(L)(x_[i], y_[i], bold(theta)) = "error"(f(x_[i], bold(theta)),  y_[i]) = (f(x_[i], bold(theta)) - y_[i])^2 
   $ #pause
 
-  For the entire dataset: 
+  What about the entire dataset?
   $ bold(x) = mat(x_[1], x_[2], dots, x_[n])^top, bold(y) = mat(y_[1], y_[2], dots, y_[n])^top $ #pause
 
   #text(size: 22pt)[
@@ -664,16 +603,16 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
   $ cal(L)(bold(x), bold(y), bold(theta)) = sum_(i=1)^n "error"(f(x_[i], bold(theta)),  y_[i]) = sum_(i=1)^n (f(x_[i], bold(theta)) - y_[i])^2 $ #pause
 
-  When $cal(L)(bold(x), bold(y), bold(theta))$ is small, then $f(x, bold(theta)) approx y$ for the whole dataset! #pause
-
   We want to find parameters $bold(theta)$ that make the loss small #pause
+
+  We call this search for $bold(theta)$ *optimization* #pause
 
   Let us state this more formally
 ==
 
   Our objective is to *minimize* the loss, using $argmin$ #pause
 
-  $argmin_x f(x)$ means find the $x$ that makes $f(x)$ smallest #pause
+  #side-by-side[$ argmin_x f(x) $][Find $x$ that makes $f(x)$ smallest] #pause
 
   #side-by-side[*Question:* $ "What is " argmin_(x) (x + 1)^2 $ ][  #argmin_plot] #pause
 
@@ -681,40 +620,23 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
 
 ==
-  Formally, our objective is to find the $argmin$ of the loss
+  *Optimization objective:* Find the $bold(theta)$ that minimizes the loss #pause
   $ 
    argmin_bold(theta) cal(L)(bold(x), bold(y), bold(theta)) &= argmin_bold(theta) sum_(i=1)^n "error"(f(x_[i], bold(theta)),  y_[i]) \ &= argmin_bold(theta) sum_(i=1)^n (f(x_[i], bold(theta)) - y_[i])^2 
-  $ 
+  $  #pause
 
+  How do we optimize $bold(theta)$? #pause
 
-==
-  $ 
-   argmin_bold(theta) cal(L)(bold(x), bold(y), bold(theta)) &= argmin_bold(theta) sum_(i=1)^n "error"(f(x_[i], bold(theta)),  y_[i]) \ &= argmin_bold(theta) sum_(i=1)^n (f(x_[i], bold(theta)) - y_[i])^2 
-  $ #pause
+  There is an analytical solution we will derive next lecture #pause
 
-  *Question:* How do we evaluate this expression to find $bold(theta)$? #pause
-
-  *Answer:* Deriving the solution for this objective requires taking partial derivatives of matrices #pause
-
-  We will derive the solution later. For now, trust me! #pause
-
-  We will go over the steps to find $bold(theta)$ 
+  For now, just follow these steps 
 
 ==
   First, we will construct a *design matrix* $overline(bold(X))$ containing input data $x$ #pause
 
   $ overline(bold(X)) = mat(bold(x), bold(1)) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) $
 
-==
-  #text(size: 22pt)[
-  We add the column of ones so that we can multiply $overline(bold(X))$ with $bold(theta)$ to get a linear function $theta_1 x + theta_0$ evaluated at each data point
-
-  $ overline(bold(X)) bold(theta) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) vec(theta_1, theta_0) = underbrace(vec(theta_1 x_1 + theta_0, theta_1 x_2 + theta_0, dots.v, theta_1 x_n + theta_0), "Predicted" y) $
-
-  We can also evaluate our model for new datapoints #pause
-
-  $ overline(bold(X)) bold(theta) = mat(x_"Steven", 1) vec(theta_1, theta_0) = underbrace(vec(theta_1 x_"Steven" + theta_0), "Predicted" y) $ 
-  ]
+  *Question:* Why two columns? #pause *Hint:* How many parameters? #pause
 
 ==
   #side-by-side[
@@ -729,7 +651,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
   #v(2em)
 
-  #side-by-side[$ bold(theta) = (overline(bold(X))^top overline(bold(X)) )^(-1) overline(bold(X))^top bold(y) $ ][(Magic!) We can find the parameters that minimize $cal(L)$]
+  $ argmin_bold(theta) cal(L)(bold(X), bold(Y), bold(theta)) = (overline(bold(X))^top overline(bold(X)) )^(-1) overline(bold(X))^top bold(y) $
 
 ==
   To summarize: #pause
@@ -743,13 +665,23 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
    argmin_bold(theta) cal(L)(bold(x), bold(y), bold(theta)) &= argmin_bold(theta) sum_(i=1)^n "error"(f(x_[i], bold(theta)),  y_[i]) \ &= argmin_bold(theta) sum_(i=1)^n (f(x_[i], bold(theta)) - y_[i])^2 
   $ 
 
+==
+  Multiply $overline(bold(X))$ and $bold(theta)$ to predict labels #pause
+
+  $ overline(bold(X)) bold(theta) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) vec(theta_1, theta_0) = underbrace(vec(#pin(1)theta_1 x_1 + theta_0#pin(2), theta_1 x_2 + theta_0, dots.v, theta_1 x_n + theta_0), "Predicted" y) $
+
+  #pinit-highlight-equation-from((1,2), (2,2), fill: red, pos: top, height: 1.1em)[$f(x_1, bold(theta))$] #pause
+
+  We can also evaluate our model for new datapoints #pause
+
+  $ mat(x_"Steven", 1) vec(theta_1, theta_0) = underbrace(vec(theta_1 x_"Steven" + theta_0), "Predicted" y) $ 
 // 55:00, maybe 60:00 with more slides?
 
 = Linear Regression - Example Problem <touying:hidden>
 ==
   Back to the example... #pause
 
-  *Task:* Given your education, predict your life expectancy #pause
+  *Task:* Predict life expectancy #pause
 
   $X = bb(R)_+:$ Years in school #pause
   
@@ -764,29 +696,20 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
   #align(center)[You will be doing this in your first assignment!]
 
 ==
-  Plot the datapoints $(x_1, y_1), (x_2, y_2), dots $ #pause
+  Plot the datapoints $(x_[1], y_[1]), (x_[2], y_[2]), dots $ #pause
 
   Plot the curve $f(x, bold(theta)) = theta_1 x + theta_0; quad x in [0, 25]$ #pause
 
-  #cimage("figures/lecture_2/linear_regression.png", height: 60%) #pause
+  #cimage("figures/lecture_2/linear_regression.png", height: 60%) 
 
-==
-  + Define an example problem 
-  + Define our linear model $f$ 
-  + Define a loss function $cal(L)$ 
-  + Use $cal(L)$ to learn the parameters $theta$ of $f$
-  + *Solve the example problem*
-  + Expand to nonlinear models
-  + Discuss overfitting
-  + Interactive discussion
-  + Homework summary
+= Linear Regression - Solve the Problem <touying:hidden>
 
 // 70:00 maybe 75:00
 
 ==
-  *Task:* Given your education, predict your life expectancy #pause
+  *Goal:* Given someone's education, predict how long they will live #pause
 
-  Plot the datapoints $(x_1, y_1), (x_2, y_2), dots $ #pause
+  Plot the datapoints $(x_[1], y_[1]), (x_[2], y_[2]), dots $ #pause
 
   Plot the curve $f(x, bold(theta)) = theta_1 x + theta_0; quad x in [0, 25]$ #pause
 
@@ -802,9 +725,9 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 = Polynomial Regression
 
 ==
-  *Question:* #pause
+  *Question:* 
   #side-by-side[
-    Does the data look linear? #pause
+    Does the data look linear? 
     #cimage("figures/lecture_2/linear_regression.png", height: 60%) #pause
   ][
     Or maybe more logarithmic? #pause
@@ -816,25 +739,26 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
   *Question:* What does it mean when we say linear regression is linear? #pause
 
-  *Answer:* The function $f(x, theta)$ is a linear function of $x$ #pause
+  *Answer:* The function $f(x, theta)$ is a linear function of $x$ and $theta$ #pause
 
-  *Trick:* Change of variables to make $f$ nonlinear: $x_"new" = log(1 + x_"data")$ #pause
+  *Trick:* Change of variables to make $f$ nonlinear: $x_"new" = log(1 + x)$ #pause
 
   $ overline(bold(X)) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => overline(bold(X)) = mat(log(1 + x_1), 1; log(1 + x_2), 1; dots.v, dots.v; log(1 + x_n), 1) $
 
   Now, $f$ is a linear function of $log(1 + x)$ -- a nonlinear function of $x$!
 
 ==
-  New design matrix...
-  $ overline(bold(X)) = mat(log(1 + x_1), 1; log(1 + x_2), 1; dots.v, dots.v; log(1 + x_n), 1) $
 
-  #side-by-side[
-  New function...
-  $ f(x, vec(theta_1, theta_0)) = theta_1 log(1 + x) + theta_0 $#pause
-  ][
+
+  #side-by-side(columns: (0.3fr, 0.5fr))[
+  New design matrix...
+  $ overline(bold(X)) = mat(log(1 + x_1), 1; log(1 + x_2), 1; dots.v, dots.v; log(1 + x_n), 1) $][ #pause
+  New *nonlinear* function...
+
+     $ overline(bold(X)) bold(theta) = mat(log(1 + x_1), 1; dots.v, dots.v; log(1 + x_n), 1) vec(theta_1, theta_0) = vec(theta_1 x_1 + theta_0, dots.v, theta_1 x_n + theta_0) $ #pause
+  ]
   Same solution...
   $ bold(theta) = (overline(bold(X))^top overline(bold(X)) )^(-1) overline(bold(X))^top bold(y) $
-  ]
 
 ==
   #cimage("figures/lecture_2/log_regression.png", height: 60%) #pause
@@ -848,7 +772,8 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
   $ f(x) = a x^m + b x^(m-1) + dots + c x + d $ #pause
 
-  Polynomials can approximate *any* function (universal function approximator) #pause
+  Polynomials are *universal function approximators* #pause
+  - Can approximate *any* function #pause
 
   Can we extend linear regression to polynomials?
 
@@ -858,10 +783,10 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
   Expand $x$ to a multi-dimensional input space... #pause
 
   $ overline(bold(X)) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => overline(bold(X)) = mat(
-    x_1^m, x_1^(m-1), dots, x_1, 1; 
-    x_2^m, x_2^(m-1), dots, x_2, 1; 
+    x_[1]^m, x_[1]^(m-1), dots, x_[1], 1; 
+    x_[2]^m, x_[2]^(m-1), dots, x_[2], 1; 
     dots.v, dots.v, dots.down; 
-    x_n^m, x_n^(m-1), dots, x_n, 1
+    x_[n]^m, x_[n]^(m-1), dots, x_[n], 1
     ) $ #pause
 
   Remember, $n$ datapoints and $m + 1$ polynomial terms #pause
@@ -870,35 +795,37 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
   $ bold(theta) = mat(theta_1, theta_0)^top => bold(theta) =  mat(theta_m, theta_(m-1), dots, theta_1, theta_0)^top $
 
 ==
-  #text(size:22pt)[
+  New function... #pause
   $ overline(bold(X)) bold(theta) = underbrace(mat(
-    x_1^m, x_1^(m-1), dots, x_1, 1; 
-    x_2^m, x_2^(m-1), dots, x_2, 1; 
+    x_[1]^m, x_[1]^(m-1), dots, x_[1], 1; 
+    x_[2]^m, x_[2]^(m-1), dots, x_[2], 1; 
     dots.v, dots.v, dots.down; 
-    x_n^m, x_n^(m-1), dots, x_n, 1
+    x_[n]^m, x_[n]^(m-1), dots, x_[n], 1
     ), n times (m + 1)) 
     underbrace(vec(theta_m, theta_(m-1), dots.v, theta_0), (m + 1) times 1) = 
     underbrace(vec(
-      theta_m x_1^m + theta_(m-1) x_1^(m-1) + dots + theta_0,
-      theta_m x_2 + theta_(m-1) x_2^(m-1) + dots + theta_0,
+      theta_m x_[1]^m + theta_(m-1) x_[1]^(m-1) + dots + theta_0,
+      theta_m x_[2] + theta_(m-1) x_[2]^(m-1) + dots + theta_0,
       dots.v,
-      theta_n x_n^m + theta_(m-1) x_n^(m-1) + dots + theta_0
+      theta_n x_[n]^m + theta_(m-1) x_[n]^(m-1) + dots + theta_0
     ), "Y prediction, " n times 1)
-   $] #pause
+   $ #pause
 
-  $ "New function... " quad f(x, bold(theta)) = theta_m x^m + theta_(m - 1) x^(m-1), dots, theta_1 + x^1 + theta_0 $ #pause
+  //$ "Polynomial function: " quad f(x, bold(theta)) = theta_m x^m + theta_(m - 1) x^(m-1), dots, theta_1 + x^1 + theta_0 $ #pause
 
   $ "Same solution... "quad bold(theta) = (overline(bold(X))^top overline(bold(X)) )^(-1) overline(bold(X))^top bold(y) $
 
+
 ==
-  $ f(x, bold(theta)) = theta_m x^m + theta_(m - 1) x^(m-1), dots, theta_1 + x^1 + theta_0 $ #pause
+  $ f(x, bold(theta)) = f(x, vec(theta_m, theta_(m-1), dots.v, theta_1, theta_0)) = theta_m x^m + theta_(m - 1) x^(m-1), dots, theta_1 x^1 + theta_0 $ #pause
 
   *Summary:* By changing the input space, we can fit a polynomial to the data using a linear fit!
 
+// TODO: Continue updating here fall 2025
 = Overfitting
 
 ==
-  $ f(x, bold(theta)) = theta_n x^m + theta_(m - 1) x^(m - 1), dots, theta_1 + x^1 + theta_0 $ #pause
+  $ f(x, bold(theta)) = theta_n x^m + theta_(m - 1) x^(m - 1), dots, theta_1 x^1 + theta_0 $ #pause
 
   How do we choose $m$ (polynomial order) that provides the best fit? #pause
 
@@ -986,26 +913,26 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
   *Question:* How do we choose the training and testing datasets? #pause
 
   $ "Option 1:" bold(x)_"train" &= vec(
-    x_1, x_2, x_3
+    x_[1], x_[2], x_[3]
   ) bold(y)_"train" &= vec(
-    y_1, y_2, y_3
+    y_[1], y_[2], y_[3]
   ); quad
   bold(x)_"test" &= vec(
-    x_4, x_5
+    x_[4], x_[5]
   ) bold(y)_"test" &= vec(
-    y_4, y_5
+    y_[4], y_[5]
   ) 
   $ #pause
 
   $ "Option 2:" bold(x)_"train" &= vec(
-    x_4, x_1, x_3
+    x_[4], x_[1], x_[3]
   ) bold(y)_"train" &= vec(
-    y_4, y_1, y_3
+    y_[4], y_[1], y_[3]
   ); quad
   bold(x)_"test" &= vec(
-    x_2, x_5
+    x_[2], x_[5]
   ) bold(y)_"test" &= vec(
-    y_2, y_5
+    y_[2], y_[5]
   ) 
   $ #pause
 
@@ -1030,27 +957,6 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
   We use separate training and testing datasets on *all* machine learning models, not just linear regression #pause
 
 // 55:00 + 20 break + 40 = 1h55m
-==
-  + Define an example problem 
-  + Define our linear model $f$ 
-  + Define a loss function $cal(L)$ 
-  + Use $cal(L)$ to learn the parameters $theta$ of $f$
-  + Solve the example problem
-  + Expand to nonlinear models
-  + *Discuss overfitting*
-  + Interactive discussion
-  + Homework summary
-==
-
-  + Define an example problem 
-  + Define our linear model $f$ 
-  + Define a loss function $cal(L)$ 
-  + Use $cal(L)$ to learn the parameters $theta$ of $f$
-  + Solve the example problem
-  + Expand to nonlinear models
-  + Discuss overfitting
-  + *Interactive discussion*
-  + Homework summary
 
 /*
 ==
@@ -1064,47 +970,33 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
   *Q:* We use a squared error loss. What effect does this have on outliers? #pause
 */
-==
-  + Define an example problem 
-  + Define our linear model $f$ 
-  + Define a loss function $cal(L)$ 
-  + Use $cal(L)$ to learn the parameters $theta$ of $f$
-  + Solve the example problem
-  + Expand to nonlinear models
-  + Discuss overfitting
-  + *Interactive discussion*
-  + Homework summary
-
-==
-  + Define an example problem 
-  + Define our linear model $f$ 
-  + Define a loss function $cal(L)$ 
-  + Use $cal(L)$ to learn the parameters $theta$ of $f$
-  + Solve the example problem
-  + Expand to nonlinear models
-  + Discuss overfitting
-  + Interactive discussion
-  + *Homework summary*
-
-==
-  Tips for assignment 1 #pause
-
-  ```py
-  def f(theta, design): 
-    # Linear function
-    return design @ theta
-  ``` #pause
-
-  Not all matrices can be inverted! Ensure the matrices are square and the condition number is low
-
-  ```py
-  A.shape
-  cond = jax.numpy.linalg.cond(A)
-  ``` #pause
-
-  Everything you need is in the lecture notes
 
 = Homework
-==
 
-  https://colab.research.google.com/drive/1I6YgapkfaU71RdOotaTPLYdX9WflV1me
+==
+Homework 1 is released, due in two weeks #pause
+
+You will predict life expectancy based on education #pause
+- Maybe this convinces you to do a PhD
+
+
+==
+Tips for assignment 1 #pause
+
+```py
+def f(theta, design): 
+  # Linear function
+  return design @ theta
+``` #pause
+
+Not all matrices can be inverted! Ensure the matrices are square and the condition number is low
+
+```py
+A.shape
+cond = jax.numpy.linalg.cond(A)
+``` #pause
+
+Everything you need is in the lecture notes
+
+==
+https://colab.research.google.com/drive/1I6YgapkfaU71RdOotaTPLYdX9WflV1me

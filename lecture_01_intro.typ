@@ -9,7 +9,7 @@
 
 // For students: you may want to change this to true
 // otherwise you will get one slide for each new line
-#let handout = false
+#let handout = true
 
 // cetz and fletcher bindings for touying
 #let cetz-canvas = touying-reducer.with(reduce: cetz.canvas, cover: cetz.draw.hide.with(bounds: true))
@@ -452,7 +452,9 @@ TypeError: dot_general requires contracting dimensions to have the same shape, g
 
 = Coding
 ==
-  Let us do a Google Colab tutorial!
+  Let us do a Google Colab tutorial with assignment 0!
+
+  https://colab.research.google.com/drive/1lIYP8f0hZCD_gFdUzzzTZceiV3f98x2a?usp=sharing
 ==
   Let us set up a local `conda` environment
 ==

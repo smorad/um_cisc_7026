@@ -2,7 +2,7 @@
 #table(
   columns: (0.2fr, 0.8fr),
   [Course], [CISC 7026 Fall 2025],
-  [Time], [19:00-22:00, Fridays],
+  [Time], [19:00-22:00, Thursdays],
   [Location], [Room E6-1102C],
   [Description], [This course introduces the theory and application of deep neural networks],
   [Instructor], [
