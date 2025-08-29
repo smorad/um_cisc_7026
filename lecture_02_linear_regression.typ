@@ -80,10 +80,10 @@ I am getting married, and will be away 09.12 and 09.19 #pause
 
 ==
 
-Currently writing exam 1, probably 5 questions: #pause
+Currently writing exam 1, probably 6 questions: #pause
 - 1 question function notation
 - 1 question set notation
-- 1 question linear regression (make sure you can invert matrices)
+- 2 questions linear regression (make sure you can invert matrices)
 - 1 question neural networks (neurons)
 - 1 question gradient descent (know how to take derivatives, no need to memorize formulas) #pause
 
@@ -130,13 +130,13 @@ If you ever get confused, come back to these slides #pause
 
 #side-by-side(align: horizon)[
   Vectors
-][bold small latin letters][
+][bold small characters][
   $ bold(x) = vec(x_1, x_2, dots.v, x_n) $
 ] #pause
 
 #side-by-side(align: horizon)[
   Matrices
-][bold big latin letters][
+][bold big characters][
   $ bold(X) = mat(
     x_(1,1), x_(1,2), dots, x_(1,n); 
     x_(2,1), x_(2,2), dots, x_(2,n); 
@@ -668,13 +668,13 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 ==
   Multiply $overline(bold(X))$ and $bold(theta)$ to predict labels #pause
 
-  $ overline(bold(X)) bold(theta) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) vec(theta_1, theta_0) = underbrace(vec(#pin(1)theta_1 x_1 + theta_0#pin(2), theta_1 x_2 + theta_0, dots.v, theta_1 x_n + theta_0), "Predicted" y) $
+  $ overline(bold(X)) bold(theta) = mat(x_[1], 1; x_[2], 1; dots.v, dots.v; x_[n], 1) vec(theta_1, theta_0) = underbrace(vec(#pin(1)theta_1 x_[1] + theta_0#pin(2), theta_1 x_[2] + theta_0, dots.v, theta_1 x_[n] + theta_0), y "prediction") $
 
-  #pinit-highlight-equation-from((1,2), (2,2), fill: red, pos: top, height: 1.1em)[$f(x_1, bold(theta))$] #pause
+  #pinit-highlight-equation-from((1,2), (2,2), fill: red, pos: top, height: 1.1em)[$f(x_[1], bold(theta))$] #pause
 
   We can also evaluate our model for new datapoints #pause
 
-  $ mat(x_"Steven", 1) vec(theta_1, theta_0) = underbrace(vec(theta_1 x_"Steven" + theta_0), "Predicted" y) $ 
+  $ mat(x_"Steven", 1) vec(theta_1, theta_0) = underbrace(vec(theta_1 x_"Steven" + theta_0), y "prediction") $ 
 // 55:00, maybe 60:00 with more slides?
 
 = Linear Regression - Example Problem <touying:hidden>
@@ -743,7 +743,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
   *Trick:* Change of variables to make $f$ nonlinear: $x_"new" = log(1 + x)$ #pause
 
-  $ overline(bold(X)) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => overline(bold(X)) = mat(log(1 + x_1), 1; log(1 + x_2), 1; dots.v, dots.v; log(1 + x_n), 1) $
+  $ overline(bold(X)) = mat(x_[1], 1; x_[2], 1; dots.v, dots.v; x_[n], 1) => overline(bold(X)) = mat(log(1 + x_[1]), 1; log(1 + x_[2]), 1; dots.v, dots.v; log(1 + x_[n]), 1) $
 
   Now, $f$ is a linear function of $log(1 + x)$ -- a nonlinear function of $x$!
 
@@ -752,10 +752,10 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
   #side-by-side(columns: (0.3fr, 0.5fr))[
   New design matrix...
-  $ overline(bold(X)) = mat(log(1 + x_1), 1; log(1 + x_2), 1; dots.v, dots.v; log(1 + x_n), 1) $][ #pause
+  $ overline(bold(X)) = mat(log(1 + x_[1]), 1; log(1 + x_[2]), 1; dots.v, dots.v; log(1 + x_[n]), 1) $][ #pause
   New *nonlinear* function...
 
-     $ overline(bold(X)) bold(theta) = mat(log(1 + x_1), 1; dots.v, dots.v; log(1 + x_n), 1) vec(theta_1, theta_0) = vec(theta_1 x_1 + theta_0, dots.v, theta_1 x_n + theta_0) $ #pause
+     $ overline(bold(X)) bold(theta) = mat(log(1 + x_[1]), 1; dots.v, dots.v; log(1 + x_[n]), 1) vec(theta_1, theta_0) = vec(theta_1 x_[1] + theta_0, dots.v, theta_1 x_[n] + theta_0) $ #pause
   ]
   Same solution...
   $ bold(theta) = (overline(bold(X))^top overline(bold(X)) )^(-1) overline(bold(X))^top bold(y) $
@@ -782,7 +782,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 ==
   Expand $x$ to a multi-dimensional input space... #pause
 
-  $ overline(bold(X)) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) => overline(bold(X)) = mat(
+  $ overline(bold(X)) = mat(x_[1], 1; x_[2], 1; dots.v, dots.v; x_[n], 1) => overline(bold(X)) = mat(
     x_[1]^m, x_[1]^(m-1), dots, x_[1], 1; 
     x_[2]^m, x_[2]^(m-1), dots, x_[2], 1; 
     dots.v, dots.v, dots.down; 
@@ -890,9 +890,11 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
   We will only use our model for new data (we already have the $y$ for a known $x$)! #pause
 
 ==
-  When our model has a small loss but does not generalize to new data, we call it *overfitting* #pause
+  Model has a small loss but does not generalize to new data #pause
 
-  The model has fit too closely to the sampled data points, rather than the trend #pause
+  We call this issue *overfitting* #pause
+
+  The model fit too closely to data noise, rather than the trend #pause
 
   Models that overfit are not useful for making predictions #pause
 
