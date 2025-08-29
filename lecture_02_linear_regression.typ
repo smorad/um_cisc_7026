@@ -509,16 +509,16 @@ For now, we let $f$ be a linear function #pause
   columns: 2,
   align: center,
   column-gutter: 2em,
-  $ f(x, bold(theta)) = f(x, vec(theta_1, theta_0)) = theta_1 x + theta_0 $,
+  $ f(x, bold(theta)) = f(x, vec(theta_0, theta_1)) = theta_0 + theta_1 x $,
   cimage("figures/lecture_2/example_regression_graph.png", height: 50%)
 )) #pause
 
-Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that makes $f(x, bold(theta)) = y$
+Now, we need to find the parameters $bold(theta) = vec(theta_0, theta_1)$ that makes $f(x, bold(theta)) = y$
 //   To do this, we will need to find a *loss function* $cal(L)$
 
 = Linear Regression - Loss Function <touying:hidden>
 ==
-  Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that make $f(x, bold(theta)) = y$ #pause
+  Now, we need to find the parameters $bold(theta) = vec(theta_0, theta_1)$ that make $f(x, bold(theta)) = y$ #pause
 
   *Question:* How do we choose $bold(theta)$? #pause
   
@@ -634,7 +634,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 ==
   First, we will construct a *design matrix* $overline(bold(X))$ containing input data $x$ #pause
 
-  $ overline(bold(X)) = mat(bold(x), bold(1)) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1) $
+  $ overline(bold(X)) = mat(bold(1), bold(x))  = mat(1, x_[1]; 1, x_[2]; dots.v, dots.v; 1, x_[n]) $
 
   *Question:* Why two columns? #pause *Hint:* How many parameters? #pause
 
@@ -642,12 +642,12 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
   #side-by-side[
     With our design matrix $overline(bold(X))$ and desired output $bold(y)$,
   ][  
-  $ overline(bold(X)) = mat(x_1, 1; x_2, 1; dots.v, dots.v; x_n, 1), bold(y) = vec(y_1, y_2, dots.v, y_n) $
+  $ overline(bold(X)) = mat(1, x_[1]; 1, x_[2]; dots.v, dots.v; 1, x_[n]), bold(y) = vec(y_[1], y_[2], dots.v, y_[n]) $
   ] #pause
   
   #side-by-side[
     and our parameters $bold(theta),$
-  ][ $ bold(theta) = vec(theta_1, theta_0),  $] #pause
+  ][ $ bold(theta) = vec(theta_0, theta_1),  $] #pause
 
   #v(2em)
 
@@ -668,13 +668,13 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 ==
   Multiply $overline(bold(X))$ and $bold(theta)$ to predict labels #pause
 
-  $ overline(bold(X)) bold(theta) = mat(x_[1], 1; x_[2], 1; dots.v, dots.v; x_[n], 1) vec(theta_1, theta_0) = underbrace(vec(#pin(1)theta_1 x_[1] + theta_0#pin(2), theta_1 x_[2] + theta_0, dots.v, theta_1 x_[n] + theta_0), y "prediction") $
+  $ overline(bold(X)) bold(theta) = mat(1, x_[1]; 1, x_[2]; dots.v, dots.v; 1, x_[n]) vec(theta_0, theta_1) = underbrace(vec(#pin(1)theta_0 + theta_1 x_[1]#pin(2), theta_0 + theta_1 x_[2], dots.v, theta_0 + theta_1 x_[n]), y "prediction") $
 
   #pinit-highlight-equation-from((1,2), (2,2), fill: red, pos: top, height: 1.1em)[$f(x_[1], bold(theta))$] #pause
 
   We can also evaluate our model for new datapoints #pause
 
-  $ mat(x_"Steven", 1) vec(theta_1, theta_0) = underbrace(vec(theta_1 x_"Steven" + theta_0), y "prediction") $ 
+  $ mat(1, x_"Steven") vec(theta_0, theta_1) = underbrace(vec(theta_0 + theta_1 x_"Steven"), y "prediction") $ 
 // 55:00, maybe 60:00 with more slides?
 
 = Linear Regression - Example Problem <touying:hidden>
@@ -698,7 +698,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 ==
   Plot the datapoints $(x_[1], y_[1]), (x_[2], y_[2]), dots $ #pause
 
-  Plot the curve $f(x, bold(theta)) = theta_1 x + theta_0; quad x in [0, 25]$ #pause
+  Plot the curve $f(x, bold(theta)) = theta_0 + theta_1 x; quad x in [0, 25]$ #pause
 
   #cimage("figures/lecture_2/linear_regression.png", height: 60%) 
 
@@ -711,7 +711,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
   Plot the datapoints $(x_[1], y_[1]), (x_[2], y_[2]), dots $ #pause
 
-  Plot the curve $f(x, bold(theta)) = theta_1 x + theta_0; quad x in [0, 25]$ #pause
+  Plot the curve $f(x, bold(theta)) = theta_0 + theta_1 x; quad x in [0, 25]$ #pause
 
   #cimage("figures/lecture_2/linear_regression.png", height: 60%) 
 
@@ -743,7 +743,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
   *Trick:* Change of variables to make $f$ nonlinear: $x_"new" = log(1 + x)$ #pause
 
-  $ overline(bold(X)) = mat(x_[1], 1; x_[2], 1; dots.v, dots.v; x_[n], 1) => overline(bold(X)) = mat(log(1 + x_[1]), 1; log(1 + x_[2]), 1; dots.v, dots.v; log(1 + x_[n]), 1) $
+  $ overline(bold(X)) = mat(1, x_[1]; 1, x_[2]; dots.v, dots.v; 1, x_[n]) => overline(bold(X)) = mat(1, log(1 + x_[1]); 1, log(1 + x_[2]); dots.v, dots.v; 1, log(1 + x_[n])) $
 
   Now, $f$ is a linear function of $log(1 + x)$ -- a nonlinear function of $x$!
 
@@ -752,10 +752,10 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
   #side-by-side(columns: (0.3fr, 0.5fr))[
   New design matrix...
-  $ overline(bold(X)) = mat(log(1 + x_[1]), 1; log(1 + x_[2]), 1; dots.v, dots.v; log(1 + x_[n]), 1) $][ #pause
+  $ overline(bold(X)) = mat(1, log(1 + x_[1]); dots.v, dots.v; 1, log(1 + x_[n])) $][ #pause
   New *nonlinear* function...
 
-     $ overline(bold(X)) bold(theta) = mat(log(1 + x_[1]), 1; dots.v, dots.v; log(1 + x_[n]), 1) vec(theta_1, theta_0) = vec(theta_1 x_[1] + theta_0, dots.v, theta_1 x_[n] + theta_0) $ #pause
+     $ overline(bold(X)) bold(theta) = mat(1, log(1 + x_[1]); dots.v, dots.v; 1, log(1 + x_[n])) vec(theta_0, theta_1) = vec(theta_0 + theta_1 x_[1], dots.v, theta_0 + theta_1 x_[n]) $ #pause
   ]
   Same solution...
   $ bold(theta) = (overline(bold(X))^top overline(bold(X)) )^(-1) overline(bold(X))^top bold(y) $
@@ -770,7 +770,8 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 ==
   What about polynomials? #pause
 
-  $ f(x) = a x^m + b x^(m-1) + dots + c x + d $ #pause
+  //$ f(x) = a x^m + b x^(m-1) + dots + c x + d $ #pause
+  $ f(x) = a + b x + c x^2 + dots + d x^m $ #pause
 
   Polynomials are *universal function approximators* #pause
   - Can approximate *any* function #pause
@@ -782,33 +783,33 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 ==
   Expand $x$ to a multi-dimensional input space... #pause
 
-  $ overline(bold(X)) = mat(x_[1], 1; x_[2], 1; dots.v, dots.v; x_[n], 1) => overline(bold(X)) = mat(
-    x_[1]^m, x_[1]^(m-1), dots, x_[1], 1; 
-    x_[2]^m, x_[2]^(m-1), dots, x_[2], 1; 
+  $ overline(bold(X)) = mat(1, x_[1]; 1, x_[2]; dots.v, dots.v; 1, x_[n]) => overline(bold(X)) = mat(
+    1, x_[1], x_[1]^2, dots, x^m_[1]; 
+    1, x_[2], x_[2]^2, dots, x^m_[2]; 
     dots.v, dots.v, dots.down; 
-    x_[n]^m, x_[n]^(m-1), dots, x_[n], 1
+    1, x_[n], x_[n]^2, dots, x^m_[n]
     ) $ #pause
 
   Remember, $n$ datapoints and $m + 1$ polynomial terms #pause
 
   And add some new parameters...
-  $ bold(theta) = mat(theta_1, theta_0)^top => bold(theta) =  mat(theta_m, theta_(m-1), dots, theta_1, theta_0)^top $
+  $ bold(theta) = mat(theta_0, theta_1)^top => bold(theta) =  mat(theta_0, theta_1, dots, theta_m)^top $
 
 ==
   New function... #pause
   $ overline(bold(X)) bold(theta) = underbrace(mat(
-    x_[1]^m, x_[1]^(m-1), dots, x_[1], 1; 
-    x_[2]^m, x_[2]^(m-1), dots, x_[2], 1; 
+    1, x_[1], x_[1]^2, dots, x_[1]^m, 1; 
+    1, x_[2], x_[2]^2, dots, x_[2]^m, 1; 
     dots.v, dots.v, dots.down; 
-    x_[n]^m, x_[n]^(m-1), dots, x_[n], 1
+    1, x_[n], x_[n]^2, dots, x_[n]^m, 1
     ), n times (m + 1)) 
-    underbrace(vec(theta_m, theta_(m-1), dots.v, theta_0), (m + 1) times 1) = 
+    underbrace(vec(theta_0, theta_1, dots.v, theta_m), (m + 1) times 1) = 
     underbrace(vec(
-      theta_m x_[1]^m + theta_(m-1) x_[1]^(m-1) + dots + theta_0,
-      theta_m x_[2] + theta_(m-1) x_[2]^(m-1) + dots + theta_0,
+      theta_0 + theta_1 x_[1] + dots + theta_(m) x_[1]^(m),
+      theta_0 + theta_1 x_[2] + dots + theta_(m) x_[2]^(m),
       dots.v,
-      theta_n x_[n]^m + theta_(m-1) x_[n]^(m-1) + dots + theta_0
-    ), "Y prediction, " n times 1)
+      theta_0 + theta_1 x_[n] + dots + theta_(m) x_[n]^(m),
+    ), "y prediction, " n times 1)
    $ #pause
 
   //$ "Polynomial function: " quad f(x, bold(theta)) = theta_m x^m + theta_(m - 1) x^(m-1), dots, theta_1 + x^1 + theta_0 $ #pause
@@ -817,7 +818,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 
 
 ==
-  $ f(x, bold(theta)) = f(x, vec(theta_m, theta_(m-1), dots.v, theta_1, theta_0)) = theta_m x^m + theta_(m - 1) x^(m-1), dots, theta_1 x^1 + theta_0 $ #pause
+  $ f(x, bold(theta)) = f(x, vec(theta_0, theta_(1), dots.v, theta_m)) = theta_0 + theta_1 x + dots + theta_m x^m $ #pause
 
   *Summary:* By changing the input space, we can fit a polynomial to the data using a linear fit!
 
@@ -825,7 +826,7 @@ Now, we need to find the parameters $bold(theta) = vec(theta_1, theta_0)$ that m
 = Overfitting
 
 ==
-  $ f(x, bold(theta)) = theta_n x^m + theta_(m - 1) x^(m - 1), dots, theta_1 x^1 + theta_0 $ #pause
+  $ f(x, bold(theta)) = theta_0 + theta_1 x + dots + theta_m x^m $ #pause
 
   How do we choose $m$ (polynomial order) that provides the best fit? #pause
 
