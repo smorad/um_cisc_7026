@@ -111,9 +111,9 @@
 Exam next lecture, it will be *hard*, make sure you study! #pause
 - 1 question function notation
 - 1 question set notation
-- 2 questions linear regression (make sure you can invert 2x2 matrices)
-- 1 question neural networks (neurons)
-- 1 question gradient descent (take and evalute derivatives, no need to memorize formulas) #pause
+- 2 questions linear regression (invert 2x2 matrices, understand hw1)
+- 1 question neural networks (neuron)
+- 1 question gradient descent (take and evaluate derivatives, no need to memorize formulas) #pause
 
 Chinese translation for all exam questions
 
