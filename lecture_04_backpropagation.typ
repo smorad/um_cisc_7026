@@ -107,10 +107,10 @@
 
 // 4:00
 
+/*
 = Review
 ==
 
-/*
 #sslide[
   In lecture 1, we assumed a single-input system #pause
 
