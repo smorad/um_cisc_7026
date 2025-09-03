@@ -7,7 +7,7 @@
 
 // For students: you may want to change this to true
 // otherwise you will get one slide for each new line
-#let handout = false
+#let handout = true
 
 // cetz and fletcher bindings for touying
 #let cetz-canvas = touying-reducer.with(reduce: cetz.canvas, cover: cetz.draw.hide.with(bounds: true))
@@ -74,7 +74,7 @@ Homework 0 was ok? #pause
 Homework 1 released, due in ~2 weeks (see Moodle) #pause
 - Discuss more at the end of class #pause
 
-I am getting married, and will be away 09.12 and 09.19 #pause
+I will be away 09.12 and 09.19 #pause
 - Yutao will lecture 09.12 #pause
 - My students will proctor exam 1 on 09.19 #pause
 
@@ -83,7 +83,7 @@ I am getting married, and will be away 09.12 and 09.19 #pause
 Currently writing exam 1, probably 6 questions: #pause
 - 1 question function notation
 - 1 question set notation
-- 2 questions linear regression (make sure you can invert matrices)
+- 2 questions linear regression (make sure you can invert 2x2 matrices)
 - 1 question neural networks (neurons)
 - 1 question gradient descent (know how to take derivatives, no need to memorize formulas) #pause
 
@@ -658,11 +658,11 @@ Now, we need to find the parameters $bold(theta) = vec(theta_0, theta_1)$ that m
 
   The $bold(theta)$ given by
 
-  $ bold(theta) = (overline(bold(X))^top overline(bold(X)) )^(-1) overline(bold(X))^top bold(y) $ #pause
+  $ argmax_bold(theta) = (overline(bold(X))^top overline(bold(X)) )^(-1) overline(bold(X))^top bold(y) $ #pause
 
   Provide the solution to 
   $ 
-   argmin_bold(theta) cal(L)(bold(x), bold(y), bold(theta)) &= argmin_bold(theta) sum_(i=1)^n "error"(f(x_[i], bold(theta)),  y_[i]) \ &= argmin_bold(theta) sum_(i=1)^n (f(x_[i], bold(theta)) - y_[i])^2 
+   argmin_bold(theta) cal(L)(bold(x), bold(y), bold(theta)) &= argmin_bold(theta) sum_(i=1)^n (f(x_[i], bold(theta)) - y_[i])^2 
   $ 
 
 ==

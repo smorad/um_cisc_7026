@@ -5,6 +5,8 @@
 #import "common.typ": *
 #import "@preview/pinit:0.2.2": *
 
+// TODO Swap order of ones in design
+
 
 // TODO: Missing x^2 term when we show polynomial+multivariate example (not 2^3, should be 3^2 + 1)
 
@@ -53,13 +55,6 @@
     })
 })
 
-#show: university-theme.with(
-  aspect-ratio: "16-9",
-  short-title: "CISC 7026: Introduction to Deep Learning",
-  short-author: "Steven Morad",
-  short-date: "Lecture 3: Neural Networks"
-)
-
 
 #title-slide()
 
@@ -82,6 +77,7 @@
 */
 
 = Agenda
+==
 
 = Review
 ==
@@ -116,7 +112,7 @@
     columns: 2,
     align: center,
     column-gutter: 2em,
-    $ f(x, bold(theta)) = f(x, vec(theta_1, theta_0)) = theta_1 x + theta_0 $,
+    $ f(x, bold(theta)) = f(x, vec(theta_0, theta_1)) = theta_0 + theta_1 x $,
     cimage("figures/lecture_2/example_regression_graph.png", height: 50%)
   )) #pause
   
@@ -156,13 +152,13 @@
   $ 
 
 ==
-  We defined the design matrix $bold(X)_D$ #pause
+  We defined the design matrix $overline(bold(X))$ #pause
 
-  $ bold(X)_D = mat(bold(x), bold(1)) = mat(x_[1], 1; x_[2], 1; dots.v, dots.v; x_[n], 1) $ #pause
+  $ overline(bold(X)) = mat(bold(1), bold(x)) = mat(1, x_[1]; 1, x_[2]; dots.v, dots.v; 1, x_[n]) $ #pause
 
   We use the design matrix to find an *analytical* solution to the optimization objective #pause
   
-$ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ 
+$ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))^top bold(y) $ 
 
 ==
   With this analytical solution, we were able to learn a linear model #pause
@@ -172,16 +168,16 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 ==
   Then, we used a trick to extend linear regression to nonlinear models #pause
 
-  $ bold(X)_D = mat(x_[1], 1; x_[2], 1; dots.v, dots.v; x_[n], 1) => bold(X)_D = mat(log(1 + x_[1]), 1; log(1 + x_[2]), 1; dots.v, dots.v; log(1 + x_[n]), 1) $
+  $ overline(bold(X)) = mat(1, x_[1]; 1, x_[2]; dots.v, dots.v; 1, x_[n]) => overline(bold(X)) = mat(1, log(1 + x_[1]); 1, log(1 + x_[2]); dots.v, dots.v; 1, log(1 + x_[n])) $
 
 ==
   We extended to polynomials, which are *universal function approximators* #pause
 
-  $ bold(X)_D = mat(x_[1], 1; x_[2], 1; dots.v, dots.v; x_[n], 1) => bold(X)_D = mat(
-    x_[1]^m, x_[1]^(m-1), dots, x_[1], 1; 
-    x_[2]^m, x_[2]^(m-1), dots, x_[2], 1; 
+  $ overline(bold(X)) = mat(1, x_[1]; 1, x_[2]; dots.v, dots.v; 1, x_[n]) => overline(bold(X)) = mat(
+    1, x_[1], dots, x^m_[1]; 
+    1, x_[2], dots, x^m_[2]; 
     dots.v, dots.v, dots.down; 
-    x_[n]^m, x_[n]^(m-1), dots, x_[n], 1
+    1, x_[3], dots, x^m_[3]; 
     ) $ #pause
 
   $ f: X times Theta |-> bb(R) $ #pause
@@ -191,7 +187,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 ==
   Finally, we discussed overfitting #pause
 
-  $ f(x, bold(theta)) = theta_m x^m + theta_(m - 1) x^(m - 1), dots, theta_1 x^1 + theta_0 $ #pause
+  $ f(x, bold(theta)) = theta_0 + theta_1 x + dots + theta_m x^m $ #pause
 
   #grid(
     columns: 3,
@@ -213,6 +209,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
 // 16:00 fast
 = Multivariate Linear Regression
+
 ==
 
   Last time, we assumed a single-input system #pause
@@ -244,18 +241,18 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 ==
   The design matrix for a *multivariate* linear system is
 
-  $ bold(X)_D = mat(
-    x_([1], d_x), x_([1], d_x - 1),  dots, x_([1], 1), 1; 
-    x_([2], d_x), x_([2], d_x - 1), dots, x_([2], 1), 1; 
-    dots.v, dots.v, dots.down, dots.v; 
-    x_([n], d_x), x_([n], d_x - 1), dots, x_([n], 1), 1
+  $ overline(bold(X)) = mat(
+    1, x_([1], 1), x_([1], 2),  dots, x_([1], d_x); 
+    1, x_([2], 1), x_([2], 2),  dots, x_([2], d_x); 
+    dots.v, dots.v, dots.v, dots.down, dots.v ; 
+    1, x_([n], 1), x_([n], 2),  dots, x_([n], d_x); 
   ) $ #pause
 
   Remember $x_([n], d_x)$ refers to dimension $d_x$ of training data $n$ #pause
 
   The solution is the same as before
 
-  $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $ 
+  $ bold(theta) = (overline(bold(X))^top overline(bold(X)) )^(-1) overline(bold(X))^top bold(y) $ 
 
 // 22:00 fast
 
@@ -280,19 +277,19 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
   #side-by-side[
     One-dimensional polynomial functions
-    $ bold(X)_D = mat(
-      x_[1]^m, x_[1]^(m-1), dots, x_[1], 1; 
-      x_[2]^m, x_[2]^(m-1), dots, x_[2], 1; 
-      dots.v, dots.v, dots.down; 
-      x_[n]^m, x_[n]^(m-1), dots, x_[n], 1
-      ) $ #pause][
+    $ overline(bold(X)) = mat(
+    1, x_[1], dots, x^m_[1]; 
+    1, x_[2], dots, x^m_[2]; 
+    dots.v, dots.v, dots.down; 
+    1, x_[3], dots, x^m_[3]; 
+    ) $ #pause][
     Multi-dimensional linear functions
-    $ bold(X)_D = mat(
-      x_([1], d_x), x_([1], d_x - 1),  dots, 1; 
-      x_([2], d_x), x_([2], d_x - 1), dots, 1; 
-      dots.v, dots.v, dots.down, dots.v; 
-      x_([n], d_x), x_([n], d_x - 1), dots, 1
-    ) $ #pause
+    $ overline(bold(X)) = mat(
+    1, x_([1], 1), x_([1], 2),  dots, x_([1], d_x); 
+    1, x_([2], 1), x_([2], 2),  dots, x_([2], d_x); 
+    dots.v, dots.v, dots.v, dots.down, dots.v, ; 
+    1, x_([n], 1), x_([n], 2),  dots, x_([n], d_x); 
+  ) $ #pause
   ]
 
   Combine them to create multi-dimensional polynomial functions #pause
@@ -309,9 +306,10 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   Highly nonlinear task, use a polynomial with order $m=20$ 
 
 ==
-  $ bold(X)_D = mat(bold(x)_(D, [1]), dots, bold(x)_(D, [n]))^top $ #pause
+// TODO FIX THIS 2025
+  $ overline(bold(X)) = mat(bold(x)_([1], d_x), dots, bold(x)_([n], d_x))^top $ #pause
 
-  $ &bold(x)_(D, [i]) = \ &mat(
+  $ &bold(x)_([i], D) = \ &mat(
     underbrace(x_([i], d_x)^m x_([i], d_x - 1)^m dots x_([i], 1)^m, (d_x => 1, x^m)),
     underbrace(x_([i], d_x)^m x_([i], d_x - 1)^m dots x_([i], 2)^m, (d_x => 2, x^m)),
     dots,
@@ -353,16 +351,16 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
   Take the limit of polynomials to see their behavior #pause
 
-  #side-by-side[$ lim_(x -> oo) theta_m x^m + theta_(m-1) x^(m-1) + dots $][Equation of a polynomial] #pause
+  #side-by-side[$ lim_(x -> oo) theta_0 + theta_1 x + dots + theta_m x^m $][Equation of a polynomial] #pause
 
-  #side-by-side[$ lim_(x -> oo) x^m (theta_m + theta_(m-1) / x + dots) $][Factor out $x^m$] #pause
+  #side-by-side[$ lim_(x -> oo) x^m (theta_0 / x^m + theta_1 / x^(m-1) + dots + theta_m) $][Factor out $x^m$] #pause
 
-  #side-by-side[$ lim_(x -> oo) x^m dot lim_(x-> oo) (theta_m + theta_(m-1) / x + dots) $][Split the limit (limit of products)] 
+  #side-by-side[$ lim_(x -> oo) x^m dot lim_(x-> oo) (theta_0 / x^m + theta_1 / x^(m-1) + dots + theta_m) $][Split the limit (limit of products)] 
 
 ==
-  #side-by-side[$ lim_(x -> oo) x^m dot lim_(x-> oo) (theta_m + theta_(m-1) / x + dots) $][Split the limit (limit of products)]
+  #side-by-side[$ lim_(x -> oo) x^m dot lim_(x-> oo) (theta_0 / x^m + theta_1 / x^(m-1) + dots + theta_m) $][Split the limit (limit of products)] #pause
   
-  #side-by-side[$ (lim_(x -> oo) x^m) dot (theta_m + 0 + dots) $][Evaluate right limit] #pause
+  #side-by-side[$ (lim_(x -> oo) x^m) dot (0 + 0 + dots + theta_m ) $][Evaluate right limit] #pause
 
   #side-by-side[$ theta_m lim_(x -> oo) x^m  $][Rewrite] #pause
 
@@ -373,7 +371,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 ==
   Polynomials quickly tend towards $-oo, oo$ outside of the support #pause
 
-  $ f(x) = x^3-2x^2-x+2 $ #pause
+  $ f(x) = 2 -x - 2x^2 + x^3 $ #pause
 
   #cimage("figures/lecture_3/polynomial_generalize.png", height: 50%) #pause
 
@@ -589,7 +587,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 
   *Answer:* Inside $sigma$ is the multivariate linear model!
 
-  $ f(bold(x), bold(theta)) = theta_(d_x) x_(d_x) + theta_(d_x - 1) x_(d_x - 1) + dots + theta_0 1 $
+  $ f(bold(x), bold(theta)) = theta_0 + theta_1 x_1 + dots + theta_(d_x) x_(d_x)  $
 
 ==
   We model a neuron using a linear model and activation function #pause
@@ -820,7 +818,7 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
   $ bold(z)_1 = f_1(bold(x), bold(phi)) = sigma(bold(phi)^top overline(bold(x))) $ #pause
   $ bold(z)_2 = f_2(bold(z_1), bold(psi)) = sigma(bold(psi)^top overline(bold(z))_1) $ #pause
   $ dots.v $ #pause
-  $ bold(y) = f_(ell)(bold(x), bold(xi)) = sigma(bold(xi)^top overline(bold(z))_(ell - 1)) $
+  $ bold(hat(y)) = f_(ell)(bold(x), bold(xi)) = sigma(bold(xi)^top overline(bold(z))_(ell - 1)) $
 
   We call each function a *layer* #pause
 
@@ -874,12 +872,16 @@ $ bold(theta) = (bold(X)_D^top bold(X)_D )^(-1) bold(X)_D^top bold(y) $
 ==
   A *layer* is a linear operation and an activation function
 
-  $ f(bold(x), vec(bold(b), bold(W))) = sigma(bold(b) + bold(W)^top bold(x)) $
+  #side-by-side[
+    $ f(bold(x), bold(theta)) = sigma(bold(theta)^top overline(bold(x))) $ #pause
+  ][
+    $ f(bold(x), vec(bold(b), bold(W))) = sigma(bold(b) + bold(W)^top bold(x)) $ #pause
+  ]
 
   #side-by-side[Many layers makes a deep neural network][
   #text(size: 22pt)[
-    $ bold(z)_1 &= f(bold(x), vec(bold(b)_1, bold(W)_1)) \
-    bold(z)_2 &= f(bold(z)_1, vec(bold(b)_2, bold(W)_2)) \ quad bold(y) &= f(bold(z)_2, vec(bold(b)_2, bold(W)_2)) $
+    $ bold(z)_1 &= f(bold(x), bold(theta)) \
+    bold(z)_2 &= f(bold(z)_1, bold(theta)) \ quad bold(hat(y)) &= f(bold(z)_2, bold(theta)) $
   ]
   ]
 
