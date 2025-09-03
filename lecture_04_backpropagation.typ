@@ -401,31 +401,6 @@
 
   $ d / (d x): (f: X |-> Y) |-> (f': X |-> bb(R)) $
 
-/*
-==
-To avoid ambiguity, we will use the following functional notation #pause
-
-$ d / (d x) f = f' => (d / (d x) f) $
-
-$ d / (d x) f (x) = f'(x) => 
-  (d / (d x) f)(x)
-$
-
-$ markhl(
-  (d / (d x) f), radius: #10%, tag: #<1>
-) markhl(
-  (x), color: #blue, tag: #<2>
-) $
-
-#annot(<1>)[Compute new function $f'$]
-#annot(<2>, pos: right )[New function $f'$ takes input $x$]
-*/
-==
-TODO: Introduce simple gradient notation
-TODO: Critical points
-TODO: Introduce partials and notation
-TODO: Introduce gradient notation
-
 ==
   There are formulas for computing the derivative of various operations #pause
 
