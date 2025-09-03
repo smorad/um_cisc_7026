@@ -105,6 +105,24 @@
     outline(title: none, indent: 1em, depth: 1)
 )
 
+= Admin
+
+==
+Exam next lecture, it will be *hard*, make sure you study! #pause
+- 1 question function notation
+- 1 question set notation
+- 2 questions linear regression (make sure you can invert 2x2 matrices)
+- 1 question neural networks (neurons)
+- 1 question gradient descent (take and evalute derivatives, no need to memorize formulas) #pause
+
+Chinese translation for all exam questions
+
+所有考试题目均提供中文翻译
+
+Only need pen or pencil 
+
+==
+
 // 4:00
 
 /*
