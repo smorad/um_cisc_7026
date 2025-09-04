@@ -2,13 +2,13 @@
 #table(
   columns: (0.2fr, 0.8fr),
   [Course], [CISC 7026 Fall 2025],
-  [Time], [19:00-22:00, Thursdays],
+  [Time], [19:00-22:00, Fridays],
   [Location], [Room E6-1102C],
   [Description], [This course introduces the theory and application of deep neural networks],
   [Instructor], [
     Steven Morad \<smorad at um.edu.mo\>
   ],
-  [Office Hours], [14:00-16:00 Friday],
+  [Office Hours], [14:00-16:00 Thursday in E11-4084c],
   [Grading], [
     - Assignments: 30%
     - Exams: 30%

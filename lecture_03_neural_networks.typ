@@ -5,9 +5,6 @@
 #import "common.typ": *
 #import "@preview/pinit:0.2.2": *
 
-// TODO Swap order of ones in design
-
-
 // TODO: Missing x^2 term when we show polynomial+multivariate example (not 2^3, should be 3^2 + 1)
 
 // For students: you may want to change this to true
@@ -50,7 +47,52 @@
       plot.add(
         domain: (-2, 2), 
         x => calc.pow(1 + x, 2),
-        label: $ (x + 1)^2 $
+        label: $ (x + 1)^2 $,
+        style: (stroke: (paint: red, thickness: 4pt)),
+      )
+    })
+})
+
+
+#let polynomial = canvas(length: 1cm, {
+  plot.plot(size: (12, 6),
+    x-tick-step: 4,
+    y-tick-step: 10,
+    y-min: -10,
+    y-max: 10,
+    x-min: -5,
+    x-max: 5,
+    {
+      plot.add(
+        domain: (-5, 5), 
+        x => 2 - x - 2 * calc.pow(x, 2) + calc.pow(x, 3),
+        style: (stroke: (paint: orange, thickness: 4pt)),
+      )
+      plot.add((
+        (0, 2), 
+        ( 0.25    ,  1.640625),
+        ( 0.5     ,  1.125   ),
+        ( 0.75    ,  0.546875),
+        ( 1.      ,  0.      ),
+        ( 1.25    , -0.421875),
+        ( 1.5     , -0.625   ),
+        ( 1.75    , -0.515625)
+      ),
+        mark: "o",
+        mark-style: (stroke: none, fill: black, thickness: 10pt),
+        style: (stroke: none))
+      })
+})
+
+#let heaviside = canvas(length: 1cm, {
+  plot.plot(size: (8, 4),
+    x-tick-step: 1,
+    y-tick-step: 2,
+    {
+      plot.add(
+        domain: (-2, 2), 
+        x => calc.clamp(calc.floor(x + 1), 0, 1),
+        style: (stroke: (paint: red, thickness: 4pt)),
       )
     })
 })
@@ -92,11 +134,11 @@
 ==
   *Goal:* Given your education, predict your life expectancy #pause
 
-  $X in bb(R)_+:$ Years in school #pause
+  $X = bb(R)_+:$ Years in school #pause
   
-  $Y in bb(R)_+:$ Age of death #pause
+  $Y = bb(R)_+:$ Age of death #pause
 
-  $Theta in bb(R)^2:$ Parameters #pause 
+  $Theta = bb(R)^2:$ Parameters #pause 
 
   $ f: X times Theta |-> Y $ #pause
 
@@ -182,7 +224,7 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
 
   $ f: X times Theta |-> bb(R) $ #pause
 
-  $ Theta in bb(R)^2 => Theta in bb(R)^(m+1) $ 
+  $ Theta = bb(R)^2 => Theta = bb(R)^(m+1) $ 
 
 ==
   Finally, we discussed overfitting #pause
@@ -203,9 +245,9 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
 ==
   We care about *generalization* in machine learning #pause
 
-  So we should always split our dataset into a training dataset and a testing dataset #pause
+  Always split our dataset into a training dataset and a testing dataset #pause
 
-  #cimage("figures/lecture_2/train_test_regression.png", height: 60%)
+  #cimage("figures/lecture_2/train_test_regression.png", height: 70%)
 
 // 16:00 fast
 = Multivariate Linear Regression
@@ -214,20 +256,22 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
 
   Last time, we assumed a single-input system #pause
 
-  Years of education: $X in bb(R)$ #pause
+  Years of education: $X = bb(R)_+$ #pause
 
   But sometimes we want to consider multiple input dimensions #pause
 
-  Years of education, BMI, GDP: $X in bb(R)^3$ #pause
+  Years of education, BMI, GDP: $X = bb(R)_+^3$ #pause
 
-  We can solve these problems using linear regression too
+  We can solve these problems using linear regression too #pause
+
+  We call it *multivariate linear regression*
 
 ==
   For multivariate problems, we will define the input dimension as $d_x$ #pause
 
-  $ bold(x) in X; quad X in bb(R)^(d_x) $ #pause
+  $ bold(x) in X; quad X = bb(R)^(d_x) $ #pause
 
-  We will write the vectors as
+  We write a single input as
 
   $ bold(x)_[i] = vec(
     x_([i], 1),
@@ -236,10 +280,10 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
     x_([i], d_x)
   ) $ #pause
 
-  $x_([i], 1)$ refers to the first dimension of training data $i$
+  $x_([i], 1)$ refers to the first dimension of datapoint $i$
 
 ==
-  The design matrix for a *multivariate* linear system is
+  The design matrix for a multivariate linear system is
 
   $ overline(bold(X)) = mat(
     1, x_([1], 1), x_([1], 2),  dots, x_([1], d_x); 
@@ -301,7 +345,11 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
 
   $ f: X times Theta |-> Y; quad X: "Image", quad Y: "Number of " #redm[$#sym.suit.heart$]  $ #pause
 
-  $ X in bb(Z)_+^(256 times 256) = bb(Z)_+^(65536); quad Y in bb(Z)_+ $  #pause
+  #side-by-side[
+  $ X = bb(Z)_+^(256 times 256) = bb(Z)_+^(65536) $
+  ][
+  $ Y = bb(Z)_+ $  #pause
+  ]
 
   Highly nonlinear task, use a polynomial with order $m=20$ 
 
@@ -309,6 +357,15 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
 // TODO FIX THIS 2025
   $ overline(bold(X)) = mat(bold(x)_([1], d_x), dots, bold(x)_([n], d_x))^top $ #pause
 
+  $ &bold(x)_([i]) = mat(
+    1, x_([i], 1), x_([i], 2),  dots, x_([i], d_x), dots, 
+    underbrace(x_([i], 1) x_([i], 1), x^2_([i], 1)) , x_([i], 2) x_([i], 1), dots, x_([i], d_x),
+    //x^2_([i], 1), x^2_([i], 2),  dots, x^2_([i], d_x), 
+    dots, x^m_([i], d_x)
+  ) 
+  $
+
+  /*
   $ &bold(x)_([i], D) = \ &mat(
     underbrace(x_([i], d_x)^m x_([i], d_x - 1)^m dots x_([i], 1)^m, (d_x => 1, x^m)),
     underbrace(x_([i], d_x)^m x_([i], d_x - 1)^m dots x_([i], 2)^m, (d_x => 2, x^m)),
@@ -317,24 +374,29 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
     dots,
   )
   $
+  */
 
 
   *Question:* How many columns in this matrix? #pause
 
-  *Hint:* $d_x = 2, m = 3$: $x^3 + y^3 + x^2 y + y^2 x + x y + x + y + 1$ #pause
+  *Hint:* Consider a multivariate polynomial (e.g., 2 variables, order 3)
+  
+  $d_x = 2, m = 3$: $x^3 + y^3 + x^2 y + y^2 x + x^2 + y^2 + x y + x + y + 1$ #pause
 
-  *Answer:* $(d_x)^m = 65536^20 + 1 approx 10^96$
+  *Hint:* $d_x = 2, m = 3$ has 9 terms #pause
+
+  *Answer:* $(m)^(d_x) = 20^655360 approx 10^(852000)$
 
 ==
-  How big is $10^96$? #pause
+  How big is $10^(852000)$? #pause
 
   *Question:* How many atoms are there in the universe? #pause
 
   *Answer:* $10^82$ #pause
 
-  There is not enough matter in the universe to represent one row #pause
+  There is not enough matter in the universe to represent one row of $overline(bold(X))$#pause
 
-  #side-by-side[We cannot predict how many #text(fill: color.red)[#sym.suit.heart] the picture will get][#cimage("figures/lecture_1/dog.png", height: 30%)] #pause
+  #side-by-side[We cannot predict how many #text(fill: color.red)[#sym.suit.heart] the picture will get][#cimage("figures/lecture_1/dog.png", height: 30%)] 
 
 ==
   Polynomial regression does not scale to large inputs
@@ -373,9 +435,11 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
 
   $ f(x) = 2 -x - 2x^2 + x^3 $ #pause
 
-  #cimage("figures/lecture_3/polynomial_generalize.png", height: 50%) #pause
+  #align(center, polynomial)
 
-  Remember, to predict new data we want our functions to generalize
+  //#cimage("figures/lecture_3/polynomial_generalize.png", height: 50%) #pause
+
+  Remember, to predict new data $f$ must generalize
 
 ==
   Linear regression has issues #pause
@@ -393,7 +457,7 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
 
   Drawbacks: #pause
     + No analytical solution #pause
-    + High data requirement 
+    + Big data requirement 
 
 
 
@@ -401,20 +465,20 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
 // 40:00 fast
 = History of Neural Networks
 ==
-  In 1939-1945, there was a World War #pause
+  In 1939-1945, there was a World War (抗日战争) #pause
 
   Militaries invested funding for research, and invented the computer #pause
 
   #cimage("figures/lecture_3/turing.jpg", height: 70%)
 
 ==
-  #side-by-side[Meanwhile, a neuroscientist and mathematician (McCullough and Pitts) were trying to understand the human brain][#cimage("figures/lecture_3/mccullough-pitts.png", height: 70%)] #pause
+  #side-by-side(align: left + horizon)[Meanwhile, a neuroscientist and mathematician (McCullough and Pitts) were trying to understand the human brain][#cimage("figures/lecture_3/mccullough-pitts.png", height: 70%)] #pause
 
   They designed the theory for the first neural network
 
 ==
   Rosenblatt implemented this neural network theory on a computer a few years later #pause
-  #side-by-side[
+  #side-by-side(align: left + horizon)[
     At the time, computers were very slow and expensive
 ][#cimage("figures/lecture_3/original_nn.jpg", height: 70%)] 
 
@@ -439,9 +503,11 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
 
   *Computer:* Artificial neurons $->$ Artificial neural network #pause
 
-  First, let us review biological neurons #pause
+  To understand artificial neurons, we must first understand human neurons #pause
 
-  *Note:* I am not a neuroscientist! I may make simplifications or errors with biology
+  *Note:* I am not a neuroscientist #pause
+  - I may make simplifications or errors with biology #pause
+  - Neuroscience students please correct me!
 
 = Biological Neurons
 ==
@@ -470,14 +536,18 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
   The axon terminals will connect to dendrites of other neurons through a synapse
 
 ==
-  #cimage("figures/lecture_3/synapse.png", height: 60%)
-  The synapse converts electrical signal, to chemical signal, back to electrical signal #pause
+  #cimage("figures/lecture_3/synapse.png", height: 70%)
+  Synapse converts electrical signal, to chemical signal, to electrical signal #pause
 
   Synaptic weight determines how well a signal crosses the gap
 
 ==
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
-  For our purposes, we can model the axon terminals, dendrites, and synapses to be one thing
+  To simplify, we combine axon terminals, synaptic gap, and dendrites
+
+==
+  #cimage("figures/lecture_3/neuron_anatomy.jpg") 
+  "Simplified" neuron has many dendrites but only one axon terminal
 
 ==
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
@@ -485,25 +555,48 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
 
 ==
   #cimage("figures/lecture_3/neuron_anatomy.jpg") 
-  The neuron will only output a signal down the axon ("fire") at certain times
+  Due to electric potential, signals behave like lightning
+
+==
+  #cimage("figures/lecture_3/neuron_anatomy.jpg") 
+  Potential varies, eventually it will "snap" (fire) like lightning
+
+
+==
+  #cimage("figures/lecture_3/neuron_anatomy.jpg") 
+  The neuron only fires sometimes, other times it does not fire
 
 ==
   How does a neuron decide to send an impulse ("fire")? #pause
 
-  #side-by-side[Incoming impulses (via dendrites) change the electric potential of the neuron][  #cimage("figures/lecture_3/bio_neuron_activation.png", height: 50%)] #pause
+  #side-by-side(align: left + horizon)[Incoming impulses (via dendrites) change the electric potential of the neuron][  #cimage("figures/lecture_3/bio_neuron_activation.png", height: 50%)] #pause
 
   In a parallel circuit, we can sum voltages together #pause
+
+  Neural dendrites form a parallel circuit!
+
+==
+
+  Neural dendrites form a parallel circuit! #pause
+
+  #cimage("figures/lecture_3/neuron_anatomy.jpg") #pause
 
   Many active dendrites will add together and trigger an impulse
   
 ==
-  #side-by-side[Pain triggers initial nerve impulse, starts a chain reaction into the brain][#cimage("figures/lecture_3/nervous-system.jpg")]
+  #side-by-side(align: horizon + left)[Touch triggers initial nerve impulse, starts a chain reaction into the brain][#cimage("figures/lecture_3/nervous-system.jpg")]
 
 ==
-  #side-by-side[When the signal reaches the brain, we will think][#cimage("figures/lecture_3/nervous-system.jpg")]
+  #side-by-side(align: horizon + left)[When the signal reaches the brain, we feel the touch][#cimage("figures/lecture_3/nervous-system.jpg")]
 
 ==
-  #side-by-side[After thinking, we will take action][#cimage("figures/lecture_3/nervous-system.jpg")]
+  #side-by-side(align: horizon + left)[Feeling the touch activates other neurons in the brain (thinking)][#cimage("figures/lecture_3/nervous-system.jpg")]
+
+==
+  #side-by-side(align: horizon + left)[After thinking, we will take action][#cimage("figures/lecture_3/nervous-system.jpg")]
+
+==
+  #side-by-side(align: horizon + left)[Action follows reverse path, leaves the brain and goes to motor neurons][#cimage("figures/lecture_3/nervous-system.jpg")]
 
 // 57:00
 
@@ -520,7 +613,7 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
 ==
   Let us implement an artifical neuron as a function #pause
 
-  #side-by-side[#cimage("figures/lecture_3/neuron_anatomy.jpg")][
+  #side-by-side(align: left)[#cimage("figures/lecture_3/neuron_anatomy.jpg")][
     #only((2,3))[
       Neuron has a structure of dendrites with synaptic weights
 
@@ -556,19 +649,39 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
 
     #only((8, 9, 10))[
       The axon fires only if the voltage is over a threshold
+
     ]
     #only((9, 10))[
+
+      Step function $sigma(x) = H(x)$
+
+      #heaviside
       
-      $ sigma(x)= H(x) = #image("figures/lecture_3/heaviside.png", height: 30%) $
+       // #image("figures/lecture_3/heaviside.png", height: 30%) $
     ]
     #only(10)[
-      $ f(vec(x_(1), dots.v, x_(n)), vec(theta_(1),  dots.v, theta_(n)) ) = #redm[$sigma$] (sum_(j=1)^(d_x) theta_j x_(j) ) $
+
     ]
   ]
+
+==
+#side-by-side[
+  Step function $sigma(x) = H(x)$
+
+  #heaviside #pause
+  
+][
+  $ f(vec(x_(1), dots.v, x_(n)), vec(theta_(1),  dots.v, theta_(n)) ) = #redm[$sigma$] (sum_(j=1)^(d_x) theta_j x_(j) ) $
+]
+
+We call $sigma$ the *activation function* #pause
+
+Tells us when the neural fires (activates)
+
 // 1:05
 
 ==
-  #side-by-side[Maybe we want to vary the activation threshold][#cimage("figures/lecture_3/bio_neuron_activation.png", height: 30%)][#image("figures/lecture_3/heaviside.png", height: 30%)] #pause
+  #side-by-side(align: left)[Maybe we want to vary the activation threshold][#cimage("figures/lecture_3/bio_neuron_activation.png", height: 30%)][#scale(80%, place(heaviside))] #pause
 
   $ f(vec(#redm[$1$], x_(1), dots.v, x_(d_x)), vec(#redm[$theta_0$], theta_(1),  dots.v, theta_(d_x)) ) = sigma(#redm[$theta_0$] + sum_(j=1)^(d_x) theta_j x_j) = sigma(sum_(#redm[$j=0$])^(d_x) theta_j x_j) $ #pause
 
@@ -604,7 +717,7 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
 
   $ bold(theta) = vec(b, bold(w)); quad vec(theta_0, theta_1, dots.v, theta_(d_x)) = vec(b_" ", w_1, dots.v, w_(d_x)) $ #pause
 
-  $ f(bold(x), vec(b, bold(w))) = b + bold(w)^top bold(x) $ 
+  $ f(bold(x), vec(b, bold(w))) = sigma(b + bold(w)^top bold(x)) $ 
 
 // 1:15
 
@@ -628,7 +741,7 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
     
       *Review:* Activation function (Heaviside step function) #pause
 
-      #cimage("figures/lecture_3/heaviside.png", height: 50%)
+      #heaviside
 
       $
         sigma(x) = H(x) = cases(
@@ -742,13 +855,13 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
 
   $ f: bb(R)^(d_x) times Theta |-> bb(R) $ 
   
-  $ Theta in bb(R)^(d_x + 1) $ #pause
+  $ Theta = bb(R)^(d_x + 1) $ #pause
 
   $d_y$ neurons (wide):
 
   $ f: bb(R)^(d_x) times Theta |-> bb(R)^(d_y) $ 
   
-  $ Theta in bb(R)^((d_x + 1) times d_y) $
+  $ Theta = bb(R)^((d_x + 1) times d_y) $
 
 ==
   For a single neuron:
@@ -788,9 +901,9 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
 
   But the parameters change!
 
-  Wide: $Theta in bb(R)^((d_x + 1) times d_y)$ #pause 
+  Wide: $Theta = bb(R)^((d_x + 1) times d_y)$ #pause 
 
-  Deep: $Theta in bb(R)^((d_x + 1) times d_h) times bb(R)^((d_h + 1) times d_h) times dots times bb(R)^((d_h + 1) times d_y)$ #pause
+  Deep: $Theta = bb(R)^((d_x + 1) times d_h) times bb(R)^((d_h + 1) times d_h) times dots times bb(R)^((d_h + 1) times d_y)$ #pause
 
   $ bold(theta) = mat(bold(theta)_1, bold(theta)_2, dots, bold(theta)_ell)^top = mat(bold(phi), bold(psi), dots, bold(xi))^top $ 
 
@@ -863,6 +976,7 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
     - Recurrent neural networks #pause
     - Graph neural networks #pause
     - Transformers #pause
+    - Generative image models #pause
     - Chatbots #pause
 
   It is very important to understand MLPs! #pause
@@ -904,7 +1018,7 @@ $ bold(theta) = (overline(bold(X))^top overline(bold(X)))^(-1) overline(bold(X))
 
     $-$ No analytical solution #pause
 
-    $-$ High data requirement #pause
+    $-$ Big data requirement #pause
 
     $+$ Scale to large inputs #pause
 
