@@ -9,7 +9,7 @@
 
 // For students: you may want to change this to true
 // otherwise you will get one slide for each new line
-#let handout = false
+#let handout = true
 
 // cetz and fletcher bindings for touying
 #let cetz-canvas = touying-reducer.with(reduce: cetz.canvas, cover: cetz.draw.hide.with(bounds: true))
@@ -48,6 +48,24 @@
         domain: (-2, 2), 
         x => calc.pow(1 + x, 2),
         label: $ (x + 1)^2 $,
+        style: (stroke: (paint: red, thickness: 4pt)),
+      )
+    })
+})
+
+#let linear_plot = canvas(length: 1cm, {
+  plot.plot(size: (8, 4),
+    x-tick-step: 10,
+    y-tick-step: 50,
+    y-min: -10,
+    y-max: 100,
+    x-label: [Years of Education],
+    y-label: [Life Expectancy],
+    {
+      plot.add(
+        domain: (0, 20), 
+        x => 43 + 2.1 * x,
+        //label: $ (x + 1)^2 $,
         style: (stroke: (paint: red, thickness: 4pt)),
       )
     })
@@ -118,13 +136,26 @@
     [Practical considerations]
 */
 
-= Agenda
+= Admin
 ==
+How is assignment 1? #pause
+- Due next week, 32/109 completed #pause
+  - You are very disciplined, great job! #pause
+  - One student completed it before the lecture finished #pause
+
+I will be away for the next two weeks #pause
+- My TAs will hold office hours in E11-4084, same time #pause
+- You may email them questions: yc57439,yc57442,mc45154,mc45189
+
+Exam 1 in two weeks #pause
+- It will be hard #pause
+- Starting assignment 2 before exam will help you #pause
+  - Make sure you can compute gradients
 
 = Review
 ==
 
-  Since you are very educated, we focused on how education affects life expectancy #pause
+  We focused on how education affects life expectancy #pause
 
   Studies show a causal effect of education on health #pause
     - _The causal effects of education on health outcomes in the UK Biobank._ Davies et al. _Nature Human Behaviour_. #pause
@@ -155,7 +186,7 @@
     align: center,
     column-gutter: 2em,
     $ f(x, bold(theta)) = f(x, vec(theta_0, theta_1)) = theta_0 + theta_1 x $,
-    cimage("figures/lecture_2/example_regression_graph.png", height: 50%)
+    linear_plot
   )) #pause
   
   Then, we derived the square error function #pause
@@ -178,7 +209,7 @@
   $
 
 ==
-  Our objective was to find the parameters that minimized the loss function over the dataset #pause
+  We wanted the parameters that minimized the loss function #pause
 
   We introduced the $argmin$ operator #pause
 

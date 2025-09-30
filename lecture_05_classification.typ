@@ -8,7 +8,7 @@
 #import algorithmic: style-algorithm, algorithm-figure, algorithm
 #import "@preview/mannot:0.3.0": *
 
-#let handout = false
+#let handout = true
 
 // cetz and fletcher bindings for touying
 #let cetz-canvas = touying-reducer.with(reduce: cetz.canvas, cover: cetz.draw.hide.with(bounds: true))
@@ -91,8 +91,6 @@
 )
 
 = Admin
-==
-TODO wedding yutao, exams, hw2 extention, hw3 release, etc
 
 ==
 
@@ -264,7 +262,7 @@ You should start to form groups soon
 
   # Create a new function that is the gradient of L
   # Then compute gradient of L for given inputs
-  J = jax.grad(L)(X, Y, theta)
+  J = jax.grad(L, argnums=2)(X, Y, theta)
   # Update parameters
   alpha = 0.0001
   theta = theta - alpha * J
@@ -275,7 +273,7 @@ You should start to form groups soon
   
   ```python
   import torch
-  optimizer = torch.optim.SGD(lr=0.0001)
+  optimizer = torch.optim.SGD(params, lr=0.0001)
 
   def L(model, X, Y):
     ...
@@ -435,13 +433,13 @@ $ P: E -> [0, 1] $ #pause
   - Conditionally dependent events
 
 ==
-  Two events $A, B$ are *disjoint* if either $A$ occurs or $B$ occurs, *but not both* #pause
+  Two events $A, B$ are *disjoint* if $A$ and $B$ cannot occur together #pause
 
-  With disjoint events, $P(A inter B) = 0$ #pause
+  $ P(A, B) = 0 $ #pause
 
   #side-by-side[Flip a coin][
     $P("Heads") = 0.5, P("Tails") = 0.5$
-    $P("Heads" inter "Tails") = 0$
+    $P("Heads", "Tails") = 0$
   ] #pause
 
   Be careful!
@@ -452,16 +450,18 @@ $ P: E -> [0, 1] $ #pause
   ]
 
 ==
-  If $A, B$ are not disjoint, they are *conditionally dependent* #pause
+  If $B$ provides information about $A$, they are *conditionally dependent* #pause
+
+  $ P(A | B) != P(A) $ #pause
 
   $ P("cloud") = 0.2, P("rain") = 0.1 $ #pause
 
   $ P("rain" | "cloud") = 0.5 $ #pause
 
-  $ P(A | B) = P(A inter B) / P(B) $ #pause
+  $ P(A | B) = P(A, B) / P(B) $ #pause
 
   #side-by-side[Walk outside][
-    $P("Rain" inter "Cloud") = 0.1 \ 
+    $P("Rain", "Cloud") = 0.1 \ 
     P("Cloud") = 0.2$
     $P("Rain" | "Cloud") = 0.1 / 0.2 = 0.5$
   ]
@@ -493,7 +493,7 @@ $ P: E -> [0, 1] $ #pause
 
   *Question:* Can we use this model to predict probabilities? #pause
 
-  *Answer:* No! Because probabilities must be $in (0, 1)$ and sum to one 
+  *Answer:* No! Outcome probabilities must be $in [0, 1]$ and sum to one 
 
   //*Question:* What is the range/co-domain of $f$? #pause
 
@@ -506,9 +506,9 @@ $ P: E -> [0, 1] $ #pause
   //We introduce the *softmax* operator to ensure all probabilities sum to 1 #pause
 
 ==
-  How can we represent a probability distribution for a neural network? #pause
+  How can we model a distribution over outcomes? #pause
 
-  $ bold(v) = { vec(v_1, dots.v, v_(d_y)) mid(|) quad sum_(i=1)^(d_y) v_i = 1; quad v_i in (0, 1) } $ #pause
+  $ bold(v) = { vec(v_1, dots.v, v_(d_y)) mid(|) quad sum_(i=1)^(d_y) v_i = 1; quad v_i in [0, 1] } $ #pause
 
   There is special notation for this vector, called the *simplex* #pause
 
@@ -561,10 +561,10 @@ $ P: E -> [0, 1] $ #pause
 
   If we attach it to our linear model, we can output probabilities!
 
-  $ f(bold(x), bold(theta)) = "softmax"(bold(theta)^top bold(x)) $
+  $ f(bold(x), bold(theta)) = "softmax"(bold(theta)^top overline(bold(x))) $
 
 ==
-  Naturally, we can use the same method for a deep neural network
+  Naturally, we can use the same method with a deep neural network
 
   $ 
   f_1(bold(x), bold(phi)) = sigma(bold(phi)^top overline(bold(x))) \
@@ -575,7 +575,7 @@ $ P: E -> [0, 1] $ #pause
   Now, our neural network can output probabilities
 
   $ f(bold(x), bold(theta)) = vec(
-    P("Ankle boot" | #image("figures/lecture_5/shirt.png", height: 10%)),
+    P("Shirt" | #image("figures/lecture_5/shirt.png", height: 10%)),
     P("Bag" | #image("figures/lecture_5/shirt.png", height: 10%)),
     dots.v
   ) = vec(0.25, 0.08, dots.v)
@@ -630,6 +630,8 @@ $ P: E -> [0, 1] $ #pause
 
   This can work, but in reality it does not work well #pause
 
+  Distributions have special properties (positive, sum to one) that square error does not consider #pause
+
   Instead, we use the *cross-entropy loss* #pause
 
   Let us derive it
@@ -637,7 +639,9 @@ $ P: E -> [0, 1] $ #pause
 ==
   We can model $f(bold(x), bold(theta))$ and $bold(y)$ as probability distributions #pause
 
-  How do we measure the difference between probability distributions? #pause
+  Loss should measure the error between distributions $f(bold(x), bold(theta))$ and $bold(y)$ #pause
+
+  How do we measure the error between probability distributions? #pause
 
   We use the *Kullback-Leibler Divergence (KL)* #pause
 
@@ -730,9 +734,9 @@ $ P: E -> [0, 1] $ #pause
 
   I will not derive any more gradients, but the softmax gradient nearly identical to the sigmoid function gradient #pause
 
-  $ gradient_bold(theta) "softmax"(bold(z)) = "softmax"(bold(z)) dot.circle (1 - "softmax"(bold(z))) $ #pause
+  $ (gradient_bold(theta) "softmax")(bold(z)) = "softmax"(bold(z)) dot.circle (1 - "softmax"(bold(z))) $ #pause
 
-  This is because softmax is a multi-class generalization of the sigmoid function
+  Softmax is a multi-class generalization of the sigmoid function
 
 // 120:00
 = Coding
