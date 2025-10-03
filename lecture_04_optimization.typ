@@ -82,6 +82,7 @@
       "Gradient Descent",
       ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$),
       {
+        Assign[$bold(theta)$][Random()]
         For(
           $i in {1 dots t}$,
           {

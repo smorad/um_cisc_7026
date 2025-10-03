@@ -103,7 +103,7 @@ You will have 3 hours to finish the exam #pause
 
   We learn a function or mapping from $X$ to $Y$
 
-  $ f: X times |-> Y $ 
+  $ f: X |-> Y $ 
 
 ==
 

@@ -87,6 +87,8 @@
     set text(size: 25pt)
     canvas(length: 1cm, {
   plot.plot(size: (8, 6),
+    x-label: $z$,
+    y-label: none,
     x-tick-step: 2.5,
     //y-tick-step: 1,
     y-tick-step: none,
@@ -97,7 +99,7 @@
       plot.add(
         domain: (-5, 5), 
         style: (stroke: (thickness: 5pt, paint: red)),
-        label: $ sigma(x) $,
+        label: $ sigma(z) $,
         line: (type: "linear"),
         x => calc.max(0, x)
       )
@@ -125,11 +127,13 @@
     y-ticks: (-0.1, 3, 5),
     y-min: -1,
     y-max: 5,
+    x-label: $z$,
+    y-label: none,
     {
       plot.add(
         domain: (-5, 5), 
         style: (stroke: (thickness: 5pt, paint: red)),
-        label: $ sigma(x) $,
+        label: $ sigma(z) $,
         line: (type: "linear"),
         x => calc.max(0.1 * x, x)
       )
@@ -141,7 +145,7 @@
       plot.add(
         domain: (0, 5), 
         style: (stroke: (thickness: 3pt, paint: blue)),
-        label: $ gradient sigma(x)$,
+        label: $ gradient sigma(z)$,
         x => 1,
       )
     })

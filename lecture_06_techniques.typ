@@ -10,13 +10,14 @@
 #let handout = false
 
 
+// FUTURE TODO (Fall 2025): Break into two lectures, second lecture just for optimization, more coding
 // FUTURE TODO: Swap order, modern techniques -> classification
 
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
 
 
-#let gd_algo(init: "Random()") = algorithm(
+#let gd_algo(init: "Init()") = algorithm(
   line-numbers: false,
   {
     import algorithmic: *
@@ -51,13 +52,13 @@
         {
           Assign[$bold(theta)$][$"Glorot"()$] 
           For($i in 1 dots t$, {
-            Assign[$bold(X), bold(Y)$][$"Shuffle"(bold(X)), "Shuffle"(bold(Y))$]
-            For($j in 0 dots n / B - 1$, {
-            Assign[$bold(X)_j$][$mat(bold(x)_[ j B], bold(x)_[ j B + 1], dots, bold(x)_[ (j + 1) B - 1])^top$]
+            Assign[#redm[$bold(X), bold(Y)$]][#redm[$"Shuffle"(bold(X)), "Shuffle"(bold(Y))$]]
+            For(redm[$j in 0 dots n / B - 1$], {
+            Assign[#redm[$bold(X)_j$]][#redm[$mat(bold(x)_[ j B], bold(x)_[ j B + 1], dots, bold(x)_[ (j + 1) B - 1])^top$]]
             LineBreak
-            Assign[$bold(Y)_j$][$mat(bold(y)_[ j B], bold(y)_[ j B + 1], dots, bold(y)_[ (j + 1) B - 1])^top$]
+            Assign[#redm[$bold(Y)_j$]][#redm[$mat(bold(y)_[ j B], bold(y)_[ j B + 1], dots, bold(y)_[ (j + 1) B - 1])^top$]]
             LineBreak
-            Assign[$bold(J)$][$(gradient_bold(theta) cal(L))(bold(X)_j, bold(Y)_j, bold(theta))$]
+            Assign[$bold(J)$][$(gradient_bold(theta) cal(L))(bold(X)_#redm[$j$], bold(Y)_#redm[$j$], bold(theta))$]
             Assign[$bold(theta)$][$bold(theta) - alpha dot bold(J)$]
             })
           })
@@ -91,13 +92,45 @@
 
 = Admin
 ==
+Thank you for coming! #pause
 
+Silly to have Weds+Thursday holiday but not Friday... #pause
+
+==
+Was youtube video ok? #pause
+
+YouTube translations better than realtime translation? #pause
+
+Next year, should I record and upload all lectures?
+
+==
+How was exam 1? #pause
+
+Do you feel like experts in: #pause
+- Linear regression #pause
+- Artificial neurons #pause
+- Gradient descent
+
+==
+How was assignment 2? #pause
+
+Assignment 3 due soon, get started! #pause
+
+Assignment 4 is last assignment #pause
+
+Meeting with students on Monday to finish grading #pause
+- Exam 1 #pause
+- Assignment 1 #pause
+
+The rest of the course is final project #pause
+- Focus on your interests
+
+==
+How was Yutao's lecture? #pause
+
+Anything you liked/disliked?
 
 = Review
-==
-TODO classification coding
-// 4:30
-
 ==
   Many problems in ML can be reduced to *regression* or *classification* #pause
 
@@ -110,9 +143,9 @@ TODO classification coding
   - Is this a dog or muffin? #pause
   - Will it rain tomorrow? Yes or no? #pause
   - What color is this object? #pause
-  
-  So far, we only looked at regression. Now, let us look at classification
 
+  Last lecture, we defined classification
+  
 ==
   *Task:* Given a picture of clothes, predict the text description #pause
 
@@ -126,16 +159,18 @@ TODO classification coding
   $ f(bold(x), bold(theta)) = P(bold(y) | bold(x)) = P(vec("T-Shirt", "Trouser", dots.v) mid(|) #image("figures/lecture_5/shirt.png", height: 20%)) = vec(0.2, 0.01, dots.v) $
 
 ==
-  If events $A, B$ are not disjoint, they are *conditionally dependent* #pause
+  If $B$ provides information about $A$, they are *conditionally dependent* #pause
+
+  $ P(A | B) != P(A) $ #pause
 
   $ P("cloud") = 0.2, P("rain") = 0.1 $ #pause
 
   $ P("rain" | "cloud") = 0.5 $ #pause
 
-  $ P(A | B) = P(A sect B) / P(B) $ #pause
+  $ P(A | B) = P(A, B) / P(B) $ #pause
 
   #side-by-side[Walk outside][
-    $P("Rain" sect "Cloud") = 0.1 \ 
+    $P("Rain", "Cloud") = 0.1 \ 
     P("Cloud") = 0.2$
     $P("Rain" | "Cloud") = 0.1 / 0.2 = 0.5$
   ]
@@ -143,7 +178,7 @@ TODO classification coding
 ==
   How can we represent a probability distribution for a neural network? #pause
 
-  $ bold(v) = { vec(v_1, dots.v, v_(d_y)) mid(|) quad sum_(i=1)^(d_y) v_i = 1; quad v_i in (0, 1) } $ #pause
+  $ bold(v) = { vec(v_1, dots.v, v_(d_y)) mid(|) quad sum_(i=1)^(d_y) v_i = 1; quad v_i in [0, 1] } $ #pause
 
   There is special notation for this vector, called the *simplex* #pause
 
@@ -229,7 +264,14 @@ TODO classification coding
 // 12:30 + 15:00?
 
 ==
-  #cimage("figures/lecture_6/poor_minima.png")
+  #cimage("figures/lecture_6/poor_minima.png", height: 80%) #pause
+
+  1. Objective 2. NN architecture 3. Param initialization 4. Optimizer
+
+==
+  #cimage("figures/lecture_1/timeline.svg") #pause
+
+  Today we will move from 1982 to 2012
 
 
 = Dirty Secret of Deep Learning
@@ -243,8 +285,8 @@ TODO classification coding
     There is no widely-accepted theory for why deep neural networks are so effective #pause
 
     In modern deep learning, we progress using trial and error #pause
-
-    Today we experiment, and maybe tomorrow we discover the theory 
+    - Early DL used deductive reasoning (proofs from axioms) #pause
+    - Modern DL uses inductive reasoning (hypothesis, experiments)
 
 ==
     Scientific method: #pause
@@ -253,37 +295,35 @@ TODO classification coding
         + Run experiment #pause
         + Publish theory #pause
 
-    However, there is a second part: #pause
+    However, there is a second part of the scientific method: #pause
         + Find existing theory #pause
         + Show counterexample through experiment #pause
         + Publish counterexample #pause
-        + Update or falsify theory 
+        + Update or falsify theory #pause
 
     Deep learning is new, so much of part 2 has not happened yet!
 
 ==
-    For many concepts, the *observations* are stronger than the *theory* #pause
+    For many ideas, the *observations* are stronger than the *theory* #pause
 
-    Observe that a concept improves many types of neural networks #pause
+    Observe that an idea improves many types of neural networks #pause
 
-    Concepts we discuss today are known to improve neural networks #pause
+    Ideas we discuss today are known to improve neural networks #pause
+    - We will discuss theories about why they improve neural networks #pause
+    - If you do not believe the theory, prove it wrong and be famous! #pause
 
-    We will discuss theories about why they improve neural networks #pause
-
-    If you do not believe the theory, prove it wrong and be famous! #pause
-
-    Even if we do not agree on *why* a concept works, if we *observe* that it helps, we can still use it #pause
+    Even if we do not agree on *why* an idea works, if we *observe* that it helps, we can still use it #pause
 
     This is how medicine works (e.g., Anesthetics)!
 
 ==
   Theoretical advancements are still very important! #pause
 
-  Imagine the 40 years of neural network research before we understood how to train neural networks #pause
+  40 years of neural network research before we understood how to train neural networks #pause
 
   #cimage("figures/lecture_1/timeline.svg", width: 77%) #pause
 
-  Are modern networks too complex for humans to understand?
+  Modern networks too complex for humans to understand
 
 
 = Optimization is Hard
@@ -310,7 +350,7 @@ TODO classification coding
     Harder tasks can have millions of local optima, and many of the local optima are not very good!
 
 ==
-    Many of the concepts today create a *flat* loss landscape #pause
+    Many of the ideas today create *smoother* loss landscapes #pause
 
     #cimage("figures/lecture_6/skip_connection_img.png", height: 70%) #pause
 
@@ -326,9 +366,9 @@ TODO classification coding
     #text(size: 18pt)[- Eldan, Ronen, and Ohad Shamir. "The power of depth for feedforward neural networks." Conference on learning theory. PMLR, 2016.] #pause
 
 
-    $ 2 times 32 times 32 => 2^(2 times 32 times 32) approx 10^616; quad "universe has " 10^80 "atoms"$ #pause
+    $ 256 times d_y => e^128 times d_y approx 10^111 times d_y; quad "universe has " 10^80 "atoms"$ #pause
 
-    One more layer can solve this problem $3 times 32 times 32$ #pause
+    Another layer can solve this problem in $256 times 256 + 256 times d_y$ params #pause
 
     We need more layers for harder problems 
 // 24:00 + 15:00
@@ -341,11 +381,15 @@ TODO classification coding
 
     The number of neurons in a deep neural network affects the quality of local optima #pause
 
-    From Choromanska, Anna, et al. _The loss surfaces of multilayer networks._ (2014): #pause
+    From Choromanska et al. _The loss surfaces of multilayer networks._ (2014): #pause
 
     - "For large-size networks, most local minima are equivalent and yield similar performance on a test set." #pause
 
     - "The probability of finding a “bad” (high value) local minimum is non-zero for small-size networks and decreases quickly with network size"
+
+==
+
+    #cimage("figures/lecture_6/skip_connection_img.png", height: 70%) 
 
 ==
   This is a difficult finding to conceptualize #pause
@@ -359,7 +403,7 @@ TODO classification coding
   We call such networks *overparameterized* neural networks
 
 ==
-  To summarize, deeper and wider neural networks tend to produce better results #pause
+  *Summary:* Deeper and wider neural networks produce better results #pause
 
   Add more layers to your network #pause
 
@@ -380,17 +424,16 @@ TODO classification coding
     ```python
     # Deeper and wider neural network
     from torch import nn
-    
     d_x, d_y, d_h = 1, 1, 256
-    # Linear(input, output)
     l1 = nn.Linear(d_x, d_h)
     l2 = nn.Linear(d_h, d_h) 
     l3 = nn.Linear(d_h, d_h) 
     ...
     l6 = nn.Linear(d_h, d_y) 
     ```
-
+    ]
 ==
+
     ```python
     import torch
     d_x, d_y, d_h = 1, 1, 256
@@ -406,7 +449,6 @@ TODO classification coding
     x = torch.ones((d_x,))
     y = net(x)
     ```
-]
 
 // 32:00 + 15:00
 
@@ -444,7 +486,7 @@ TODO classification coding
 
 
     #only(4)[
-    $ gradient_bold(theta_1) f(bold(x), bold(theta)) = 
+    $ (gradient_bold(theta_1) f)(bold(x), bold(theta)) = 
     gradient [sigma](bold(theta)_3^top sigma(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))))
 
     dot gradient[sigma](bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))
@@ -455,21 +497,25 @@ TODO classification coding
     ]
 
     #only((5,6))[
-    $ gradient_bold(theta_1) f(bold(x), bold(theta)) = 
-    underbrace(gradient [sigma](bold(theta)_3^top sigma(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))), < 0.5)
+    $ (gradient_bold(theta_1) f)(bold(x), bold(theta)) = 
+    underbrace((gradient sigma)(bold(theta)_3^top sigma(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))), < 0.25)
 
-    dot underbrace(gradient[sigma](bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))), < 0.5)
+    dot underbrace((gradient sigma)(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))), < 0.25)
 
-    dot underbrace(gradient[sigma](bold(theta)_1^top overline(bold(x))), < 0.5)
+    dot underbrace((gradient sigma)(bold(theta)_1^top overline(bold(x))), < 0.25) (gradient overline(bold(x)))
     $ 
     ]
 
     #only(6)[
-    $ gradient_bold(theta_1) f(bold(x), bold(theta)) approx 0 $
+      #side-by-side[
+      $ max_(bold(theta), bold(x)) (gradient_bold(theta_1) f)(bold(x), bold(theta)) approx 0.01 $
+      ][
+      $ lim_(ell -> oo) (gradient_bold(theta_1) f)(bold(x), bold(theta)) = 0 $
+      ]
     ]
 ==
-    #only((1,2))[To fix the vanishing gradient, researchers use the *rectified linear unit (ReLU)*]
-    #side-by-side[$ sigma(x) = max(0, x) \ gradient sigma(x) = cases(0 "if" x < 0, 1 "if" x >= 0) $ #pause][#relu #pause]
+    #only((1,2))[Fix vanishing gradient with *rectified linear unit (ReLU)*]
+    #side-by-side[$ sigma(z) = max(0, z) \ gradient sigma(z) = cases(0 "if" z < 0, 1 "if" z >= 0) $ #pause][#relu #pause]
 
     #only((3,4,5))[Looks nothing like a biological neuron]
 
@@ -477,7 +523,7 @@ TODO classification coding
 
     #only((5,6,7))[Via chain rule, gradient is $1 dot 1 dot 1 dots$ which does not vanish]
     
-    #only((6,7,8))[If layers outputs one positive number, gradient will not vanish] 
+    #only((6,7,8))[If layer outputs one positive number, gradient will not vanish] 
 
     #only((7,8,9))[*Question:* Any problems?]
 
@@ -494,17 +540,19 @@ TODO classification coding
 
     Training for longer results in more dead neurons #pause
 
-    Dead neurons hurt your network!
+    Dead neurons hurt your network (brain damage)!
 
 ==
     To fix dying neurons, use *leaky ReLU* #pause
 
-    #side-by-side[$ sigma(x) = max(0.1 x, x) \ gradient sigma(x) = cases(0.1 "if" x < 0, 1 "if" x >= 0) $ #pause][#lrelu #pause]
+    #side-by-side[$ sigma(z) = max(0.1 z, z) \ gradient sigma(z) = cases(0.1 "if" z < 0, 1 "if" z >= 0) $ #pause][#lrelu #pause]
 
-    Small negative slope allows dead neurons to recover
+    Small negative slope allows dead neurons to recover #pause
+
+    As long as one neuron is positive in each layer, non-vanishing gradient
 
 ==
-    #side-by-side[
+    #side-by-side(align: left)[
     There are other activation functions that are better than leaky ReLU #pause
     - Mish #pause
     - Swish #pause
@@ -556,9 +604,9 @@ TODO classification coding
 
     *Answer:* For ReLU activation, the gradient will always be zero
 
-    $ gradient_bold(theta)_1 f = gradient[sigma] (bold(theta)^top_2 sigma( bold(theta)_1^top overline(bold(x)))) space gradient[sigma]( bold(theta)_1^top overline(bold(x))) space  overline(bold(x)) $ #pause
+    $ (gradient_bold(theta)_1 f)(bold(x), bold(theta)) = (gradient sigma) (bold(theta)^top_2 sigma( bold(theta)_1^top overline(bold(x)))) dot (gradient sigma)( bold(theta)_1^top overline(bold(x))) dot overline(bold(x)) $ #pause
 
-    $ gradient_bold(theta)_1 f = gradient[sigma] (bold(0)^top sigma ( bold(0)^top overline(bold(x)))) space gradient[sigma] ( bold(0)_1^top overline(bold(x))) space overline(bold(x)) = 0 $
+    $ (gradient_bold(theta)_1 f)(bold(x), bold(theta)) = underbrace((gradient sigma) (bold(0)^top sigma ( bold(0)^top overline(bold(x)))), 0) dot underbrace((gradient sigma) ( bold(0)^top overline(bold(x))), 0) dot overline(bold(x)) = 0 $
 
 ==
     Ok, so initialize $bold(theta) = bold(1)$ #pause
@@ -592,34 +640,34 @@ TODO classification coding
         -0.8, dots, -1.1
     ), dots $ #pause
 
-    But what scale? If $bold(theta) << 0$ the gradient will vanish to zero, if $bold(theta) >> 0$ the gradient explode to infinity #pause
+    But what scale? If $bold(theta) approx 0$ the gradient will vanish to zero, if $|bold(theta)| >> 0$ the gradient explode to infinity #pause
 
     Almost everyone initializes following a single paper from 2010: #pause
-        - Glorot, Xavier, and Yoshua Bengio. "Understanding the difficulty of training deep feedforward neural networks." #pause
+        - Xavier Glorot and Yoshua Bengio. "Understanding the difficulty of training deep feedforward neural networks." #pause
         - Maybe there are better options?
 
 ==
-    Here is the magic equation, given the input and output size of the layer is $d_h$
+    Magic expression, given the input and output size of the layer is $d_h$
 
     $ bold(theta) tilde cal(U)[ - sqrt(6) / sqrt(2 d_h), sqrt(6) / sqrt(2 d_h)] $ #pause
 
-    If you have different input or output sizes, such as $d_x, d_y$, then the equation is
+    Magic expression with input/output sizes $d_x, d_y$ 
 
     $ bold(theta) tilde cal(U)[ - sqrt(6) / sqrt(d_x + d_y), sqrt(6) / sqrt(d_x + d_y)] $
 
 ==
     These equations are designed for ReLU and similar activation functions #pause
 
-    They prevent vanishing or exploding gradients
+    They prevent vanishing or exploding gradients in deep networks
 
 ==
-    Usually `torch` and `jax/equinox` will automatically use this initialization when you create `nn.Linear`
+    Usually `torch` and `jax/equinox` will automatically use Glorot initialization when you create `nn.Linear` #pause
 
     ```python
     layer = nn.Linear(d_x, d_h) # Uses Glorot init
-    ```
+    ``` #pause
 
-    You can find many initialization functions at https://pytorch.org/docs/stable/nn.init.html
+    You can find many initialization functions at https://pytorch.org/docs/stable/nn.init.html #pause
 
     For JAX it is https://jax.readthedocs.io/en/latest/jax.nn.initializers.html
 
@@ -667,7 +715,7 @@ TODO classification coding
     ```
 
 ==
-    Remember, in `equinox` and `torch`, `nn.Linear` is already initialized correctly! #pause
+    Remember, in `equinox` and `torch`, `nn.Linear` is already initialized using Glorot! #pause
 
     In some cases, you may want to use different initializations #pause
     - Reinforcement learning #pause
@@ -703,18 +751,20 @@ TODO classification coding
 ==
   This works for our small datasets, where $n = 1000$ #pause
 
-  *Question:* How many GB are the LLM datasets? #pause
+  *Question:* How many GB are the LLM datasets? #pause *Answer:* \~1M GB
 
-  *Answer:* About 774,000 GB according to _Datasets for Large Language Models: A Comprehensive Survey_ #pause
+  //*Answer:* About 774,000 GB according to _Datasets for Large Language Models: A Comprehensive Survey_ #pause
 
-  This is just the dataset size, the gradient is orders of magnitude larger 
+  This is just the dataset size, the gradient is orders of magnitude larger #pause
 
-  $ (gradient_bold(theta) cal(L))(bold(x)_[i], bold(y)_[i], bold(theta)) = mat(
-      (partial f_1) / (partial x_1), dots, (partial f_ell) / (partial x_1);
+  $ (gradient_bold(theta) cal(L))(bold(x)_[i], bold(y)_[i], bold(theta)) = overbrace(mat(
+      (partial f_1) / (partial z_1), dots, (partial f_(d_h)) / (partial z_1);
       dots.v, dots.down, dots.v;
-      (partial f_n) / (partial x_1), dots, (partial f_ell) / (partial x_1);
-  )_[i]
+      (partial f_(d_h)) / (partial z_1), dots, (partial f_(d_h)) / (partial z_(d_h));
+  ), "One layer")_[i] dots
   $
+
+  Gradient at least $O(ell dot d_h^2 dot n) = underbrace(128 dot 16384^2 dot 10^12, "GPT guess") approx 10^22 approx 10^12 "GB"$
 
 ==
     *Question:* We do not have enough memory to compute the gradient. What can we do? #pause
@@ -768,26 +818,27 @@ TODO classification coding
 
     I want to show you a video to prepare you
 
-    https://www.youtube.com/watch?v=MD2fYip6QsQ&t=77s
+    //https://www.youtube.com/watch?v=MD2fYip6QsQ&t=77s
+    https://youtu.be/MD2fYip6QsQ?si=0PFkmaKWKdXAg_Sy&t=197
 
 ==
-    The video simulations provide an intuitive understanding of adaptive optimizers #pause
-
-    The key behind modern optimizers is two concepts:
+    There are two key concepts behind modern optimizers:
     - Momentum #pause
     - Adaptive learning rate #pause
 
-    Let us discuss the algorithms more slowly
+    Let us discuss the algorithms further
 
 ==
     Review gradient descent again, because we will be making changes to it #pause
+
+    We usually use SGD (batching), for simplicity I will ignore this
 
     #gd_algo(init: "Glorot()")
 
 ==
     Introduce *momentum* first #pause
 
-    #algorithm({
+    #algorithm(line-numbers: false, {
     import algorithmic: *
 
     Function(redm[$"Momentum"$] + " Gradient Descent", ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$, redm[$beta$]), {
@@ -796,9 +847,9 @@ TODO classification coding
       Assign[#redm[$bold(M)$]][#redm[$bold(0)$] #text(fill:red)[\# Init momentum]]
 
       For($i in 1 dots t$, {
-        Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$ #text(fill: red)[\# Represents acceleration]]
+        Assign[$bold(J)$][$(gradient_bold(theta) cal(L))(bold(X), bold(Y), bold(theta))$ #text(fill: red)[\# Represents acceleration]]
         Assign[#redm[$bold(M)$]][#redm[$beta dot bold(M) + (1 - beta) dot bold(J)$] #text(fill: red)[\# Momentum and acceleration]]
-        Assign[$bold(theta)$][$bold(theta) - alpha dot #redm[$bold(M)$]$]
+        Assign[$bold(theta)$][$bold(theta) - alpha dot #redm[$bold(M)$]$ #text(fill: red)[\# Multiply by momentum not gradient]]
       })
 
     Return[$bold(theta)$]
@@ -813,7 +864,7 @@ TODO classification coding
       {
       import algorithmic: *
 
-      Procedure(redm[$"RMSProp"$], ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$, $beta$, redm[$epsilon$]), {
+      Procedure(redm[$"RMSProp"$], ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$, redm[$beta$]), {
 
         Assign[$bold(theta)$][$"Glorot"()$] 
         Assign[#redm[$bold(V)$]][#redm[$bold(0)$] #text(fill: red)[\# Init variance]] 
@@ -821,7 +872,8 @@ TODO classification coding
         For($i in 1 dots t$, {
           Assign[$bold(J)$][$(gradient_bold(theta) cal(L))(bold(X), bold(Y), bold(theta))$ \# Represents acceleration]
           Assign[#redm[$bold(V)$]][#redm[$beta dot bold(V) + (1 - beta) dot bold(J) dot.circle bold(J) $] #text(fill: red)[\# Magnitude]]
-          Assign[$bold(theta)$][$bold(theta) - alpha dot #redm[$bold(J) div.circle (bold(V) + epsilon)^(dot.circle 1/2)$]$ #text(fill: red)[\# Rescale grad by prev updates]]
+          Comment[#text(fill: red)[\# Rescale grad by magnitude of prev updates]]
+          Assign[$bold(theta)$][$bold(theta) - alpha dot #redm[$bold(J) div.circle bold(V)^(dot.circle 1/2)$]$]
         })
 
       Return[$bold(theta)$]
@@ -830,23 +882,24 @@ TODO classification coding
 
 
 ==
-    Combine *momentum* and *adaptive learning rate* to create *Adam* #pause
+    Combine *#greenm[momentum]* and *#bluem[adaptive learning rate]* to create *Adam* #pause
 
   #algorithm(line-numbers: false, {
     import algorithmic: *
 
-    Procedure("Adaptive Moment Estimation", ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$, greenm[$beta_1$], bluem[$beta_2$], bluem[$epsilon$]), {
+    Procedure("Adaptive Moment Estimation", ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$, greenm[$beta_1$], bluem[$beta_2$]), {
       Assign[$bold(theta)$][$"Glorot"()$] 
       Assign[$#greenm[$bold(M)$], #bluem[$bold(V)$]$][$bold(0)$] 
 
       For($i in 1 dots t$, {
         Assign[$bold(J)$][$(gradient_bold(theta) cal(L))(bold(X), bold(Y), bold(theta))$]
-        Assign[#greenm[$bold(M)$]][#greenm[$beta_1 dot bold(M) + (1 - beta_1) dot bold(J)$] \# Compute momentum]
-        Assign[#bluem[$bold(V)$]][#bluem[$beta_2 dot bold(V) + (1 - beta_2) dot bold(J) dot.circle bold(J)$] \# Magnitude]
+        Assign[#greenm[$bold(M)$]][#greenm[$beta_1 dot bold(M) + (1 - beta_1) dot bold(J)$] #greenm[\# Update momentum]]
+        Assign[#bluem[$bold(V)$]][#bluem[$beta_2 dot bold(V) + (1 - beta_2) dot bold(J) dot.circle bold(J)$] #bluem[\# Update magnitude]]
+        Comment[\# Rescale #greenm[momentum] by #bluem[magnitude]]
         //Assign[$hat(bold(M))$][$bold(M)  "/" (1 - beta_1)$ \# Bias correction]
         //Assign[$hat(bold(V))$][$bold(V) "/" (1 - beta_2)$ \# Bias correction]
 
-        Assign[$bold(theta)$][$bold(theta) - alpha dot #greenm[$bold(M)$] #bluem[$div.circle (bold(V) + epsilon)^(dot.circle 1/2)$]$ \# Adaptive param update]
+        Assign[$bold(theta)$][$bold(theta) - alpha dot #greenm[$bold(M)$] #bluem[$div.circle bold(V)^(dot.circle 1/2)$]$]
       })
 
     Return[$bold(theta)$ \# Note, we use biased $bold(M), bold(V)$ for clarity]
@@ -915,7 +968,7 @@ TODO classification coding
 
   ```python
   Lambda = 0.01
-  opt = torch.optim.adamw(..., weight_decay=Lambda)
+  opt = torch.optim.AdamW(..., weight_decay=Lambda)
   opt = optax.adamw(..., weight_decay=Lambda)
   ```
 
