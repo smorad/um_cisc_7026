@@ -114,9 +114,9 @@ Do you feel like experts in: #pause
 ==
 How was assignment 2? #pause
 
-Assignment 3 due soon, get started! #pause
-
-Assignment 4 is last assignment #pause
+Assignment 3 due next week, did anyone start? #pause
+- Should I extend due date? #pause
+  - Would need to cancel assignment 4 (Convolutional networks) #pause
 
 Meeting with students on Monday to finish grading #pause
 - Exam 1 #pause
