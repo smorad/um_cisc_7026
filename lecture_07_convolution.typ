@@ -38,23 +38,6 @@
 )
 
 
-// Grades in, come see me if issues
-// May change score in your favour or not depending!
-// Mean score = 91/120 approx 76%
-// Perfect scores: 
-/* 
-CHEN ZHONGHONG
-CUI SHUHANG
-GAO YUCHEN
-LAI YONGCHAO
-SHENG JUNWEI
-WU CHENGQIN
-
-Do this again on exam 2 and you can skip exam 3
-
-Also cover cheaters
-*/
-
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
 
@@ -404,18 +387,21 @@ Also cover cheaters
 
 #let draw_filter(x, y, cells, colors: none) = {
   import cetz.draw: *
+
   grid((x, y), (x + cells.len(), y + cells.at(0).len()))
+  
   for i in range(cells.len()) {
     for j in range(cells.at(i).len()) {
+      
       if (colors != none)  {
         let cell_color = colors.at(cells.at(i).len() - j - 1).at(i)
         if (cell_color != none){
           rect((i, j), (i + 1, j + 1), fill: cell_color)
         }
-        content((x + i + 0.4, y + j + 0.6), (i, j), cells.at(cells.at(i).len() - j - 1).at(i))
+        content((x + i + 0.4, y + j + 0.6), (x + i + 0.3, y + j + 0.8), cells.at(cells.at(i).len() - j - 1).at(i))
 
       } else {
-        content((x + i + 0.4, y + j + 0.6), (i, j), str(cells.at(cells.at(i).len() - j - 1).at(i)))
+        content((x + i + 0.4, y + j + 0.6), (x + i + 0.3, y + j + 0.8), str(cells.at(cells.at(i).len() - j - 1).at(i)))
       }
 
       }
@@ -442,23 +428,48 @@ let image_values = (
 draw_filter(0, 0, image_values)
 })
 
+= Admin
+==
+Exam 1 graded #pause
+- Mean score: $91"/"120 approx 76%$ #pause
+- If you finished exam but don't have a Moodle score come see me #pause
 
-// Signals, large continuous time inputs
-// Want translation invariance and scalability to long sequences
-// Introduce convolution (continuous)
+Course grades will be curved *up* to 85% #pause
+- If everyone scores an A, this is fine #pause
+- In practice, do better than exam mean for A
 
+*DO NOT CHEAT* #pause
+- Failed multiple cheaters on exam 1 #pause
+  - *Course grade: F* #pause
+- Lowest exam dropped #pause
+  - Can score 0 on exam and get A in class
+==
+The following students got perfect marks! (120 / 120) #pause
 
-/*
-#let ag = (
-  [Review],
-  [Signal Processing], 
-  [Convolution],
-  [Convolutional Neural Networks],
-  [Additional Dimensions],
-  [Deeper Networks],
-  [Coding]
-)
-*/
+- Chen Zhong Hong 
+- Cui Shu Hang
+- Gao Yu Chen
+- Lai Yong Chao 
+- Sheng Jun Wei 
+- Wu Cheng Qin #pause
+
+Great job! Please consider a career in deep learning research #pause
+
+With perfect marks on exams 1 and 2, you can skip exam 3 #pause
+- Lowest exam dropped
+
+==
+Exam 2 next week, 6 preliminary questions: #pause
+- (1) Wide neural networks
+- (1) Relationship between KL divergence and cross entropy loss
+- (1) Vanishing gradient from activation
+- (1) Modern optimizers (RMSProp, SGD+momentum)
+- (1) 1D discrete convolution
+- (1) 1D convolutional neural networks
+
+==
+Homework 1 and 2 graded #pause
+- Homework 1 mean score 94/100
 
 = Review
 
@@ -882,12 +893,12 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   - Control theory #pause
   - Electrical engineering #pause
 
-  Almost all deep learning occurs on digital hardware (discrete time/space) #pause
+  Deep learning uses digital hardware (discrete time/space) #pause
   - Images #pause
   - Recorded audio #pause
   - Anything stored as bits #pause
 
-  But it is good to know both! Continuous variables for theory. Discrete variables for software 
+  It is good to know both! Continuous for theory, discrete for software 
 
 ==
   $
@@ -1390,7 +1401,7 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   Convolve $c_y$ filters of size $k times k$ across $c_x$ channels, bias for each output
 
 ==
-  #side-by-side[
+  #side-by-side(align: left)[
     One last thing, *stride* allows you to "skip" cells during convolution #pause
 
     This can decrease the size of image without pooling #pause
