@@ -290,9 +290,9 @@ def listen_print_loop(responses: object, stream: object) -> None:
             sys.stdout.write(GREEN)
             sys.stdout.write("\033[K")
             # English
-            sys.stdout.write(transcript + "\n")
+            # sys.stdout.write(transcript + "\n")
             # Chinese
-            # sys.stdout.write(translate_text(transcript) + "\n")
+            sys.stdout.write(translate_text(transcript) + "\n")
 
             stream.is_final_end_time = stream.result_end_time
             stream.last_transcript_was_final = True
@@ -307,7 +307,7 @@ def listen_print_loop(responses: object, stream: object) -> None:
         else:
             sys.stdout.write(RED)
             sys.stdout.write("\033[K")
-            sys.stdout.write(str(corrected_time) + ": " + transcript + "\r")
+            sys.stdout.write(transcript + "\r")
 
             stream.last_transcript_was_final = False
 

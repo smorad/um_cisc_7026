@@ -1,12 +1,59 @@
-#import "@preview/cetz:0.2.2"
-#import "@preview/polylux:0.3.1": *
+#import "@preview/touying:0.6.1": *
 #import themes.university: *
-#import "@preview/cetz:0.2.2": canvas, draw, plot
+#import "@preview/cetz:0.4.0"
+#import "@preview/fletcher:0.5.8" as fletcher: node, edge
 #import "common.typ": *
-#import "@preview/algorithmic:0.1.0"
-#import algorithmic: algorithm
+#import "@preview/algorithmic:1.0.5"
+#import algorithmic: style-algorithm, algorithm-figure, algorithm
+#import "@preview/mannot:0.3.0": *
+
+#let handout = false
+
 
 // FUTURE TODO: Repeat self too much on locality/equivariance, restructure and replace with something else
+
+#set math.vec(delim: "[")
+#set math.mat(delim: "[")
+
+#show: university-theme.with(
+  aspect-ratio: "16-9",
+  config-common(handout: handout),
+  config-info(
+    title: [Convolution],
+    subtitle: [CISC 7026 - Introduction to Deep Learning],
+    author: [Steven Morad],
+    institution: [University of Macau],
+    logo: image("figures/common/bolt-logo.png", width: 4cm)
+  ),
+  header-right: none,
+  header: self => utils.display-current-heading(level: 1)
+)
+
+#title-slide()
+
+== Outline <touying:hidden>
+
+#components.adaptive-columns(
+    outline(title: none, indent: 1em, depth: 1)
+)
+
+
+// Grades in, come see me if issues
+// May change score in your favour or not depending!
+// Mean score = 91/120 approx 76%
+// Perfect scores: 
+/* 
+CHEN ZHONGHONG
+CUI SHUHANG
+GAO YUCHEN
+LAI YONGCHAO
+SHENG JUNWEI
+WU CHENGQIN
+
+Do this again on exam 2 and you can skip exam 3
+
+Also cover cheaters
+*/
 
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
@@ -392,16 +439,7 @@ let image_values = (
   (4, 0, 0, 4),
   (4, 0, 0, 4),
 )
-/*
-let colors = (
-  red, red, red, red,
-  red, red, red, red,
-  red, red, red, red,
-  red, red, red, red,
-)
-*/
 draw_filter(0, 0, image_values)
-//content((2, 2), image("figures/lecture_7/ghost_dog_bw.svg", width: 4cm))
 })
 
 
@@ -410,6 +448,7 @@ draw_filter(0, 0, image_values)
 // Introduce convolution (continuous)
 
 
+/*
 #let ag = (
   [Review],
   [Signal Processing], 
@@ -419,95 +458,30 @@ draw_filter(0, 0, image_values)
   [Deeper Networks],
   [Coding]
 )
+*/
 
+= Review
 
-#show: university-theme.with(
-  aspect-ratio: "16-9",
-  short-title: "CISC 7026: Introduction to Deep Learning",
-  short-author: "Steven Morad",
-  short-date: "Lecture 7: Convolution"
-)
-
-#title-slide(
-  title: [Convolution],
-  subtitle: "CISC 7026: Introduction to Deep Learning",
-  institution-name: "University of Macau",
-)
-
-#sslide[
-  #side-by-side[#cimage("figures/lecture_7/hinton_nobel.jpeg")][John Hopfield and Geoffrey Hinton used tools from physics to construct methods that helped lay the foundation for today’s powerful machine learning. Machine learning based on artificial neural networks is currently revolutionising science, engineering and daily life.
-]
-]
-
-#sslide[
-  John Hopfield - Hopfield networks, an older type of neural network #pause
-
-  Geoffrey Hinton - Most well-known for backpropagation #pause
-
-  Geoffrey Hinton's student also created AlexNet, which we will discuss today
-]
-
-#sslide[
-  https://www.youtube.com/watch?v=qrvK_KuIeJk
-]
-
-#sslide[
-  #side-by-side[
-    #cimage("figures/lecture_7/alphafold.png")
-  ][Demis Hassabis and John Jumper have successfully utilised artificial intelligence to predict the structure of almost all known proteins. David Baker has learned how to master life’s building blocks and create entirely new proteins.]
-]
-
-#sslide[
-  https://www.youtube.com/watch?v=gg7WjuFs8F4 #pause
-
-  Alphafold solves a regression problem #pause
-
-  $ X: {A,C,D,E,F,G,H,I,K,L,M,N,P,Q,R,S,T,V,W,Y}^k \ "Sequence of amino acids" $ #pause
-
-  $ Y: bb(R)^(j times 3) \
-  "3D coordinates (x, y, z) of each atom in the protein" $ #pause
-
-  $ f: X times Theta |-> Y \ 
-  f "is a neural network known as a transformer" $
-]
-
-#sslide[
-  Hinton, Hassabis, and Jumper attended Cambridge!
-]
-
-#sslide[
-  Plan for makeup lecture Saturday October 26 #pause
-
-  Afternoon? Evening? #pause
-
-  I will teach Autoencoders and Generative Models #pause
-  
-  Prof. Qingbiao Li will teach you Graph Neural Networks on Monday October 28
-]
-
-#aslide(ag, none)
-#aslide(ag, 0)
-
-#sslide[
+==
     Dirty secret of deep learning #pause
 
     As networks become larger, deep learning changes #pause
 
     We understand the rules that govern small networks (physics) #pause
 
-    One the system becomes sufficiently complex, we lose understanding (biology) #pause
+    When the system becomes complex, we lose understanding (biology) #pause
 
-    Modern deep learning is a science, where we advance through trial and error
-]
+    Early deep learning was inductive #pause
 
-#sslide[
+    Modern deep learning is deductive
+==
   To improve neural networks, we looked at: #pause
   - Deeper and wider networks #pause
   - New activation functions #pause
   - Parameter initialization #pause
   - New optimization methods
-]
-#sslide[
+
+==
     A 2-layer neural network can represent *any* continuous function to arbitrary precision #pause
 
     $ | f(bold(x), bold(theta)) - g(bold(x)) | < epsilon $ #pause
@@ -515,65 +489,26 @@ draw_filter(0, 0, image_values)
     $ lim_(d_h -> oo) epsilon = 0 $ #pause
 
     However, finding such $bold(theta)$ is a much harder problem
-]
-#sslide[
+
+==
     Gradient descent only guarantees convergence to a *local* optima #pause
 
     #cimage("figures/lecture_6/poor_minima.png", height: 80%)
-]
 
-#sslide[
+==
   Deeper and wider networks often perform better #pause
 
   We call these *overparameterized* networks #pause
 
   "The probability of finding a “bad” (high value) local minimum is non-zero for small-size networks and decreases quickly with network size" - Choromanska, Anna, et al. _The loss surfaces of multilayer networks._ (2014)
 
-]
-#sslide[
+==
   #cimage("figures/lecture_6/filters.png", width: 120%)  
-]
 
-#sslide[
-    ```python
-    import torch
-    d_x, d_y, d_h = 1, 1, 256
-    net = torch.nn.Sequential(
-        torch.nn.Linear(d_x, d_h),
-        torch.nn.Sigmoid(),
-        torch.nn.Linear(d_h, d_h),
-        torch.nn.Sigmoid(),
-        ...
-        torch.nn.Linear(d_h, d_y),
-    )
-
-    x = torch.ones((d_x,))
-    y = net(x)
-    ```
-]
-
-#sslide[
-    ```python
-    import jax, equinox
-    d_x, d_y, d_h = 1, 1, 256
-    net = equinox.nn.Sequential([
-        equinox.nn.Linear(d_x, d_h),
-        equinox.nn.Lambda(jax.nn.sigmoid), 
-        equinox.nn.Linear(d_h, d_h),
-        equinox.nn.Lambda(jax.nn.sigmoid), 
-        ...
-        equinox.nn.Linear(d_h, d_y),
-    ])
-
-    x = jax.numpy.ones((d_x,))
-    y = net(x)
-    ```
-]
-
-#sslide[
+==
   Next, we looked at activation functions
-]
-#sslide[
+
+==
     #side-by-side[#sigmoid #pause][
         The sigmoid function can result in a *vanishing gradient* #pause
         
@@ -582,51 +517,53 @@ draw_filter(0, 0, image_values)
 
 
     #only(4)[
-    $ gradient_bold(theta_1) f(bold(x), bold(theta)) = 
-    gradient [sigma](bold(theta)_3^top sigma(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))))
+    $ (gradient_bold(theta_1) f)(bold(x), bold(theta)) = 
+    (gradient sigma)(bold(theta)_3^top sigma(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))))
 
-    dot gradient[sigma](bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))
+    dot (gradient sigma)(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))
 
-    dot gradient[sigma](bold(theta)_1^top overline(bold(x)))
+    dot (gradient sigma)(bold(theta)_1^top overline(bold(x)))
     $ 
 
     ]
 
     #only((5,6))[
-    $ gradient_bold(theta_1) f(bold(x), bold(theta)) = 
-    underbrace(gradient [sigma](bold(theta)_3^top sigma(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))), < 0.5)
+    $ (gradient_bold(theta_1) f)(bold(x), bold(theta)) = 
+    underbrace((gradient sigma)(bold(theta)_3^top sigma(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))), < 0.25)
 
-    dot underbrace(gradient[sigma](bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))), < 0.5)
+    dot underbrace((gradient sigma)(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))), < 0.25)
 
-    dot underbrace(gradient[sigma](bold(theta)_1^top overline(bold(x))), < 0.5)
+    dot underbrace((gradient sigma)(bold(theta)_1^top overline(bold(x))), < 0.25) overline(bold(x))
     $ 
     ]
 
     #only(6)[
-    $ gradient_bold(theta_1) f(bold(x), bold(theta)) approx 0 $
+      #side-by-side[
+      $ max_(bold(theta), bold(x)) (gradient_bold(theta_1) f)(bold(x), bold(theta)) approx 0.01 overline(bold(x)) $
+      ][
+      $ lim_(ell -> oo) (gradient_bold(theta_1) f)(bold(x), bold(theta)) = 0 $
+      ]
     ]
-]
 
-#sslide[
+==
     To fix the vanishing gradient, use the *rectified linear unit (ReLU)*
     #side-by-side[$ sigma(x) = max(0, x) \ gradient sigma(x) = cases(0 "if" x < 0, 1 "if" x >= 0) $ #pause][#relu #pause]
 
     "Dead" neurons always output 0, and cannot recover
-]
 
-#sslide[
-    To fix dead neurons, use *leaky ReLU* #pause
+==
+    To fix dying neurons, use *leaky ReLU* #pause
 
-    #side-by-side[$ sigma(x) = max(0.1 x, x) \ gradient sigma(x) = cases(0.1 "if" x < 0, 1 "if" x >= 0) $ #pause][#lrelu #pause]
+    #side-by-side[$ sigma(z) = max(0.1 z, z) \ gradient sigma(z) = cases(0.1 "if" z < 0, 1 "if" z >= 0) $ #pause][#lrelu #pause]
 
-    Small negative slope allows dead neurons to recover
-]
+    Small negative slope allows dead neurons to recover #pause
 
-#sslide[
+    As long as one neuron is positive in each layer, non-vanishing gradient
+
+==
   #cimage("figures/lecture_6/activations.png")
-]
 
-#sslide[
+==
   Then, we discussed parameter initialization #pause
 
   Initialization should: #pause
@@ -636,30 +573,26 @@ draw_filter(0, 0, image_values)
   $ bold(theta) tilde cal(U)[ - sqrt(6) / sqrt(2 d_h), sqrt(6) / sqrt(2 d_h)] $ #pause
 
   $ bold(theta) tilde cal(U)[ - sqrt(6) / sqrt(d_x + d_y), sqrt(6) / sqrt(d_x + d_y)] $
-]
 
-#sslide[
+==
   Finally, we reviewed improvements to optimization: #pause
   + Stochastic gradient descent #pause
   + Adaptive optimization #pause
   + Weight decay
-]
 
-#sslide[
+==
   Stochastic gradient descent (SGD) reduces the memory usage #pause
 
   Rather than compute the gradient over the entire dataset, we approximate the gradient over a subset of the data 
-]
 
-#sslide[
+==
   Stochastic gradient descent also inserts noise into the optimization process #pause
 
   This noise can prevent premature convergence to bad optima #pause
 
   #cimage("figures/lecture_5/saddle.png")
-]
 
-#sslide[
+==
     Use `torch.utils.data.DataLoader` for SGD #pause
 
     ```python
@@ -675,100 +608,30 @@ draw_filter(0, 0, image_values)
             loss = L(X_j, Y_j, theta)
             ...
     ```
-]
 
-#sslide[
+==
   Then, we looked at adaptive variants of gradient descent #pause
 
-    #algorithm({
-    import algorithmic: *
+  #gd_algo()
 
-    Function("Gradient Descent", args: ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$), {
 
-      Cmt[Randomly initialize parameters]
-      Assign[$bold(theta)$][$"Glorot"()$] 
-
-      For(cond: $i in 1 dots t$, {
-        Cmt[Compute the gradient of the loss]        
-        Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$]
-        Cmt[Update the parameters using the negative gradient]
-        Assign[$bold(theta)$][$bold(theta) - alpha dot bold(J)$]
-      })
-
-    Return[$bold(theta)$]
-    })
-  })
-]
-
-#sslide[
+==
     Introduce *momentum* first #pause
 
-    #algorithm({
-    import algorithmic: *
+    #gd_momentum_algo
 
-    Function(redm[$"Momentum"$] + " Gradient Descent", args: ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$, redm[$beta$]), {
+==
+    Next, *adaptive learning rate* #pause
 
-      Assign[$bold(theta)$][$"Glorot"()$] 
-      Assign[#redm[$bold(M)$]][#redm[$bold(0)$] #text(fill:red)[\# Init momentum]]
-
-      For(cond: $i in 1 dots t$, {
-        Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$ #text(fill: red)[\# Represents acceleration]]
-        Assign[#redm[$bold(M)$]][#redm[$beta dot bold(M) + (1 - beta) dot bold(J)$] #text(fill: red)[\# Momentum and acceleration]]
-        Assign[$bold(theta)$][$bold(theta) - alpha dot #redm[$bold(M)$]$]
-      })
-
-    Return[$bold(theta)$]
-    })
-  })
-]
-
-#sslide[
-    Now *adaptive learning rate* #pause
-
-    #algorithm({
-    import algorithmic: *
-
-    Function(redm[$"RMSProp"$], args: ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$, $beta$, redm[$epsilon$]), {
-
-      Assign[$bold(theta)$][$"Glorot"()$] 
-      Assign[#redm[$bold(V)$]][#redm[$bold(0)$] #text(fill: red)[\# Init variance]] 
-
-      For(cond: $i in 1 dots t$, {
-        Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$ \# Represents acceleration]
-        Assign[#redm[$bold(V)$]][#redm[$beta dot bold(V) + (1 - beta) dot bold(J) dot.circle bold(J) $] #text(fill: red)[\# Magnitude]]
-        Assign[$bold(theta)$][$bold(theta) - alpha dot #redm[$bold(J) ⊘ root(dot.circle, bold(V) + epsilon)$]$ #text(fill: red)[\# Rescale grad by prev updates]]
-      })
-
-    Return[$bold(theta)$]
-    })
-  })
-]
+    #gd_adaptive_algo
 
 
-#sslide[
-    Combine *momentum* and *adaptive learning rate* to create *Adam* #pause
+==
+  Combine *momentum* and *adaptive learning rate* to create *Adam* #pause
 
-  #algorithm({
-    import algorithmic: *
+  #adam_algo
 
-    Function("Adaptive Moment Estimation", args: ($bold(X)$, $bold(Y)$, $cal(L)$, $t$, $alpha$, greenm[$beta_1$], bluem[$beta_2$], bluem[$epsilon$]), {
-      Assign[$bold(theta)$][$"Glorot"()$] 
-      Assign[$#greenm[$bold(M)$], #bluem[$bold(V)$]$][$bold(0)$] 
-
-      For(cond: $i in 1 dots t$, {
-        Assign[$bold(J)$][$gradient_bold(theta) cal(L)(bold(X), bold(Y), bold(theta))$]
-        Assign[#greenm[$bold(M)$]][#greenm[$beta_1 dot bold(M) + (1 - beta_1) bold(J)$] \# Compute momentum]
-        Assign[#bluem[$bold(V)$]][#bluem[$beta_2 dot bold(V) + (1 - beta_2) dot bold(J) dot.circle bold(J)$] \# Magnitude]
-
-        Assign[$bold(theta)$][$bold(theta) - alpha dot #greenm[$bold(M)$] #bluem[$⊘ root(dot.circle, bold(V) + epsilon)$]$ \# Adaptive param update]
-      })
-
-    Return[$bold(theta)$ \# Note, we use biased $bold(M), bold(V)$ for clarity]
-    })
-  }) 
-]
-
-#sslide[
+==
   Many modern optimizers also include *weight decay* #pause
 
   Weight decay penalizes large parameters #pause
@@ -776,20 +639,22 @@ draw_filter(0, 0, image_values)
   $ cal(L)_("decay")(bold(X), bold(Y), bold(theta)) = cal(L)_("decay")(bold(X), bold(Y), bold(theta)) + lambda sum_(i) theta_i^2 $ #pause
 
   This results in a smoother, parabolic loss landscape that is easier to optimize 
-]
 
-#aslide(ag, 0)
-#aslide(ag, 1)
+==
+Let's finish coding!
 
-#sslide[
+https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
+
+= Signal Processing
+
+==
   In our networks, we do not consider the structure of data #pause
 
   $ bold(x) = vec(x_1, x_2, dots.v, x_(d_x)) $ #pause
 
   #side-by-side[$ bold(theta) = vec(theta_0, theta_1, dots.v, theta_(d_x)) $ #pause][$ bold(theta) eq.quest vec(theta_7, theta_4, dots.v, theta_1) $]
-]
 
-#sslide[
+==
   We treat images as a vector, with no relationship between nearby pixels #pause
 
   These images are equivalent to a neural network
@@ -812,19 +677,18 @@ draw_filter(0, 0, image_values)
     ][
     $ vec(theta_0, theta_1, theta_2, theta_3, dots.v) $
   ]*/
-]
 
-#sslide[
-  There is structure inherent in the real world #pause
+==
+  The real world is structured #pause
 
-  By representing this structure, we can make more efficient neural networks that learn faster and generalize better #pause
+  Our models should mimic this structure #pause
+  - Better data efficiency #pause
+  - Better generalization #pause
 
   To do so, we will think of the world as a collection of signals
-]
 
 
-
-#slide(title: [Signal Processing])[
+==
   A *signal* represents information as a function of time, space or some other variable #pause
 
   $ x(t) = 2 t + 1 $ #pause
@@ -836,9 +700,8 @@ draw_filter(0, 0, image_values)
   In *signal processing*, we analyze the meaning of signals #pause
 
   Knowing the meaning of signals is very useful
-]
 
-#slide(title: [Signal Processing])[
+==
   $ x(t) = "stock price" $ #pause
 
   #align(center, stonks) #pause
@@ -846,9 +709,8 @@ draw_filter(0, 0, image_values)
   There is an underlying structure to $x(t)$ #pause
 
   *Structure:* Tomorrow's stock price will be close to today's stock price
-]
 
-#slide(title: [Signal Processing])[
+==
   $ x(t) = "audio" $ #pause
 
   #align(center, waveform) #pause
@@ -857,47 +719,40 @@ draw_filter(0, 0, image_values)
 
   *Structure:* Nearby syllables combine to create meaning 
 
-]
-
-#slide(title: [Signal Processing])[
+==
   $ x(u, v) = "image" $ #pause
   
   #align(center, implot) #pause
 
   *Structure:* Repeated components (circles, symmetry, eyes, nostrils, etc)
-]
 
-#slide(title: [Signal Processing])[
+==
   In signal processing, we often consider two properties: #pause
   - Locality #pause
   - Translation equivariance 
-]
 
-#slide(title: [Signal Processing])[
+==
   *Locality:* Information concentrated over small regions of space/time #pause
 
   #side-by-side[#waveform][#implot]
   
   // TODO Add output signal
-]
 
-#slide(title: [Signal Processing])[
+==
   *Translation Equivariance:* Shift in signal results in shift in output #pause
 
   #side-by-side[#waveform_left][#waveform_right] #pause
 
   #align(center)[Both say "hello"]
-]
 
-#slide(title: [Signal Processing])[
+==
   *Translation Equivariance:* Shift in signal results in shift in output #pause
 
   #side-by-side[#implot_left][#implot_right]
 
   #align(center)[Both contain a dog]
-]
 
-#slide(title: [Signal Processing])[
+==
   Perceptrons are not local or translation equivariant, each pixel is an independent neuron #pause
 
   #align(center, cetz.canvas({
@@ -918,9 +773,8 @@ draw_filter(0, 0, image_values)
   content((2, 2), image("figures/lecture_7/ghost_dog_bw.svg", width: 4cm))
   content((6, 6), image("figures/lecture_7/ghost_dog_bw.svg", width: 4cm))
   })) 
-]
 
-#slide(title: [Signal Processing])[
+==
   A more realistic scenario of locality and translation equivariance #pause
 
   #align(center, cetz.canvas({
@@ -942,9 +796,8 @@ draw_filter(0, 0, image_values)
   })) #pause
 
   //How can we represent these properties in neural networks?
-]
 
-#slide(title: [Signal Processing])[
+==
   A more realistic scenario of locality and translation equivariance 
 
   #align(center, cetz.canvas({
@@ -976,15 +829,10 @@ draw_filter(0, 0, image_values)
   })) 
 
   //How can we represent these properties in neural networks?
-]
 
 
-
-#aslide(ag, 1)
-#aslide(ag, 2)
-
-
-#slide(title: [Convolution])[
+= Convolution
+==
   In signal processing, we often turn signals into other signals #pause
 
   #side-by-side[#waveform_left][#hello] #pause
@@ -992,10 +840,8 @@ draw_filter(0, 0, image_values)
   A standard way to transform signals is *convolution* #pause
 
   Convolution is translation equivariant and local
-]
 
-
-#slide(title: [Convolution])[
+==
   Convolution is the sum of products of a signal $x(t)$ and a *filter* $g(t)$ #pause
 
   If the t is continuous in $x(t)$
@@ -1007,27 +853,21 @@ draw_filter(0, 0, image_values)
   $ x(t) * g(t) = sum_(tau=-oo)^(oo) x(t - tau) g(tau) $ #pause
 
   We slide the filter $g(t)$ across the signal $x(t)$
-]
 
 
-#slide(title: [Convolution])[
+==
   *Example:* Let us examine a low-pass filter #pause
 
   The filter will take a signal and remove noise, producing a cleaner signal
-]
 
-#slide(title: [Convolution])[
-
+==
   #conv_signal_plot #pause
 
   #conv_filter_plot #pause
 
   #conv_result_plot
-]
 
-
-#slide(title: [Convolution])[
-
+==
   #conv_signal_plot
 
   #conv_filter_plot
@@ -1035,9 +875,8 @@ draw_filter(0, 0, image_values)
   Convolution is *local* to the filter $g(t)$ #pause
 
   Convolution is also *equivariant* to time/space shifts
-]
 
-#slide(title: [Convolution])[
+==
   Often, we use continuous time/space convolution for analog signals #pause
   - Physics #pause
   - Control theory #pause
@@ -1049,9 +888,8 @@ draw_filter(0, 0, image_values)
   - Anything stored as bits #pause
 
   But it is good to know both! Continuous variables for theory. Discrete variables for software 
-]
 
-#slide(title: [Convolution])[
+==
   $
   vec(
     x(t),
@@ -1063,9 +901,8 @@ draw_filter(0, 0, image_values)
     space ; 
   )
   $
-]
 
-#slide(title: [Convolution])[
+==
   $
   vec(
     x(t),
@@ -1077,9 +914,8 @@ draw_filter(0, 0, image_values)
     #redm[$4$]; 
   )
   $
-]
 
-#slide(title: [Convolution])[
+==
   $
   vec(
     x(t),
@@ -1091,9 +927,8 @@ draw_filter(0, 0, image_values)
     4, #redm[$7$]; 
   )
   $
-]
 
-#slide(title: [Convolution])[
+==
   $
   vec(
     x(t),
@@ -1105,9 +940,8 @@ draw_filter(0, 0, image_values)
     4, 5, #redm[$10$]; 
   )
   $
-]
 
-#slide(title: [Convolution])[
+==
   $
   vec(
     x(t),
@@ -1119,10 +953,8 @@ draw_filter(0, 0, image_values)
     4, 5, 10, #redm[$13$]; 
   )
   $
-]
 
-
-#slide(title: [Convolution])[
+==
   $
   vec(
     x(t),
@@ -1150,11 +982,8 @@ draw_filter(0, 0, image_values)
     #hide[1]; 
   )
   $ 
-]
 
-
-#slide(title: [Convolution])[
-
+==
   $
   vec(
     x(t),
@@ -1167,10 +996,7 @@ draw_filter(0, 0, image_values)
   )
   $ 
 
-]
-
-#sslide[
-
+==
   $
   vec(
     x(t),
@@ -1185,9 +1011,8 @@ draw_filter(0, 0, image_values)
 
 
   #side-by-side[#waveform_left][#hello]
-]
 
-#sslide[
+==
   $
   vec(
     x(t),
@@ -1207,12 +1032,10 @@ draw_filter(0, 0, image_values)
   *Question:* How does convolution differ from a neuron? #pause
 
   *Answer:* In a neuron, each input $x_i$ has a different parameter $theta_i$. In convolution, we reuse (slide) $theta_i$ over $x_1, x_2, dots$
-]
 
-#aslide(ag, 2)
-#aslide(ag, 3)
+= Convolutional Neural Networks
 
-#sslide[
+==
   Convolutional neural networks (CNNs) use convolutional layers #pause
 
   Their translation equivariance and locality make them very efficient #pause
@@ -1220,30 +1043,26 @@ draw_filter(0, 0, image_values)
   They also scale to variable-length sequences #pause
 
   Efficiently expands neural networks to images, videos, sounds, etc 
-]
 
-#sslide[
+==
   CNNs have been around since the 1980's #pause
 
   #cimage("figures/lecture_1/timeline.svg") #pause
 
   2012: GPU and CNN efficiency resulted in breakthroughs
-]
 
-#sslide[
+==
   So how does a convolutional neural network work?
-]
 
-#sslide[
+==
   Recall the neuron #pause
   #side-by-side[Neuron for single $x$:][$ f(x, bold(theta)) = sigma(theta_1 x + theta_0) $] #pause
 
   #side-by-side[#waveform #pause][
   $ f(vec(x(0.1), x(0.2), dots.v), bold(theta)) = \ sigma(theta_0 + theta_1 x(0.1) + theta_2 x(0.2) + dots) $
   ]
-]
 
-#sslide[
+==
   #side-by-side[#waveform][
   $ f(vec(x(0.1), x(0.2), dots.v), bold(theta)) = \ theta_0 + theta_1 x(0.1) + theta_2 x(0.2) + dots $
   ] #pause
@@ -1253,9 +1072,8 @@ draw_filter(0, 0, image_values)
   *Answer 1:* 10, parameters scale with sequence length #pause
 
   *Question:* What if our sequence is 1.1 seconds long?
-]
 
-#sslide[
+==
   One parameter for each timestep does not work well #pause
 
   $ f(vec(x(0.1), x(0.2), dots.v), vec(theta_0, theta_1, dots.v)) \
@@ -1268,9 +1086,7 @@ draw_filter(0, 0, image_values)
 
   *Answer:* Train a new neural network
 
-]
-
-#sslide[
+==
   $ f(vec(x(0.1), x(0.2), dots.v), vec(theta_0, theta_1, dots.v)) \
   = sigma(theta_0 + theta_1 x(0.1) + theta_2 x(0.2) + theta_3 x(0.3) + theta_4 x(0.4) + theta_5 x(0.5) + dots) $
   #pause
@@ -1284,9 +1100,8 @@ draw_filter(0, 0, image_values)
     sigma(theta_0 + theta_1 x(0.3) + theta_2 x(0.4)),
     dots.v
   ) $ #pause
-]
 
-#sslide[
+==
   $ f(vec(x(0.1), x(0.2), dots.v), vec(theta_0, theta_1, theta_2)) = 
   vec(
     sigma(theta_0 + theta_1 x(0.1) + theta_2 x(0.2)),
@@ -1296,9 +1111,8 @@ draw_filter(0, 0, image_values)
   ) $ #pause
 
   This is convolution, we slide our filter $g(t) = vec(theta_0, theta_1, theta_2)$ over the input $x(t)$
-]
 
-#sslide[
+==
   We can write both a perceptron and convolution in vector form
 
   #side-by-side[$ f(x(t), bold(theta)) = sigma(bold(theta)^top vec(1, x(0.1), x(0.2), dots.v)) $ #pause][
@@ -1310,10 +1124,8 @@ draw_filter(0, 0, image_values)
   ]
 
   A convolution layer applies a "mini" perceptron to every few timesteps
-]
 
-
-#sslide[
+==
   #side-by-side[$ f(x(t), bold(theta)) = vec(
     sigma(bold(theta)^top vec(1, x(0.1), x(0.2))),
     sigma(bold(theta)^top vec(1, x(0.2), x(0.3))),
@@ -1323,9 +1135,8 @@ draw_filter(0, 0, image_values)
 
     Translation equivariant, each output corresponds to input 
   ]
-]
 
-#sslide[
+==
   #side-by-side[ $ f(x(t), bold(theta)) = vec(
     sigma(bold(theta)^top vec(1, x(0.1), x(0.2))),
     sigma(bold(theta)^top vec(1, x(0.2), x(0.3))),
@@ -1337,15 +1148,13 @@ draw_filter(0, 0, image_values)
   *Answer 1:* Depends on sequence length and filter size! #pause
 
   *Answer 2:* $T - k + 1$, where $T$ is sequence length and $k$ is filter length 
-]
 
-#sslide[
+==
   Maybe we want to predict a single output for a sequence #pause
 
   #stonks
-]
 
-#sslide[
+==
   If we want a single output, we should *pool* #pause
 
   $ z(t) = f(x(t), bold(theta)) = mat(
@@ -1359,9 +1168,8 @@ draw_filter(0, 0, image_values)
 
   $ "MeanPool"(z(t)) = 1 / (T - k + 1) "SumPool"(z(t)); quad "MaxPool"(z(t)) = max(z(t))
   $
-]
 
-#sslide[
+==
   *Question:* $x(t)$ is a function, what is the function signature? #pause
 
   *Answer:* 
@@ -1376,12 +1184,9 @@ draw_filter(0, 0, image_values)
   We must consider a more general case #pause
 
   Things will get more complicated, but the core idea is exactly the same
-]
 
-#aslide(ag, 3)
-#aslide(ag, 4)
-
-#sslide[
+= More Dimensions
+==
   #side-by-side[#implot][
     *Question:* How many input dimensions for $x$? #pause
 
@@ -1393,9 +1198,8 @@ draw_filter(0, 0, image_values)
     ]
 
     $ x: underbrace(bb(Z)_(0, 255), "width") times underbrace(bb(Z)_(0, 255), "height") |-> underbrace([0, 1], "Color values") $
-]
 
-#sslide[
+==
   #let c = cetz.canvas({
     import cetz.draw: *
 
@@ -1428,9 +1232,7 @@ draw_filter(0, 0, image_values)
   })
   #c
 
-]
-
-#sslide[
+==
   #side-by-side[#implot_color][
     *Question:* How many input dimensions for $x$? #pause
 
@@ -1442,9 +1244,8 @@ draw_filter(0, 0, image_values)
     ]
 
     $ x: underbrace(bb(Z)_(0, 255), "width") times underbrace(bb(Z)_(0, 255), "height") |-> underbrace([0, 1]^3, "Color values") $
-]
 
-#sslide[
+==
   #cimage("figures/lecture_7/ghost_dog_rgb.png") #pause
 
   Computers represent 3 color channel each with 256 integer values #pause
@@ -1452,10 +1253,8 @@ draw_filter(0, 0, image_values)
   But we usually convert the colors $x(u, v) in [0, 1]$ for scale reasons #pause
 
   $ mat(R / 255, G / 255, B / 255) $
-]
 
-#sslide[
-
+==
   The pixels extend in 2 directions (input) $x(u, v)$ #pause
 
   Each pixel contains 3 colors (channels) $x(u, v) = mat(r, g, b)^top$ #pause
@@ -1488,9 +1287,8 @@ draw_filter(0, 0, image_values)
   This form is called $C H W$ (channel, height, width) format #pause
 
   //Convolutional filter must process this data!
-]
 
-#sslide[
+==
   #let c = cetz.canvas({
     import cetz.draw: *
 
@@ -1572,9 +1370,8 @@ draw_filter(0, 0, image_values)
   )
   })
   #c
-]
 
-#sslide[
+==
   I will not bore you with the full equations #pause
 
   *Question:* What is the shape of $bold(theta)$ for a single layer? #pause
@@ -1591,9 +1388,8 @@ draw_filter(0, 0, image_values)
   - Filter $v$ (width): $k$ #pause
 
   Convolve $c_y$ filters of size $k times k$ across $c_x$ channels, bias for each output
-]
 
-#sslide[
+==
   #side-by-side[
     One last thing, *stride* allows you to "skip" cells during convolution #pause
 
@@ -1633,53 +1429,23 @@ draw_filter(0, 0, image_values)
   })
   #c
   ]
-]
 
-#aslide(ag, 4)
-#aslide(ag, 5)
 
-#sslide[
+= Deeper Networks
+==
   #cimage("figures/lecture_1/timeline.svg") #pause
 
   AlexNet: Train a neural network on a GPU ($n=1.2m$, 6 days) #pause
 
   Paper by Krizhevsky, Sutskever (OpenAI CSO), and Hinton (Nobel)
-]
 
-/*
-#sslide[
-  AlexNet created by Alex Krizhevsky, Ilya Sutskever, and Geoffrey Hinton #pause
-
-  - Hinton is a godfather of deep learning #pause
-  - Sutskever was cofounder/chief scientist at OpenAI #pause
-  - Krizhevsky worked at Google research
-
-  AlexNet was one of the first neural networks to run on a GPU #pause
-
-  Trained on 1.2M images over 6 days #pause
-
-]
-
-#sslide[
-  The ideas behind AlexNet were not new, it was primarily the *scale* that made it interesting #pause
-
-  It was a very big network at the time #pause
-
-  It was trained longer than other networks #pause
-
-  Only possible using special hardware (GPUs)
-]
-*/
-
-#sslide[
+==
   #cimage("figures/lecture_7/alexnet.png")
-]
 
-#sslide[
+==
   #cimage("figures/lecture_7/alexnet-layers.png")
-]
 
-#sslide[
+==
   Since AlexNet, there have been larger and better models #pause
 
   - VGG #pause
@@ -1691,19 +1457,14 @@ draw_filter(0, 0, image_values)
   ResNet, MobileNet, and ResNeXt are still used today! #pause
 
   Each one introduces a few tricks to obtain better results 
-]
 
-#sslide[
+==
   After ResNet, marginal improvements #pause
 
   #cimage("figures/lecture_7/cnn_models.png")
 
-]
-
-#aslide(ag, 5)
-#aslide(ag, 6)
-
-#sslide[
+= Coding
+==
   ```python
   import torch
   c_x = 3 # Number of colors
@@ -1719,10 +1480,8 @@ draw_filter(0, 0, image_values)
   image = torch.rand((1, c_x, h, w)) # Torch requires BCHW
   out = conv1(image) # Shape(1, c_y, h - k, w - k)
   ```
-]
 
-
-#sslide[
+==
   ```python
   import jax, equinox
   c_x = 3 # Number of colors
@@ -1738,9 +1497,8 @@ draw_filter(0, 0, image_values)
   image = jax.random.uniform(jax.random.key(1), (c_x, h, w)) 
   out = conv1(image) # Shape(c_y, h - k, w - k)
   ```
-]
 
-#sslide[
+==
   ```python
   import torch
   conv1 = torch.nn.Conv2d(3, c_h, 2)
@@ -1756,9 +1514,8 @@ draw_filter(0, 0, image_values)
   z_2 = pool2(z_2) # Shape(1, c_y, b, b)
   z_3 = linear(z_2.flatten())
   ```
-]
 
-#sslide[
+==
   ```python
   import jax, equinox
   conv1 = equinox.nn.Conv2d(3, c_h, 2)
@@ -1774,8 +1531,5 @@ draw_filter(0, 0, image_values)
   z_2 = pool2(z_2) # Shape(c_y, b, b)
   z_3 = linear(z_2.flatten())
   ```
-]
-
-#sslide[
+==
   https://colab.research.google.com/drive/1IRRSsvdeC4a5AEWF_1WX9iveBqGSppn1#scrollTo=YVkCyz78x4Rp
-]
