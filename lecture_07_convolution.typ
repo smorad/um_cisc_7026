@@ -57,7 +57,7 @@
         domain: (0, 5), 
         label: [Stock Price (MOP)],
         style: (stroke: (thickness: 5pt, paint: red)),
-        t => 100 * (0.3 * calc.sin(0.2 * t) +
+        t => 10 + 100 * (0.3 * calc.sin(0.2 * t) +
                 0.1 * calc.sin(1.5 * t) +
                 0.05 * calc.sin(3.5 * t) +
                 0.02 * calc.sin(7.0 * t))
@@ -336,8 +336,9 @@
   plot.plot(size: (20, 2.75),
     y-tick-step: none,
     x-tick-step: none,
+    y-ticks: (0, 0.5),
     y-min: 0,
-    y-max: 1,
+    y-max: 0.5,
     x-min: 0,
     x-max: 1,
     x-label: "t",
@@ -347,7 +348,7 @@
         domain: (0, 0.2), 
         label: $ g(t) $,
         style: (stroke: (thickness: 5pt, paint: blue)),
-        t => calc.exp(-calc.pow((t - 0.1), 2) / 0.002)
+        t => 1 / (calc.pow(2  * 3.14, 0.5)) * calc.exp(-calc.pow((t - 0.1), 2) / 0.002)
       )
     })
 })}  
@@ -430,16 +431,16 @@ draw_filter(0, 0, image_values)
 
 = Admin
 ==
-Exam 1 graded #pause
+Exam 1 graded, scores on moodle #pause
 - Mean score: $91"/"120 approx 76%$ #pause
 - If you finished exam but don't have a Moodle score come see me #pause
 
 Course grades will be curved *up* to 85% #pause
 - If everyone scores an A, this is fine #pause
-- In practice, do better than exam mean for A
+- In practice, do better than exam mean for A #pause
 
 *DO NOT CHEAT* #pause
-- Failed multiple cheaters on exam 1 #pause
+- Failed cheaters on exam 1 #pause
   - *Course grade: F* #pause
 - Lowest exam dropped #pause
   - Can score 0 on exam and get A in class
@@ -463,17 +464,26 @@ Exam 2 next week, 6 preliminary questions: #pause
 - (1) Wide neural networks
 - (1) Relationship between KL divergence and cross entropy loss
 - (1) Vanishing gradient from activation
-- (1) Modern optimizers (RMSProp, SGD+momentum)
+- (1) Modern optimizers (RMSProp, GD+momentum)
 - (1) 1D discrete convolution
-- (1) 1D convolutional neural networks
+- (1) 1D convolutional neural networks #pause
+
+I tell you exactly what to study, no need to cheat
 
 ==
-Homework 1 and 2 graded #pause
+Homework 1 and 2 graded, scores on moodle #pause
 - Homework 1 mean score 94/100 #pause
 - Homework 2 mean score 92/100 #pause
 
 Homework 3 due the night before exam #pause
 - Finish it soon so you can study!
+
+==
+New website clones and compiles `typst` docs in your browser! #pause
+
+Follow my lectures along in real time
+
+https://github.com/smorad/um_cisc_7026
 
 = Review
 
@@ -518,13 +528,10 @@ Homework 3 due the night before exam #pause
   "The probability of finding a “bad” (high value) local minimum is non-zero for small-size networks and decreases quickly with network size" - Choromanska, Anna, et al. _The loss surfaces of multilayer networks._ (2014)
 
 ==
-  #cimage("figures/lecture_6/filters.png", width: 120%)  
-
-==
   Next, we looked at activation functions
 
 ==
-    #side-by-side[#sigmoid #pause][
+    #side-by-side(align: left)[#sigmoid #pause][
         The sigmoid function can result in a *vanishing gradient* #pause
         
         $ f(bold(x), bold(theta)) = sigma(bold(theta)_3^top sigma(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))) $ #pause
@@ -537,7 +544,7 @@ Homework 3 due the night before exam #pause
 
     dot (gradient sigma)(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))
 
-    dot (gradient sigma)(bold(theta)_1^top overline(bold(x)))
+    dot (gradient sigma)(bold(theta)_1^top overline(bold(x))) dot overline(bold(x))
     $ 
 
     ]
@@ -548,7 +555,7 @@ Homework 3 due the night before exam #pause
 
     dot underbrace((gradient sigma)(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))), < 0.25)
 
-    dot underbrace((gradient sigma)(bold(theta)_1^top overline(bold(x))), < 0.25) overline(bold(x))
+    dot underbrace((gradient sigma)(bold(theta)_1^top overline(bold(x))), < 0.25) dot overline(bold(x))
     $ 
     ]
 
@@ -562,7 +569,7 @@ Homework 3 due the night before exam #pause
 
 ==
     To fix the vanishing gradient, use the *rectified linear unit (ReLU)*
-    #side-by-side[$ sigma(x) = max(0, x) \ gradient sigma(x) = cases(0 "if" x < 0, 1 "if" x >= 0) $ #pause][#relu #pause]
+    #side-by-side[$ sigma(z) = max(0, z) \ gradient sigma(z) = cases(0 "if" z < 0, 1 "if" z >= 0) $ #pause][#relu #pause]
 
     "Dead" neurons always output 0, and cannot recover
 
@@ -571,7 +578,7 @@ Homework 3 due the night before exam #pause
 
     #side-by-side[$ sigma(z) = max(0.1 z, z) \ gradient sigma(z) = cases(0.1 "if" z < 0, 1 "if" z >= 0) $ #pause][#lrelu #pause]
 
-    Small negative slope allows dead neurons to recover #pause
+    Small negative slope prevents dead neurons (nonzero slope everywhere) #pause
 
     As long as one neuron is positive in each layer, non-vanishing gradient
 
@@ -598,10 +605,19 @@ Homework 3 due the night before exam #pause
 ==
   Stochastic gradient descent (SGD) reduces the memory usage #pause
 
-  Rather than compute the gradient over the entire dataset, we approximate the gradient over a subset of the data 
+  We cannot fit the full gradient in memory #pause
+
+  In expectation, the stochastic gradient approximates the true gradient #pause
+
+  $ bb(E)_(bold(X)_i tilde bold(X), bold(Y)_i tilde bold(Y)) [(gradient_bold(theta) cal(L))(bold(X)_i, bold(Y)_i, bold(theta))] = (gradient_bold(theta) cal(L))(bold(X), bold(Y), bold(theta)) $ #pause
+
+  *Note:* Only equal under infinitely many samples $bold(X)_i, bold(Y)_i$ #pause
+  - Approximate expectation using finite samples #pause
+
+  $ hat(bb(E))_(bold(X)_i tilde bold(X), bold(Y)_i tilde bold(Y)) [(gradient_bold(theta) cal(L))(bold(X)_i, bold(Y)_i, bold(theta))] approx (gradient_bold(theta) cal(L))(bold(X), bold(Y), bold(theta)) $ 
 
 ==
-  Stochastic gradient descent also inserts noise into the optimization process #pause
+  Stochastic gradient approximation adds noise during optimization #pause
 
   This noise can prevent premature convergence to bad optima #pause
 
@@ -631,12 +647,12 @@ Homework 3 due the night before exam #pause
 
 
 ==
-    Introduce *momentum* first #pause
+    Introduce *momentum* #pause
 
     #gd_momentum_algo
 
 ==
-    Next, *adaptive learning rate* #pause
+    Introduce *adaptive learning rate* #pause
 
     #gd_adaptive_algo
 
@@ -653,7 +669,7 @@ Homework 3 due the night before exam #pause
 
   $ cal(L)_("decay")(bold(X), bold(Y), bold(theta)) = cal(L)_("decay")(bold(X), bold(Y), bold(theta)) + lambda sum_(i) theta_i^2 $ #pause
 
-  This results in a smoother, parabolic loss landscape that is easier to optimize 
+  Creates smoother, parabolic loss landscape that is easier to optimize 
 
 ==
 Let's finish coding!
@@ -663,40 +679,26 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
 = Signal Processing
 
 ==
-  In our networks, we do not consider the structure of data #pause
+  Our neural networks do not consider the structure of data #pause
 
   $ bold(x) = vec(x_1, x_2, dots.v, x_(d_x)) $ #pause
 
   #side-by-side[$ bold(theta) = vec(theta_0, theta_1, dots.v, theta_(d_x)) $ #pause][$ bold(theta) eq.quest vec(theta_7, theta_4, dots.v, theta_1) $]
 
 ==
-  We treat images as a vector, with no relationship between nearby pixels #pause
+  We assume no relationship or ordering for input elements or parameter #pause
 
-  These images are equivalent to a neural network
+  $ sigma(theta_1 x_1 + theta_2 x_2) => sigma(theta_2 x_2 + theta_1 x_1) $
 
   #cimage("figures/lecture_7/permute.jpg") #pause
 
-  It is a miracle that our neural networks could classify clothing!
+  These images are equivalent to a perceptron! 
 
-  /*
-  #side-by-side[
-    $ mat(
-      x_(1,1), x_(1, 2), x_(1, 3);
-      x_(2,1), x_(2, 2), x_(2, 3);
-      x_(3,1), x_(3, 2), x_(3, 3);
-    ) $ #pause
-    ][
-    $ vec(
-      x_(1,1), x_(1, 2), x_(1, 3), x_(2,1), dots.v
-    ) $ #pause
-    ][
-    $ vec(theta_0, theta_1, theta_2, theta_3, dots.v) $
-  ]*/
 
 ==
   The real world is structured #pause
 
-  Our models should mimic this structure #pause
+  Our models should use this structure #pause
   - Better data efficiency #pause
   - Better generalization #pause
 
@@ -747,14 +749,21 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   - Translation equivariance 
 
 ==
-  *Locality:* Information concentrated over small regions of space/time #pause
+  *Locality:* Information structured and concentrated over small regions //$x(t)$ related to nearby neighbors, information content is nonuniform //Information concentrated over small regions of space/time #pause
+
+  #side-by-side[
+    $underbrace(x(t + epsilon) approx f(x(t)) + epsilon, "Nearby regions related")$
+  ][
+    $underbrace(y = f(x(s))\, quad s in (- epsilon, epsilon), "Information concentrated in small region")$
+    //$ x(u + epsilon, v + epsilon) approx f(x(u, v)) + g(epsilon) $
+  ] #pause
 
   #side-by-side[#waveform][#implot]
   
-  // TODO Add output signal
-
 ==
   *Translation Equivariance:* Shift in signal results in shift in output #pause
+
+  $ f(x(t + tau)) = y(t + tau) $ #pause
 
   #side-by-side[#waveform_left][#waveform_right] #pause
 
@@ -830,15 +839,15 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   )
   let image_colors = (
     (white, white, white, white, white, white, white, white),
-    (white, white, white, white, white, none, none, none),
-    (white, white, white, white, white, none, none, none),
-    (white, white, white, white, white, none, none, none),
-    (white, white, none, none, white, white, white, white),
-    (white, white, none, none, white, white, white, white),
+    (white, white, white, white, white, white, none, none),
+    (white, white, white, white, white, white, none, none),
+    (white, white, white, white, white, white, none, none),
+    (white, white, none, none, none, white, white, white),
+    (white, white, none, none, none, white, white, white),
     (white, white, none, none, white, white, white, white),
     (white, white, white, white, white, white, white, white),
   )
-  content((4, 4), image("figures/lecture_7/flowers.jpg", width: 8cm))
+  content((5, 5), image("figures/lecture_7/flowers.jpg", width: 6cm))
   draw_filter(0, 0, image_values, colors: image_colors)
   })) #pause
 
@@ -870,6 +879,30 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
 
   We slide the filter $g(t)$ across the signal $x(t)$
 
+==
+*Note:* Convolution slides the filter from *right to left* #pause
+
+  $ x(t) * g(t) &= integral_(-oo)^(oo) x(t - tau) g(tau) d tau &&= dots + x(t + 10) g(t) + x(t + 9) g(t) + dots \
+
+  x(t) * g(t) &= sum_(tau=-oo)^(oo) x(t - tau) g(tau) &&= dots + x(t + 10) g(t) + x(t + 9) g(t) + dots $ #pause
+
+  This is equivalent to flipping the filter and sliding left to right #pause
+
+  $ g_"flip" (t) = g(-t) $
+
+==
+
+  *We will assume all filters $g(t)$ are "pre-flipped" in this course* #pause
+  - Simply scan the filter $g(t)$ left to right #pause
+  - Easier to understand and how we implement it in neural networks #pause
+
+  $ x(t) * g(t) &= integral_(-oo)^(oo) x(t + tau) g(tau) d tau &&= dots + x(t-10) g(t) + x(t-9) g(t) + dots \
+
+  x(t) * g(t) &= sum_(tau=-oo)^(oo) x(t + tau) g(tau) &&=  dots + x(t-10) g(t) + x(t-9) g(t) + dots $ #pause
+
+  Confused? Let us do an example
+
+
 
 ==
   *Example:* Let us examine a low-pass filter #pause
@@ -893,19 +926,27 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   Convolution is also *equivariant* to time/space shifts
 
 ==
-  Often, we use continuous time/space convolution for analog signals #pause
+  We use continuous convolution for analog signals #pause
   - Physics #pause
   - Control theory #pause
   - Electrical engineering #pause
 
-  Deep learning uses digital hardware (discrete time/space) #pause
+  Deep learning uses discrete convolution (digital hardware) #pause
   - Images #pause
   - Recorded audio #pause
   - Anything stored as bits #pause
 
-  It is good to know both! Continuous for theory, discrete for software 
+  It is good to know both! Continuous for theory, discrete for software #pause
+
+  Let us do a discrete example, I think it will make convolution very clear
 
 ==
+  *Example:* Discrete convolution with filter size 2 #pause 
+
+  $ y(t) = x(t) * g(t) = sum_(tau=0)^1 x(t + tau) g(tau) $  #pause
+
+  $ y(t) = x(t) g(0) + x(t + 1) g(1) $ #pause
+
   $
   vec(
     x(t),
@@ -919,6 +960,11 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   $
 
 ==
+
+  $ y(t) = x(t) * g(t) = sum_(tau=0)^1 x(t + tau) g(tau) $  
+
+  $ y(t) = x(t) g(0) + x(t + 1) g(1) $
+
   $
   vec(
     x(t),
@@ -932,6 +978,10 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   $
 
 ==
+  $ y(t) = x(t) * g(t) = sum_(tau=0)^1 x(t + tau) g(tau) $  
+
+  $ y(t) = x(t) g(0) + x(t + 1) g(1) $
+
   $
   vec(
     x(t),
@@ -945,6 +995,10 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   $
 
 ==
+  $ y(t) = x(t) * g(t) = sum_(tau=0)^1 x(t + tau) g(tau) $  
+
+  $ y(t) = x(t) g(0) + x(t + 1) g(1) $
+
   $
   vec(
     x(t),
@@ -958,6 +1012,10 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   $
 
 ==
+  $ y(t) = x(t) * g(t) = sum_(tau=0)^1 x(t + tau) g(tau) $  
+
+  $ y(t) = x(t) g(0) + x(t + 1) g(1) $
+  
   $
   vec(
     x(t),
@@ -994,12 +1052,16 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
     y(t)
   ) = mat(
     1, 2, 3, 4, 5 ;
-    theta_2, theta_1 ;
+    theta_1, theta_2 ;
     #hide[1]; 
   )
   $ 
 
 ==
+  $ y(t) = x(t) * g(t) = sum_(tau=0)^1 x(t + tau) g(tau) $  
+
+  $ y(t) = x(t) g(0) + x(t + 1) g(1) $
+
   $
   vec(
     x(t),
@@ -1007,12 +1069,16 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
     y(t)
   ) = mat(
     #redm[$1$], #redm[$2$], 3, 4, 5 ;
-    #redm[$theta_2$], #redm[$theta_1$] ;
-    #redm[$theta_2 + 2 theta_1$] 
+    #redm[$theta_1$], #redm[$theta_2$] ;
+    #redm[$theta_1 + 2 theta_2$] 
   )
   $ 
 
 ==
+  $ y(t) = x(t) * g(t) = sum_(tau=0)^1 x(t + tau) g(tau) $  
+
+  $ y(t) = x(t) g(0) + x(t + 1) g(1) $
+  
   $
   vec(
     x(t),
@@ -1020,13 +1086,11 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
     y(t)
   ) = mat(
     1, #redm[$2$], #redm[$3$], 4, 5 ;
-    , #redm[$theta_2$], #redm[$theta_1$] ;
-    theta_2 + 2 theta_1 , #redm[$2 theta_2 + 3 theta_1$]
+    , #redm[$theta_1$], #redm[$theta_2$] ;
+    theta_1 + 2 theta_2 , #redm[$2 theta_1 + 3 theta_2$]
   )
   $ #pause
 
-
-  #side-by-side[#waveform_left][#hello]
 
 ==
   $
@@ -1036,14 +1100,23 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
     y(t)
   ) = mat(
     1, #redm[$2$], #redm[$3$], 4, 5 ;
-    , #redm[$theta_2$], #redm[$theta_1$] ;
-    theta_2 + 2 theta_1 , #redm[$2 theta_2 + 3 theta_1$]
+    , #redm[$theta_1$], #redm[$theta_2$] ;
+    theta_1 + 2 theta_2 , #redm[$2 theta_1 + 3 theta_2$]
   )
   $ #pause
 
   Just like neural networks, convolution is a linear operation #pause
 
   It is a weighted sum of the inputs, just like a neuron #pause
+
+  $ x(t) * g(t) &= sum_(tau=0)^d_x x(t + tau) dot g(tau) \ 
+  f(bold(x), bold(theta)) &= sum_(i=0)^d_x x_i dot theta_i
+  $  
+
+==
+  $ x(t) * g(t) &= sum_(tau=0)^d_x x(t + tau) dot g(tau) \ 
+  f(bold(x), bold(theta)) &= sum_(i=0)^d_x x_i dot theta_i
+  $  
 
   *Question:* How does convolution differ from a neuron? #pause
 
@@ -1072,7 +1145,7 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
 
 ==
   Recall the neuron #pause
-  #side-by-side[Neuron for single $x$:][$ f(x, bold(theta)) = sigma(theta_1 x + theta_0) $] #pause
+  #side-by-side[Neuron][$ f(bold(x), bold(theta)) = sigma(bold(theta)^top overline(bold(x))) $] #pause
 
   #side-by-side[#waveform #pause][
   $ f(vec(x(0.1), x(0.2), dots.v), bold(theta)) = \ sigma(theta_0 + theta_1 x(0.1) + theta_2 x(0.2) + dots) $
@@ -1080,14 +1153,14 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
 
 ==
   #side-by-side[#waveform][
-  $ f(vec(x(0.1), x(0.2), dots.v), bold(theta)) = \ theta_0 + theta_1 x(0.1) + theta_2 x(0.2) + dots $
+  $ f(vec(x(0.1), x(0.2), dots.v), bold(theta)) = \ sigma(theta_0 + theta_1 x(0.1) + theta_2 x(0.2) + dots) $
   ] #pause
 
   *Question:* How many parameters do we need? #pause
 
   *Answer 1:* 10, parameters scale with sequence length #pause
 
-  *Question:* What if our sequence is 1.1 seconds long?
+  *Question:* What if sequence is 1.1 seconds long? #pause *A:* Train new network
 
 ==
   One parameter for each timestep does not work well #pause
@@ -1096,7 +1169,7 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   = sigma(theta_0 + theta_1 x(0.1) + theta_2 x(0.2) + theta_3 x(0.3) + theta_4 x(0.4) + theta_5 x(0.5) + dots) $
   #pause
 
-  *Question:* How many parameters if speech is 2 hours long? #uncover("4-")[72,000] #pause
+  *Question:* How many parameters if speech is 2 hours long? #uncover("4-")[*A:* 72,000] #pause
 
   *Question:* What if speech is 2 hours and 0.1 seconds long? #pause
 
@@ -1115,7 +1188,7 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
     sigma(theta_0 + theta_1 x(0.2) + theta_2 x(0.3)),
     sigma(theta_0 + theta_1 x(0.3) + theta_2 x(0.4)),
     dots.v
-  ) $ #pause
+  ) $ 
 
 ==
   $ f(vec(x(0.1), x(0.2), dots.v), vec(theta_0, theta_1, theta_2)) = 
@@ -1129,20 +1202,20 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   This is convolution, we slide our filter $g(t) = vec(theta_0, theta_1, theta_2)$ over the input $x(t)$
 
 ==
-  We can write both a perceptron and convolution in vector form
+  We can write both a perceptron and convolution layer in similar forms
 
-  #side-by-side[$ f(x(t), bold(theta)) = sigma(bold(theta)^top vec(1, x(0.1), x(0.2), dots.v)) $ #pause][
-  $ f(x(t), bold(theta)) = vec(
+  #side-by-side[$ f(x(t), bold(theta)) = underbrace(sigma(bold(theta)^top vec(1, x(0.1), x(0.2), dots.v)), "Perceptron") $ #pause][
+  $ f(x(t), bold(theta)) = underbrace(vec(
     sigma(bold(theta)^top vec(1, x(0.1), x(0.2))),
     sigma(bold(theta)^top vec(1, x(0.2), x(0.3))),
     dots.v
-  ) $
+  ), "Convolution layer") $
   ]
 
-  A convolution layer applies a "mini" perceptron to every few timesteps
+  A convolution layer applies a "mini" perceptron at each timestep
 
 ==
-  #side-by-side[$ f(x(t), bold(theta)) = vec(
+  #side-by-side(align: left)[$ f(x(t), bold(theta)) = vec(
     sigma(bold(theta)^top vec(1, x(0.1), x(0.2))),
     sigma(bold(theta)^top vec(1, x(0.2), x(0.3))),
     dots.v
@@ -1153,7 +1226,7 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   ]
 
 ==
-  #side-by-side[ $ f(x(t), bold(theta)) = vec(
+  #side-by-side(align: left)[ $ f(x(t), bold(theta)) = vec(
     sigma(bold(theta)^top vec(1, x(0.1), x(0.2))),
     sigma(bold(theta)^top vec(1, x(0.2), x(0.3))),
     dots.v
@@ -1166,12 +1239,14 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   *Answer 2:* $T - k + 1$, where $T$ is sequence length and $k$ is filter length 
 
 ==
-  Maybe we want to predict a single output for a sequence #pause
+  Maybe we want to predict a single output, e.g. stock price tomorrow #pause
 
-  #stonks
+  #stonks #pause
+
+  But convolutional layers output a variable-length signal ($T - k + 1$)!
 
 ==
-  If we want a single output, we should *pool* #pause
+  If we want a single output, we should use *pooling* #pause
 
   $ z(t) = f(x(t), bold(theta)) = mat(
     sigma(bold(theta)^top vec(1, x(0.1), x(0.2))),
@@ -1182,7 +1257,7 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   $ "SumPool"(z(t)) = sigma(bold(theta)^top vec(1, x(0.1), x(0.2))) + sigma(bold(theta)^top vec(1, x(0.2), x(0.3))) + dots
   $ #pause
 
-  $ "MeanPool"(z(t)) = 1 / (T - k + 1) "SumPool"(z(t)); quad "MaxPool"(z(t)) = max(z(t))
+  $ "MeanPool"(z(t)) = "SumPool"(z(t)) / (T - k + 1) ; quad "MaxPool"(z(t)) = max(z(t))
   $
 
 ==
@@ -1206,14 +1281,14 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   #side-by-side[#implot][
     *Question:* How many input dimensions for $x$? #pause
 
-    *Answer:* 2: $u, v$
+    *Answer:* 2: $u, v$ #pause
 
     *Question:* How many output dimensions/channels for $x$? #pause
 
     *Answer:* 1, black/white value
     ]
 
-    $ x: underbrace(bb(Z)_(0, 255), "width") times underbrace(bb(Z)_(0, 255), "height") |-> underbrace([0, 1], "Color values") $
+    $ x: underbrace({0 dots 255}, "width") times underbrace({0 dots 255}, "height") |-> underbrace([0, 1], "Color values") $
 
 ==
   #let c = cetz.canvas({
@@ -1252,14 +1327,14 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   #side-by-side[#implot_color][
     *Question:* How many input dimensions for $x$? #pause
 
-    *Answer:* 2: $u, v$
+    *Answer:* 2: $u, v$ #pause
 
     *Question:* How many output dimensions for $x$? #pause
 
     *Answer:* 3 -- red, green, and blue channels
     ]
 
-    $ x: underbrace(bb(Z)_(0, 255), "width") times underbrace(bb(Z)_(0, 255), "height") |-> underbrace([0, 1]^3, "Color values") $
+    $ x: underbrace({0 dots 255}, "width") times underbrace({0 dots 255}, "height") |-> underbrace([0, 1]^3, "Color values") $
 
 ==
   #cimage("figures/lecture_7/ghost_dog_rgb.png") #pause
@@ -1271,13 +1346,13 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   $ mat(R / 255, G / 255, B / 255) $
 
 ==
-  The pixels extend in 2 directions (input) $x(u, v)$ #pause
+  The pixels extend in 2 directions (height, width) $x(u, v)$ #pause
 
   Each pixel contains 3 colors (channels) $x(u, v) = mat(r, g, b)^top$ #pause
 
-  And the pixels extend in 2 directions (variables) #pause
+  We can store this signal as a tensor #pause
 
-  $ bold(x)(u, v) = 
+  $ bold(x) = 
     mat(
       underbrace(mat(
         .13, .14, .12, .10;
@@ -1300,9 +1375,7 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
     )^top
   $ #pause
 
-  This form is called $C H W$ (channel, height, width) format #pause
-
-  //Convolutional filter must process this data!
+  This form is called $C H W$ (channel, height, width) format 
 
 ==
   #let c = cetz.canvas({
@@ -1388,15 +1461,15 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   #c
 
 ==
-  I will not bore you with the full equations #pause
-
+  The multi-dimension, multi-channel, multi-filter equations are very long, let's skip them #pause
+  
   *Question:* What is the shape of $bold(theta)$ for a single layer? #pause
 
   *Answer:* 
 
   //$ bold(theta) in bb(R)^(overbrace((k + 1), "Filter" u) times overbrace(k, "Filter" v) times overbrace(d_x, "Input channels") times overbrace(d_y, "Output channels")) $
 
-  $ bold(theta) in bb(R)^(c_x times c_y times k times k + c_y) $
+  $ bold(theta) in bb(R)^(c_x times c_y times k times k + c_y) $ #pause
   
   - Input channels: $c_x$
   - Output channels: $c_y + 1$ 

@@ -727,6 +727,16 @@ Anything you liked/disliked?
     We call this *stochastic gradient descent* (SGD)
 
 ==
+  In expectation, the stochastic gradient approximates the true gradient #pause
+
+  $ bb(E)_(bold(X)_i tilde bold(X), bold(Y)_i tilde bold(Y)) [(gradient_bold(theta) cal(L))(bold(X)_i, bold(Y)_i, bold(theta))] = (gradient_bold(theta) cal(L))(bold(X), bold(Y), bold(theta)) $ #pause
+
+  *Note:* Only equal under infinitely many samples $bold(X)_i, bold(Y)_i$ #pause
+  - Approximate expectation using finite samples #pause
+
+  $ hat(bb(E))_(bold(X)_i tilde bold(X), bold(Y)_i tilde bold(Y)) [(gradient_bold(theta) cal(L))(bold(X)_i, bold(Y)_i, bold(theta))] approx (gradient_bold(theta) cal(L))(bold(X), bold(Y), bold(theta)) $ 
+
+==
   #sgd_algo
    
 

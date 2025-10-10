@@ -66,20 +66,22 @@
   plot.plot(size: (8, 6),
     x-tick-step: 2,
     y-tick-step: none,
-    y-ticks: (0, 1),
+    y-ticks: (0, 0.25, 1),
     y-min: 0,
     y-max: 1,
+    x-label: $ z $,
+    y-label: none,
     {
       plot.add(
         domain: (-5, 5), 
         style: (stroke: (thickness: 5pt, paint: red)),
-        label: $ sigma(x) $,
+        label: $ sigma(z) $,
         x => 1 / (1 + calc.pow(2.718, -x)),
       )
       plot.add(
         domain: (-5, 5), 
         style: (stroke: (thickness: 3pt, paint: blue)),
-        label: $ gradient sigma(x)$,
+        label: $ gradient sigma(z)$,
         x => (1 / (1 + calc.pow(2.718, -x))) * (1 - 1 / (1 + calc.pow(2.718, -x))),
       )
     })
@@ -94,7 +96,7 @@
     x-tick-step: 2.5,
     //y-tick-step: 1,
     y-tick-step: none,
-    y-ticks: (1, 3, 5),
+    y-ticks: (0, 1, 3, 5),
     y-min: 0,
     y-max: 5,
     {
