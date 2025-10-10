@@ -7,7 +7,7 @@
 #import algorithmic: style-algorithm, algorithm-figure, algorithm
 #import "@preview/mannot:0.3.0": *
 
-#let handout = false
+#let handout = true
 
 
 // FUTURE TODO: Repeat self too much on locality/equivariance, restructure and replace with something else
@@ -896,9 +896,9 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   - Simply scan the filter $g(t)$ left to right #pause
   - Easier to understand and how we implement it in neural networks #pause
 
-  $ x(t) * g(t) &= integral_(-oo)^(oo) x(t + tau) g(tau) d tau &&= dots + x(t-10) g(t) + x(t-9) g(t) + dots \
+  $ x(t) * g(t) &= integral_(-oo)^(oo) x(t + tau) g(tau) d tau &&= dots + x(t + 1) g(1) + x(t + 2) g(2) + dots \
 
-  x(t) * g(t) &= sum_(tau=-oo)^(oo) x(t + tau) g(tau) &&=  dots + x(t-10) g(t) + x(t-9) g(t) + dots $ #pause
+  x(t) * g(t) &= sum_(tau=-oo)^(oo) x(t + tau) g(tau) &&= dots + x(t + 1) g(1) + x(t + 2) g(2) + dots $ #pause
 
   Confused? Let us do an example
 

@@ -292,6 +292,12 @@ def listen_print_loop(responses: object, stream: object) -> None:
             # English
             # sys.stdout.write(transcript + "\n")
             # Chinese
+            # try:
+            #     sys.std.out.write(translate_text(transcript))
+            # except Exception:
+            #     pass
+
+            sys.stdout.write(transcript + "\n")
             sys.stdout.write(translate_text(transcript) + "\n")
 
             stream.is_final_end_time = stream.result_end_time
@@ -351,7 +357,10 @@ def main() -> None:
             responses = client.streaming_recognize(streaming_config, requests)
 
             # Now, put the transcription responses to use.
-            listen_print_loop(responses, stream)
+            try:
+                listen_print_loop(responses, stream)
+            except Exception:
+                pass
 
             if stream.result_end_time > 0:
                 stream.final_request_end_time = stream.is_final_end_time
