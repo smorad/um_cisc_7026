@@ -469,7 +469,11 @@ Exam 2 next week, 6 preliminary questions: #pause
 
 ==
 Homework 1 and 2 graded #pause
-- Homework 1 mean score 94/100
+- Homework 1 mean score 94/100 #pause
+- Homework 2 mean score 92/100 #pause
+
+Homework 3 due the night before exam #pause
+- Finish it soon so you can study!
 
 = Review
 
@@ -804,9 +808,8 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   )
   content((4, 4), image("figures/lecture_7/flowers.jpg", width: 8cm))
   draw_filter(0, 0, image_values)
-  })) #pause
+  }))
 
-  //How can we represent these properties in neural networks?
 
 ==
   A more realistic scenario of locality and translation equivariance 
@@ -837,9 +840,11 @@ https://colab.research.google.com/drive/1qTNSvB_JEMnMJfcAwsLJTuIlfxa_kyTD
   )
   content((4, 4), image("figures/lecture_7/flowers.jpg", width: 8cm))
   draw_filter(0, 0, image_values, colors: image_colors)
-  })) 
+  })) #pause
 
-  //How can we represent these properties in neural networks?
+  Our brains use the world's structure to infer missing information #pause
+
+  Our neural networks should do the same
 
 
 = Convolution
