@@ -3,6 +3,7 @@
 #import "@preview/cetz:0.4.0"
 #import "@preview/fletcher:0.5.8" as fletcher: node, edge
 #import "common.typ": *
+#import "plots.typ": *
 #import "@preview/pinit:0.2.2": *
 
 // TODO: Missing x^2 term when we show polynomial+multivariate example (not 2^3, should be 3^2 + 1)
@@ -12,8 +13,6 @@
 #let handout = true
 
 // cetz and fletcher bindings for touying
-#let cetz-canvas = touying-reducer.with(reduce: cetz.canvas, cover: cetz.draw.hide.with(bounds: true))
-#let fletcher-diagram = touying-reducer.with(reduce: fletcher.diagram, cover: fletcher.hide)
 
 #show: university-theme.with(
   aspect-ratio: "16-9",
@@ -101,20 +100,6 @@
         style: (stroke: none))
       })
 })
-
-#let heaviside = canvas(length: 1cm, {
-  plot.plot(size: (8, 4),
-    x-tick-step: 1,
-    y-tick-step: 2,
-    {
-      plot.add(
-        domain: (-2, 2), 
-        x => calc.clamp(calc.floor(x + 1), 0, 1),
-        style: (stroke: (paint: red, thickness: 4pt)),
-      )
-    })
-})
-
 
 #title-slide()
 

@@ -1,7 +1,5 @@
 #import "@preview/touying:0.6.1": *
 #import themes.university: *
-#import "@preview/cetz:0.4.0"
-#import "@preview/fletcher:0.5.8" as fletcher: node, edge
 #import "common.typ": *
 #import "@preview/pinit:0.2.2": *
 #import "@preview/algorithmic:1.0.4"
@@ -12,11 +10,7 @@
 // TODO: Add break
 // TODO: Use different brackets for gradient_theta (f(theta)) to differentiate between products and input/arguments to grad function
 
-#let handout = false
-
-// cetz and fletcher bindings for touying
-#let cetz-canvas = touying-reducer.with(reduce: cetz.canvas, cover: cetz.draw.hide.with(bounds: true))
-#let fletcher-diagram = touying-reducer.with(reduce: fletcher.diagram, cover: fletcher.hide)
+#let handout = true
 
 #show: university-theme.with(
   aspect-ratio: "16-9",

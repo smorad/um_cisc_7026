@@ -3,6 +3,7 @@
 #import "@preview/cetz:0.4.0"
 #import "@preview/fletcher:0.5.8" as fletcher: node, edge
 #import "common.typ": *
+#import "plots.typ": *
 #import "@preview/algorithmic:1.0.5"
 #import algorithmic: style-algorithm, algorithm-figure, algorithm
 #import "@preview/mannot:0.3.0": *
