@@ -13,6 +13,7 @@ There is a very nice tool that will automatically compile and render `typst` sou
 - [Lecture 5 - Classification](https://gistd.myriad-dreamin.com/@any/github.com/smorad/um_cisc_7026/blob/main/lecture_05_classification.typ?g-mode=slide)
 - [Lecture 6 - Modern Techniques](https://gistd.myriad-dreamin.com/@any/github.com/smorad/um_cisc_7026/blob/main/lecture_06_techniques.typ?g-mode=slide)
 - [Lecture 7 - Convolution](https://gistd.myriad-dreamin.com/@any/github.com/smorad/um_cisc_7026/blob/main/lecture_07_convolution.typ?g-mode=slide)
+- [Lecture 8 - Recurrence](https://gistd.myriad-dreamin.com/@any/github.com/smorad/um_cisc_7026/blob/main/lecture_08_recurrent.typ?g-mode=slide)
 
 
 

@@ -148,7 +148,7 @@ https://github.com/smorad/um_cisc_7026
   Next, we looked at activation functions
 
 ==
-    #side-by-side(align: left)[#sigmoid #pause][
+    #side-by-side[#sigmoid #pause][
         The sigmoid function can result in a *vanishing gradient* #pause
         
         $ f(bold(x), bold(theta)) = sigma(bold(theta)_3^top sigma(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))) $ #pause
@@ -159,9 +159,9 @@ https://github.com/smorad/um_cisc_7026
     $ (gradient_bold(theta_1) f)(bold(x), bold(theta)) = 
     (gradient sigma)(bold(theta)_3^top sigma(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))))
 
-    dot (gradient sigma)(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))
+    bold(theta)_3 (gradient sigma)(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))
 
-    dot (gradient sigma)(bold(theta)_1^top overline(bold(x))) dot overline(bold(x))
+    bold(theta)_2 (gradient sigma)(bold(theta)_1^top overline(bold(x)))
     $ 
 
     ]
@@ -170,15 +170,15 @@ https://github.com/smorad/um_cisc_7026
     $ (gradient_bold(theta_1) f)(bold(x), bold(theta)) = 
     underbrace((gradient sigma)(bold(theta)_3^top sigma(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))), < 0.25)
 
-    dot underbrace((gradient sigma)(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))), < 0.25)
+    bold(theta)_3 underbrace((gradient sigma)(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))), < 0.25)
 
-    dot underbrace((gradient sigma)(bold(theta)_1^top overline(bold(x))), < 0.25) dot overline(bold(x))
+    bold(theta)_2 underbrace((gradient sigma)(bold(theta)_1^top overline(bold(x))), < 0.25) overline(bold(x))
     $ 
     ]
 
     #only(6)[
       #side-by-side[
-      $ max_(bold(theta), bold(x)) (gradient_bold(theta_1) f)(bold(x), bold(theta)) approx 0.01 overline(bold(x)) $
+      $ max_(bold(theta), bold(x)) (gradient_bold(theta_1) f)(bold(x), bold(theta)) approx 0.01 dot dots $
       ][
       $ lim_(ell -> oo) (gradient_bold(theta_1) f)(bold(x), bold(theta)) = 0 $
       ]

@@ -510,7 +510,7 @@ $ P: E -> [0, 1] $ #pause
   $ Delta^(d_y - 1) $
 
 ==
-  The simplex $Delta^k$ is an $k - 1$-dimensional triangle in $k$-dimensional space #pause
+  The simplex $Delta^(k-1)$ is an $k - 1$-dimensional triangle in $k$-dimensional space #pause
 
   #cimage("figures/lecture_5/simplex.svg", height: 70%)
 
@@ -652,7 +652,7 @@ $ P: E -> [0, 1] $ #pause
 
   $ "KL"(P, Q) = sum_i P(i) log P(i) / Q(i) $  #pause
 
-  Plug in our two distributions $P = f$ and $Q = bold(y)$ 
+  Plug in our two distributions $P = bold(y)$ and $Q = f$ 
 
  $ "KL"(P(bold(y) | bold(x)), f(bold(x), bold(theta))) = sum_(i=1)^(d_y) P(y_i | bold(x)) log P(y_i | bold(x)) / f(bold(x), bold(theta))_i $
 

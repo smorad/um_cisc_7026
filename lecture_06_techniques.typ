@@ -139,7 +139,7 @@ Anything you liked/disliked?
   $ Delta^(d_y - 1) $
 
 ==
-  The simplex $Delta^k$ is an $k - 1$-dimensional triangle in $k$-dimensional space #pause
+  The simplex $Delta^(k-1)$ is an $k - 1$-dimensional triangle in $k$-dimensional space #pause
 
   #cimage("figures/lecture_5/simplex.svg", height: 70%)
 
@@ -147,7 +147,7 @@ Anything you liked/disliked?
 
 ==
   The softmax function maps real numbers to the simplex (probabilities)
-
+||  || 
   $ "softmax": bb(R)^k |-> Delta^(k - 1) $ #pause
 
   $ "softmax"(vec(x_1, dots.v, x_k)) = (e^(bold(x))) / (sum_(i=1)^k e^(x_i)) = vec(
@@ -443,9 +443,9 @@ Anything you liked/disliked?
     $ (gradient_bold(theta_1) f)(bold(x), bold(theta)) = 
     (gradient sigma)(bold(theta)_3^top sigma(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))))
 
-    dot (gradient sigma)(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))
+    bold(theta)_3 (gradient sigma)(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))
 
-    dot (gradient sigma)(bold(theta)_1^top overline(bold(x)))
+    bold(theta)_2 (gradient sigma)(bold(theta)_1^top overline(bold(x)))
     $ 
 
     ]
@@ -454,15 +454,15 @@ Anything you liked/disliked?
     $ (gradient_bold(theta_1) f)(bold(x), bold(theta)) = 
     underbrace((gradient sigma)(bold(theta)_3^top sigma(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x))))), < 0.25)
 
-    dot underbrace((gradient sigma)(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))), < 0.25)
+    bold(theta)_3 underbrace((gradient sigma)(bold(theta)_2^top sigma(bold(theta)_1^top overline(bold(x)))), < 0.25)
 
-    dot underbrace((gradient sigma)(bold(theta)_1^top overline(bold(x))), < 0.25) overline(bold(x))
+    bold(theta)_2 underbrace((gradient sigma)(bold(theta)_1^top overline(bold(x))), < 0.25) overline(bold(x))
     $ 
     ]
 
     #only(6)[
       #side-by-side[
-      $ max_(bold(theta), bold(x)) (gradient_bold(theta_1) f)(bold(x), bold(theta)) approx 0.01 overline(bold(x)) $
+      $ max_(bold(theta), bold(x)) (gradient_bold(theta_1) f)(bold(x), bold(theta)) approx 0.01 dot dots $
       ][
       $ lim_(ell -> oo) (gradient_bold(theta_1) f)(bold(x), bold(theta)) = 0 $
       ]
