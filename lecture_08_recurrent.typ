@@ -68,19 +68,29 @@ How was exam 2? #pause
 
 You like it more or less than exam 1? #pause
 
+Do you feel like you are learning some deep learning theory? #pause
+- Reason for exams is to make you learn theory, not just `import torch` #pause
+  - "What is shape?" questions make sure you (not LLM) did homework #pause
+- LLMs can write `torch`, writing `torch` is not enough for good job #pause
+
+To do what LLMs cannot, you must understand theory to: #pause
++ Uncover and fix issues when nn does not learn #pause
++ Discover new algorithms and models #pause
+
+
 I am working with TAs upload grades sometime next week
 
 ==
 Teaching schedules for next term released (winter 2026) #pause
 
-I am teaching *CISC7404 Special Topics in Artificial Intelligence* #pause
-- *Focus: Decision Making and Deep Reinforcement Learning* #pause
-  - Q learning, policy gradient, offline RL, imitation learning, RLHF
+Next term, I teach #underline[CISC7404 Special Topics in Artificial Intelligence] #pause
+- *Topic:* Decision Making and Deep Reinforcement Learning #pause
+  - Q learning, policy gradient, offline RL, imitation learning, RLHF #pause
 - RL is my primary research focus #pause
 
 Similar teaching style to this course #pause
-- 2 Assignments
-- 3 exams (best 2 exams scored) 
+- Theory-focused, uses statistics (random variables, expectations, etc) #pause
+- 2 Assignments, 3 exams (best 2 exams scored) #pause
 - Group final project (show last year projects) #pause
 
 Enroll if you are interested!
@@ -810,7 +820,7 @@ Focus on modern methods that solve hard problems #pause
     To summarize, we defined: #pause
     - Recurrent function $f$ #pause
     - Scanned recurrence $scan(f)$ #pause
-    - Output function $g$
+    - Output function $g$ #pause
 
     To run our model: #pause
     - Execute $scan(f)$ over inputs to make recurrent states #pause
@@ -832,32 +842,33 @@ Focus on modern methods that solve hard problems #pause
     - Explaining a video
 
 ==
-    *Task:* Clock -- keep track of time #pause
+    *Task:* Robot navigation #pause
 
-    Every minute, the minute hand ticks #pause
+    Input is robot velocity, output is robot position #pause
 
-    Count/remember the ticks to know the time #pause
-
-    $ X in {0, 1}, quad Y in bb(R)^2 $ 
+    $ X in bb(R)^(2), quad Y in bb(R)^2 $ 
 
 ==
     #side-by-side[Example input sequence:][
-        $ mat(1; 1; dots.v; 1;) $
+        $ vec(bold(x)_1, dots.v, bold(x)_T) = mat(dot(u)_1, dot(v)_1; dots.v, dots.v; dot(u)_T, dot(v)_T) $
     ] #pause
         
 
     #side-by-side[Desired output sequence][
-        $  mat(0, 1; 0, 2; dots.v, dots.v; 2, 13) $
-    ]
+       $ vec(bold(y)_1, dots.v, bold(y)_T) = mat(u_1, v_1; dots.v, dots.v; u_T, v_T) $
+    ] #pause
 
-    We have a corresponding label $bold(y)$ for each input $x$
+    We have a corresponding label $bold(y)$ for each input $x$ #pause
+
+    This is one datapoint (single datapoint has $T$ elements) #pause
+    - Dataset contains $n times T$ positions and velocities
 
 ==
-    Can use square error #pause
+    Regression task, can use square error #pause
 
     First, scan $f$ over the inputs to find $h$
 
-    $ bold(h)_([i], j) = scan(f)(bold(h)_0, vec(bold(x)_([i], 1), dots.v, bold(x)_([i], T)), bold(theta)_f) $ #pause
+    $ vec(bold(h)_([i], 1), dots.v, bold(h)_([i], T)) = scan(f)(bold(h)_0, vec(bold(x)_([i], 1), dots.v, bold(x)_([i], T)), bold(theta)_f) $ #pause
 
     $ cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i=1)^n sum_(j=1)^T sum_(k=1)^d_y [g(bold(h)_([i], j), bold(x)_([i], j), bold(theta)_g)_k - y_([i], j, k)]^2 $ #pause
 
@@ -868,7 +879,7 @@ Focus on modern methods that solve hard problems #pause
 
     $ X in bb(Z)^(3 times 32 times 32), quad Y in {"comedy show", "action movie", ...} $ #pause
 
-    #side-by-side[Example input sequence:][ $ vec(bold(X)_1, bold(X)_2, dots.v, bold(X)_T) $ ] 
+    #side-by-side[Example input sequence:][ $ vec(bold(X)_1, bold(X)_2, dots.v, bold(X)_T) $ ] #pause
 
     #side-by-side[Example output:]["dancing dog"] #pause
 
@@ -879,18 +890,18 @@ Focus on modern methods that solve hard problems #pause
 
     We scan $f$ over the sequence, then compute $g$ for the final timestep #pause
 
-    $ bold(h)_([i],j) = scan(f)(bold(h)_0, vec(bold(x)_([i], 1), dots.v, bold(x)_([i], T)), bold(theta)_f) $ #pause
+    $ vec(bold(h)_([i], 1), dots.v, bold(h)_([i], T)) = scan(f)(bold(h)_0, vec(bold(x)_([i], 1), dots.v, bold(x)_([i], T)), bold(theta)_f) $ #pause
 
-    $ cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_y) y_([i], j) log g(bold(h)_([i], T), bold(x)_([i], T), bold(theta)_g)_j $ #pause
+    $ cal(L)(bold(X), bold(Y), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_y) y_([i], j) log g(bold(h)_([i], #redm[$T$]), bold(x)_([i], #redm[$T$]), bold(theta)_g)_j $ #pause
 
     We only care about the $bold(h)_T$
 
 ==
     To summarize, we use standard losses for recurrent loss functions #pause
 
-    Just be careful -- we often sum over an additional axis
-
     $ sum_(i=1)^n #redm[$sum_(j=1)^T$] sum_(k=1)^(d_y) dots $
+
+    Just be careful -- we often sum over an additional axis
 
 = Backpropagation Through Time
 ==
@@ -899,6 +910,7 @@ Focus on modern methods that solve hard problems #pause
     + Now we need to find the parameters! #pause
 
     Just like other models, we train recurrent models using gradient descent #pause
+    - State $bold(h)$ updates over time, we must *backpropagate through time* #pause
 
     *Step 1:* Compute gradient #pause
 
@@ -919,19 +931,19 @@ Focus on modern methods that solve hard problems #pause
     Too easy, now let us find the gradient of $scan(f)$
 
 ==
-    $ scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(f(h_0, x_1, bold(theta)), f(h_1, x_2, bold(theta)), dots.v, f(h_(T-1), x_T, bold(theta))) = vec(f(h_0, x_1), f(f(h_0, x_1), x_2), dots.v, f( dots f(h_0, x_1) dots, x_T)) $ #pause
+    $ scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(f(bold(h)_0, bold(x)_1, bold(theta)), f(bold(h)_1, bold(x)_2, bold(theta)), dots.v, f(bold(h)_(T-1), bold(x)_T, bold(theta))) = vec(f(bold(h)_0, bold(x)_1), f(f(bold(h)_0, bold(x)_1), bold(x)_2), dots.v, f( dots f(bold(h)_0, bold(x)_1) dots, bold(x)_T)) $ #pause
 
     #side-by-side[*Question:* What is $gradient_bold(theta) scan(f)$?][*Hint:* Chain rule] #pause
 
-    $ gradient_bold(theta) scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
-        (gradient_bold(theta)f)(bold(h)_0, x_1), 
-        (gradient_bold(theta)f)(f(bold(h)_0, x_1), x_2) (gradient_bold(theta) f)(bold(h)_0, x_1), 
+    $ (gradient_bold(theta) scan(f))(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
+        (gradient_bold(theta)f)(bold(h)_0, bold(x)_1), 
+        (gradient_bold(theta)f)(f(bold(h)_0, bold(x)_1), bold(x)_2) (gradient_bold(theta) f)(bold(h)_0, bold(x)_1), 
         dots.v, 
-        (gradient_bold(theta) f)(dots f(bold(h)_0, x_1) dots, x_T) dots dot (gradient_bold(theta) f)(bold(h)_0, x_1)
+        (gradient_bold(theta) f)(dots f(bold(h)_0, bold(x)_1) dots, bold(x)_T) dots (gradient_bold(theta) f)(bold(h)_0, bold(x)_1)
     ) $
 
 ==
-    $ gradient_bold(theta) scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
+    $ (gradient_bold(theta) scan(f))(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
         gradient_bold(theta) f,
         (gradient_bold(theta) f) space (gradient_bold(theta) f),
         (gradient_bold(theta) f) space (gradient_bold(theta) f) space (gradient_bold(theta) f),
@@ -971,7 +983,8 @@ $ f(bold(h), bold(x), bold(theta)) = bold(h) + bold(theta)^top overline(bold(x))
   $ sigma(bold(h)) + bold(theta)^top overline(bold(x)) $ #pause
 ]
 
-All work, and all are recurrent neural networks!
+All work, and all are recurrent neural networks! #pause
+- In practice, we often use $sigma(bold(h) + bold(theta)^top overline(bold(x)))$ form
 
 ==
     The simplest common recurrent neural network is the *Elman Network* #pause
@@ -1015,8 +1028,9 @@ All work, and all are recurrent neural networks!
     *Question:* $sigma$ is sigmoid. What is co-domain of $f_"forget"$? #pause
 
     *Answer:* $[0, 1]$ #pause
-
-    When $f_"forget" < 1$, we forget some of our memories! #pause
+    - When $f_"forget" = 1$, we forget nothing! 
+    - When $f_"forget" = 0$, we forget everything! 
+    - When $0 < f_"forget" < 1$, we forget some things! #pause
 
     Neural network learns which memories to forget with gradient descent
 
@@ -1032,18 +1046,21 @@ All work, and all are recurrent neural networks!
     $ #pause
 
     $ 
-    f_2(bold(h), bold(x), bold(theta)) = sigma(
+    f_2(bold(h), bold(x), bold(theta)) = underbrace(sigma(
         bold(theta)_3^top overline(bold(x)) + bold(theta)_4^top 
             f_"forget" (bold(h), bold(x), bold(theta)) dot.circle bold(h)
-    ) 
+    ), "Make new memories") 
     $ #pause
 
     $
     f(bold(h), bold(x), bold(theta)) = 
-        f_"forget" (bold(h), bold(x), bold(theta)) dot.circle bold(h) + (1 - f_"forget" (bold(h), bold(x), bold(theta))) dot.circle f_2(bold(h), bold(x), bold(theta))
+        underbrace(
+          f_"forget" (bold(h), bold(x), bold(theta)) dot.circle bold(h)
+        , "Forget old memories") + 
+        underbrace((1 - f_"forget" (bold(h), bold(x), bold(theta))), "Replace") dot.circle underbrace(f_2(bold(h), bold(x), bold(theta)), "New memories")
     $ #pause
 
-    Left term forgets old, right term replaces forgotten memories
+    Only forget when we have new information to remember
 
 ==
     There are even more complicated models #pause
@@ -1070,14 +1087,14 @@ All work, and all are recurrent neural networks!
 ==
     #side-by-side[Elman network $f$:][$ f(bold(h), bold(x), bold(theta)) = sigma(bold(theta)^top_1 bold(h) + bold(theta)^top_2 overline(bold(x))) $] #pause
 
-    $ gradient_bold(theta) scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
+    $ (gradient_bold(theta) scan(f))(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
         gradient_bold(theta) f,
         (gradient_bold(theta) f) (gradient_bold(theta) f),
         (gradient_bold(theta) f) (gradient_bold(theta) f) (gradient_bold(theta) f),
         dots.v
     ) $ #pause        
 
-    $ gradient_bold(theta) scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
+    $ (gradient_bold(theta) scan(f))(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
         gradient sigma,
         (gradient sigma) (gradient sigma),
         (gradient sigma) (gradient sigma) (gradient sigma),
@@ -1085,7 +1102,7 @@ All work, and all are recurrent neural networks!
     ) $ 
 
 ==
-    $ gradient_bold(theta) scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
+    $ (gradient_bold(theta) scan(f))(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
         gradient sigma,
         (gradient sigma) (gradient sigma),
         (gradient sigma) (gradient sigma) (gradient sigma),
@@ -1107,7 +1124,7 @@ All work, and all are recurrent neural networks!
 
   Other works select eigenvalues near 1 to bound gradients #pause
   
-  $ sigma(bold(theta)^top bold(x)) = lambda bold(x); lambda approx 1 $ #pause
+  $ nabla sigma(bold(theta)^top bold(x)) = lambda bold(x); quad lambda approx 1 $ #pause
 
   But this restricts the power of the neural network
 
@@ -1117,3 +1134,12 @@ All work, and all are recurrent neural networks!
     Jax RNN https://colab.research.google.com/drive/147z7FNGyERV8oQ_4gZmxDVdeoNt0hKta#scrollTo=TUMonlJ1u8Va
 
     Homework https://colab.research.google.com/drive/1CNaDxx1yJ4-phyMvgbxECL8ydZYBGQGt?usp=sharing
+
+= Find a Group
+==
+All students *must stay 10 more minutes today* #pause
+- Talk to each other to find a group of 4-5 people #pause
+  - Discuss your project ideas, skills, etc #pause
+- Cannot do final project alone #pause
+
+Groups with 5 members can leave now (Groups S, P, A)
