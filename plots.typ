@@ -28,6 +28,26 @@
     })
 })}
 
+#let forgetting = { 
+    set text(size: 22pt)
+    canvas(length: 1cm, {
+  plot.plot(size: (8, 6),
+    x-tick-step: 10,
+    y-tick-step: 0.5,
+    y-min: 0,
+    y-max: 1,
+    x-label: [Time],
+    y-label: [$ bold(h) $],
+    {
+      plot.add(
+        domain: (0, 40), 
+        label: [Memory Strength],
+        style: (stroke: (thickness: 5pt, paint: red)),
+        t => calc.pow(0.9, t)
+      )
+    })
+})}
+
 //
 // Activation Functions
 //

@@ -294,14 +294,14 @@
   // Q: Why do we want to do this?
 
 ==
-  #side-by-side[#cimage("figures/lecture_9/shrek.jpg") #pause][
+  #side-by-side[#cimage("figures/lecture_9/kungfu.jpg", height: 100%) #pause][
     *Question:* You watch a film. How do you communicate information about the film with a friend? #pause
 
-    *Answer:* An ogre and donkey rescue a princess, discovering friendship and love along the way. #pause
+    *Answer:* Fat panda becomes kung fu master to defend his village from an evil snow leopard. #pause
 
     *Question:* What is missing? #pause
 
-    *Answer:* Shrek lives in a swamp, Lord Farquaad, dragons, etc
+    *Answer:* Goose father, tortoise teacher, tiger friend, magic scroll, etc
   ]
 
 ==
@@ -309,7 +309,7 @@
 
   This is a form of *compression* #pause
 
-  $ f(vec(bold(x)_1, dots.v, bold(x)_n)) = "Green ogre and donkey save princess" $ #pause
+  $ f(vec(bold(x)_1, dots.v, bold(x)_n)) = "Fat panda saves village" $ #pause
 
   In compression, we reduce the size of data by removing information #pause
 
