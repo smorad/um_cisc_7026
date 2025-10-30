@@ -480,7 +480,7 @@
 
   *Step 2:* Generate a sample from distribution
 
-  $ bold(z) = bold(mu) + bold(sigma) dot.circle bold(epsilon) $ #pause
+  $ bold(z) = bold(mu) + bold(sigma) dot.o bold(epsilon) $ #pause
 
   *Step 3:* Decode the sample 
 
@@ -780,7 +780,7 @@
 
     $ f_"forget" (bold(x), bold(theta)) = sigma(bold(theta)^top_lambda overline(bold(x))) $ #pause
 
-    $ f(bold(h), bold(x), bold(theta)) = f_"forget" (bold(x), bold(theta)) dot.circle bold(h) +  bold(theta)_x^top overline(bold(x)) $ 
+    $ f(bold(h), bold(x), bold(theta)) = f_"forget" (bold(x), bold(theta)) dot.o bold(h) +  bold(theta)_x^top overline(bold(x)) $ 
 ]
 
 /*
@@ -789,7 +789,7 @@
 
     $ f_"forget" (bold(x), bold(theta)) = sigma(bold(theta)^top_lambda overline(bold(x))) $ #pause
 
-    $ f(bold(h), bold(x), bold(theta)) = f_"forget" (bold(x), bold(theta)) dot.circle bold(h) +  bold(theta)_x^top overline(bold(x)) $ #pause
+    $ f(bold(h), bold(x), bold(theta)) = f_"forget" (bold(x), bold(theta)) dot.o bold(h) +  bold(theta)_x^top overline(bold(x)) $ #pause
 
     Let us do something similar #pause
 

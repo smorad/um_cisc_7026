@@ -8,7 +8,7 @@
 #import algorithmic: style-algorithm, algorithm-figure, algorithm
 #import "@preview/mannot:0.3.0": *
 
-#let handout = true
+#let handout = false 
 
 
 // FUTURE TODO: Repeat self too much on locality/equivariance, restructure and replace with something else
@@ -56,16 +56,6 @@
 
 
 // TODO: Why is encoder tractable but decoder is not?
-
-#let ag = (
-  [Review],
-  [Compression],
-  [Autoencoders],
-  [Applications],
-  [Variational Modeling],
-  [VAE Implementation],
-  [Coding]
-)
 
 = Review
 ==
@@ -230,7 +220,7 @@
     $ 
     f (bold(h), bold(x), bold(theta)) = 
     sigma(
-        bold(theta)_1^top bold(h) #redm[$dot.circle f_"forget" (bold(h), bold(x), bold(theta))$] + bold(theta)_2^top overline(bold(x)) 
+        bold(theta)_1^top bold(h) #redm[$dot.o f_"forget" (bold(h), bold(x), bold(theta))$] + bold(theta)_2^top overline(bold(x)) 
     )
     $ #pause
 
@@ -259,13 +249,13 @@
     $ 
     f_2(bold(h), bold(x), bold(theta)) = sigma(
         bold(theta)_3^top overline(bold(x)) + bold(theta)_4^top 
-            f_"forget" (bold(h), bold(x), bold(theta)) dot.circle bold(h)
+            f_"forget" (bold(h), bold(x), bold(theta)) dot.o bold(h)
     ) 
     $ #pause
 
     $
     f(bold(h), bold(x), bold(theta)) = 
-        f_"forget" (bold(h), bold(x), bold(theta)) dot.circle bold(h) + (1 - f_"forget" (bold(h), bold(x), bold(theta))) dot.circle f_2(bold(h), bold(x), bold(theta))
+        f_"forget" (bold(h), bold(x), bold(theta)) dot.o bold(h) + (1 - f_"forget" (bold(h), bold(x), bold(theta))) dot.o f_2(bold(h), bold(x), bold(theta))
     $ #pause
 
     Left term forgets old, right term replaces forgotten memories
@@ -294,7 +284,7 @@
   // Q: Why do we want to do this?
 
 ==
-  #side-by-side[#cimage("figures/lecture_9/kungfu.jpg", height: 100%) #pause][
+  #side-by-side(align: left)[#cimage("figures/lecture_9/kungfu.jpg", height: 100%) #pause][
     *Question:* You watch a film. How do you communicate information about the film with a friend? #pause
 
     *Answer:* Fat panda becomes kung fu master to defend his village from an evil snow leopard. #pause
@@ -316,7 +306,7 @@
   Let us examine a more principled form of video compression
 
 ==
-  Shrek in 4k UHD: $ X in bb(Z)_(255)^(3 times 3840 times 2160), X^(90 times 60 times 24) $ #pause
+  Kung Fu Panda in 4k UHD: $ X in {0, dots, 255}^(3 times 3840 times 2160), X^(90 times 60 times 24) $ #pause
 
   *Question:* How many GB? #pause
 
@@ -324,17 +314,19 @@
 
   But if you download films, you know they are smaller than 3 TB #pause
 
-  Today, we use the H.264 video *encoder* to transform videos into a more compact representation
+  Usually you download an `mp4` or `mpeg4` file #pause
+
+  `mp4` uses `H.264` video *encoder* to compress information 
 
 
 // Encoder and decoder of H264
 // Why do we need to encode and decode
 ==
-  H.264 encoder selects $16 times 16$ pixel blocks, estimates shift between frames, applies cosine transform, ... #pause
+  `H.264` encoder selects $16 times 16$ pixel blocks, estimates shift between frames, applies cosine transform, ... #pause
 
   The result is an `.mp4` file $Z$ #pause
 
-  #side-by-side[$ f: X^t |-> Z $][$ Z in {0, 1}^n $] #pause
+  #side-by-side[$ f: X^t |-> Z $][$ Z in {0, 1}^k $] #pause
 
   *Question:* What is the size of $Z$ in GB? #pause
 
@@ -343,7 +335,7 @@
   We achieve a compression ratio of $3000 "GB /" 60 "GB" = 50$ 
 
 ==
-  What happens on your computer when you watch Shrek? #pause
+  What happens on your computer when you watch Kung Fu Panda? #pause
 
   #side-by-side[Download $bold(z) in Z$ from the internet #pause][$ Z in {0, 1}^n $] #pause
 
@@ -351,13 +343,13 @@
 
   We must *decode* $bold(z)$ back into pixels #pause
 
-  We need to undo (invert) the encoder $f$
+  We need to undo (invert) the encoder $f$ #pause
 
   $ f: X^t |-> Z $
 
   $ f^(-1): Z |-> X^t $ #pause
 
-  You CPU has a H.264 decoder built in to make this fast
+  You CPU has an `H.264` hardware decoder to make this fast
 
 ==
   #side-by-side[
@@ -367,7 +359,7 @@
   ] #pause
   #cimage("figures/lecture_9/lossy.jpg", height: 70%) #pause
 
-  *Question:* Which is H.264?
+  *Question:* Which is `H.264`?
 
 = Autoencoders
 ==
@@ -375,7 +367,7 @@
 
   Neural networks can represent any continuous function #pause
 
-  Let us learn neural network encoders and decoders #pause
+  We can use neural networks to represent encoders and decoders #pause
 
   $ f: X times Theta |-> Z $ #pause
 
@@ -399,7 +391,8 @@
 
     $ bold(X) = mat(x_[1], x_[2], dots, x_[n])^top $ #pause
 
-    The training algorithm will learn *unsupervised* (only from $bold(X)$)
+    The training algorithm will learn *unsupervised* (only from $bold(X)$) #pause
+    - Humans do not need to provide labels!
 
 ==
   //TODO: Benefits of data-specific encoding vs general
@@ -410,7 +403,7 @@
 
   #side-by-side[$ X in [0, 1]^(d_x) $][$ Z in bb(R)^(d_z) $] #pause
 
-  #side-by-side[$ d_x: 28 times 28 $][$ d_z: 4 $] #pause
+  #side-by-side[$ d_x: 28 times 28 $][$ d_z: 3 $] #pause
 
   #side-by-side[$ f: X times Theta |-> Z $][
     $ f^(-1): Z times Theta |-> X $
@@ -423,26 +416,26 @@
 
   Start with a perceptron #pause
 
-  $ f(bold(x), bold(theta)) = sigma(bold(theta)^top overline(bold(x))); quad bold(theta) in bb(R)^(d_x times d_z) $ #pause
+  $ f(bold(x), bold(theta)) &= sigma(bold(theta)^top overline(bold(x))); quad bold(theta) in bb(R)^((d_x + 1) times d_z) #pause \
 
-  $ bold(z) = sigma(bold(theta)^top overline(bold(x))) $ #pause
+  bold(z) &= sigma(bold(theta)^top overline(bold(x))) $ #pause
 
   Solve for $bold(x)$ to find the inverse #pause
 
-  $ sigma^(-1)(bold(z)) = sigma^(-1)(sigma(bold(theta)^top overline(bold(x)))) $ #pause
+  $ sigma^(-1)(bold(z)) &= sigma^(-1)(sigma(bold(theta)^top overline(bold(x)))) #pause \
 
-  $ sigma^(-1)(bold(z)) = bold(theta)^top overline(bold(x)) $
+  sigma^(-1)(bold(z)) &= bold(theta)^top overline(bold(x)) $
 
 ==
-  $ sigma^(-1)(bold(z)) = bold(theta)^top overline(bold(x)) $ #pause
+  $ sigma^(-1)(bold(z)) &= bold(theta)^top overline(bold(x)) #pause \
 
-  $ (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) = (bold(theta)^top)^(-1) bold(theta)^top overline(bold(x)) $ #pause
+  (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) &= (bold(theta)^top)^(-1) bold(theta)^top overline(bold(x)) #pause \
 
-  $ (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) = bold(I) overline(bold(x)) $ #pause
+  (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) &= bold(I) overline(bold(x)) #pause \
 
-  $ (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) = overline(bold(x)) $ #pause
+  (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) &= overline(bold(x)) #pause \
 
-  $ f^(-1)(bold(z), bold(theta)) =  (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) $
+  f^(-1)(bold(z), bold(theta)) &=  (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) $
 
 ==
   #side-by-side[
@@ -450,10 +443,10 @@
   ][
     $ f^(-1)(bold(z), bold(theta)) = (bold(theta)^top)^(-1) sigma^(-1)(bold(z)) $
   ][
-    $ bold(theta) in bb(R)^(d_x times d_z) $
+    $ bold(theta) in bb(R)^((d_x + 1) times d_z) $
   ] #pause
 
-  *Question:* Any issues? #h(5em) *Hint:* What if $d_x != d_z$? #pause
+  *Question:* Any issues? #pause #h(5em) *Hint:* What if $d_x != d_z$? #pause
 
   *Answer:* Can only invert square matrices, $bold(theta)^top$ only invertible if $d_z = d_x$ #pause
 
@@ -469,9 +462,9 @@
 ==
   Let us try another way #pause
 
-  $ bold(z) = f(bold(x), bold(theta)_e) = sigma(bold(theta)_e^top bold(overline(x))) $
+  $ bold(z) &= f(bold(x), bold(theta)_e) & = sigma(bold(theta)_e^top bold(overline(x))) \ #pause
 
-  $ bold(x) = f^(-1)(bold(z), bold(theta)_d) = sigma(bold(theta)_d^top bold(overline(z))) $ #pause
+  bold(x) &= f^(-1)(bold(z), bold(theta)_d) & = sigma(bold(theta)_d^top bold(overline(z))) $ #pause
 
   What if we plug $bold(z)$ into the second equation?
 
@@ -489,7 +482,7 @@
   //$ f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d) $
 
 ==
-  $ bold(x) = f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d) = sigma(bold(theta)_d^top bold(sigma(bold(theta)_e^top bold(overline(x))))) $ #pause
+  $ bold(x) = f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d) = sigma(bold(theta)_d^top sigma(bold(theta)_e^top bold(overline(x)))) $ #pause
 
   More generally, $f, f^(-1)$ may be any neural network #pause
 
@@ -510,7 +503,379 @@
 
   We call this the *reconstruction loss* #pause
 
-  It is an unsupervised loss because we only provide $bold(X)$ and not $bold(Y)$!
+==
+  $ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_j)^2 $ #pause
+
+  The reconstruction loss is an *unsupervised loss* #pause
+  - No traditional labels $Y$! #pause
+  - Learns from unlabeled data $X$
+
+==
+So far, we consider only a perceptron and mean square error #pause
+
+There are many types of autoencoder architectures and objectives 
+
+= Convolutional Autoencoders
+==
+#side-by-side(align: left)[#cimage("figures/lecture_9/kungfu.jpg", height: 80%) #cimage("figures/lecture_9/kungfu.jpg", height: 10%) #pause][
+*Task:* Compress an image #pause
+
+$ 1"MB" -> 10"kb" $ #pause
+
+For Fashion MNIST we used perceptron #pause
+
+*Question:* Do we have better networks for images? #pause
+
+*Question:* Use convolutional network. Why? #pause
+
+*Answer:* More efficient than perceptrons (data/parameters)
+]
+==
+With autoencoders we must contract then expand #pause
+
+$ f: &bb(R)^(d_x) times Theta &&|-> bb(R)^(d_z) quad d_z < d_x \
+f^(-1): &bb(R)^(d_z) times Theta &&|-> bb(R)^(d_x) $ #pause
+
+*Question:* Do convolution and pooling contract or expand? #pause
+
+*Answer:* Usually contract, reduce the size of the signal #pause
+
+To create a convolutional decoder, we must expand the signal #pause
+
+To expand the signal, we must "invert" convolution and pooling
+
+==
+Let us first try and "invert" pooling #pause
+
+Consider sum pooling (adaptive $2 times 2$) #pause
+
+  #let c = cetz-canvas({
+    import cetz.draw: *
+
+    content((2, 2), image("figures/lecture_7/ghost_dog_bw.svg", width: 4cm))
+    
+    draw_filter(
+      0, 0,
+      (
+        (1, 1, 1, 1),
+        (0, 0, 1, 0),
+        (1, 0, 0, 1),
+        (1, 0, 1, 1),
+      )
+    )
+
+  content((2, -1), text(size: 40pt)[$sum$])
+
+  draw_filter(
+    1, -4,
+    (
+      (" ", " "),
+      (" ", " ")
+    )
+  ) 
+
+  })
+  
+  #let d = cetz-canvas({
+    import cetz.draw: *
+
+    content((2, 2), image("figures/lecture_7/ghost_dog_bw.svg", width: 4cm))
+    
+    draw_filter(
+      0, 0,
+      (
+        (" ", " ", " ", " "),
+        (" ", " ", " ", " "),
+        (" ", " ", " ", " "),
+        (" ", " ", " ", " "),
+      )
+    )
+
+  content((2, -1), text(size: 40pt)[$sum$])
+
+  draw_filter(
+    1, -4,
+    (
+      (2, 3),
+      (2, 3)
+    )
+  ) 
+})
+
+  #side-by-side[#c #pause][#d #pause]
+
+  This "inverse" pooling has two names: *unpooling* and *upsampling*
+
+==
+Upsampling does not use parameters! #pause
+  - Only upscaling $bold(z)$ will not provide a good reconstruction #pause
+  - Need to introduce learned parameters #pause
+    - Combine with convolution layers or "inverse" convolution layers
+
+==
+
+  Let us try and "invert" convolution #pause
+
+  #let c = cetz-canvas({
+    import cetz.draw: *
+
+    content((2, 2), image("figures/lecture_7/ghost_dog_bw.svg", width: 4cm))
+    
+    draw_filter(
+      0, 0,
+      (
+        (1, 1, 1, 1),
+        (0, 0, 1, 0),
+        (1, 0, 0, 1),
+        (1, 0, 0, 1),
+      )
+    )
+
+  content((2, -1), text(size: 40pt)[$*$])
+
+  draw_filter(
+    1, -4,
+    (
+      (1, 0),
+      (0, 1)
+    )
+  ) 
+
+  content((6, 0), text(size: 40pt)[$=$])
+  
+  draw_filter(
+    7, -1,
+    (
+      (" ", " "),
+      (" ", " ")
+    )
+  )
+  })
+  
+  #let d = cetz-canvas({
+  import cetz.draw: *
+
+  content((2, 2), image("figures/lecture_7/ghost_dog_bw.svg", width: 4cm))
+  
+  draw_filter(
+    0, 0,
+    (
+      (" ", " ", " ", " "),
+      (" ", " ", " ", " "),
+      (" ", " ", " ", " "),
+      (" ", " ", " ", " "),
+    )
+  )
+
+content((2, -1), text(size: 40pt)[$*$])
+
+draw_filter(
+  1, -4,
+  (
+    (1, 0),
+    (0, 1)
+  )
+) 
+
+content((6, 0), text(size: 40pt)[$=$])
+
+
+draw_filter(
+  7, -1,
+  (
+    (1, 0),
+    (1, 1)
+  )
+)
+})
+
+  #side-by-side[#c #pause][#d #pause]
+
+  We call this *deconvolution* or *transposed convolution*
+
+==
+Transposed convolution is similar to upsampling #pause
+- Unlike upsampling, we learn the filters (parameters) #pause
+
+New "inverse" operations let us construct a convolutional decoder
+- Many different ways to do this
+
+==
+Symmetric convolution-only autoencoder
+
+#side-by-side(align: top)[
+  ```python
+  encoder = Sequential(
+
+    Conv2d(3, 16, 3) 
+    LeakyReLU()
+
+    Conv2d(16, 32, 3)
+    LeakyReLU() 
+    ...
+    Conv2d(32, 32, 3)
+    Flatten()
+  )
+  ```
+][
+  ```python
+  decoder = Sequential(
+    Unflatten()
+    ConvTranspose2d(32, 32, 3)
+    LeakyReLU()
+
+    ConvTranspose2d(32, 16, 3)
+    LeakyReLU()
+    ...
+    ConvTranspose2d(16, 3, 3)
+
+  )
+  ```
+]
+
+==
+Modern architectures use asymmetric `conv -> upsample` blocks
+
+#side-by-side(align: top)[
+  ```python
+  encoder = Sequential(
+
+    # Block
+    Conv2d() 
+    MaxPool()
+    LeakyReLU()
+
+    ...
+    Conv2d()
+    Flatten()
+  )
+  ```
+][
+  ```python
+  decoder = Sequential(
+    Unflatten()
+    # Block
+    Upsample()
+    Conv2d()
+    LeakyReLU()
+
+    ...
+    Conv2d()
+  )
+  ```
+]
+
+==
+Asymmetric upsample autoencoders tend to work better #pause
+- `Upsample -> Conv -> Activation` #pause
+- Finding filter size, stride, etc that produce the same shape is painful #pause
+
+I use symmetric autoencoders because they are easier to implement #pause
+- `ConvTranspose -> Activation` #pause
+- Usually just reorder encoder arguments #pause
+  - `Conv2d(A, B, C) -> ConvTranspose2d(B, A, C)`
+
+= Recurrent Autoencoders
+==
+#side-by-side(align: left)[
+    #cimage("figures/lecture_9/kfp1.jpg")
+
+    #cimage("figures/lecture_9/kfp2.jpg")
+
+    $ dots.v $
+][
+  *Task:* Compress entire film (sequence of images) #pause
+
+  *Step 1:* Compress image to $bold(z)$ #pause
+
+  *Step 2:* #pause Compress $bold(z)_1, dots bold(z)_T -> bold(h)$ #pause
+
+  *Question:* What models process a sequence of inputs? #pause
+
+  *Answer:* Recurrent neural networks!
+]
+==
+Recall the recurrent neural network type signatures #pause
+
+$ f&: H times X times Theta &&|-> H \ #pause
+scan(f)&: H times X^T times Theta &&|-> H^T \ #pause
+$
+
+*Question:* This is the encoder, what about decoder? #pause
+
+$ g: H times X times Theta |-> X $ #pause
+
+*Question:* Any problems? #pause *Answer:* Need input to reconstruct input #pause
+
+$ f^(-1): H times Theta |-> X $ #pause
+
+$ scan(f^(-1)): H times Theta |-> H^T times X^T $ #pause
+
+==
+
+$ f(bold(h)_0, 
+    underbrace(#image("figures/lecture_9/kfp1.jpg", height: 20%), bold(x)_1),
+bold(theta)_e) = bold(h)_1 $ #pause
+
+$ dots.v $ #pause
+
+$ f(bold(h)_(T - 1), 
+    underbrace(#image("figures/lecture_9/kfp2.jpg", height: 20%), bold(x)_T),
+bold(theta)_e) = bold(h)_T $ #pause
+
+==
+$ f(bold(h)_T, bold(theta)_d) = hat(bold(h))_(T - 1), underbrace(#image("figures/lecture_9/kfp2.jpg", height: 20%), bold(x)_T) $ #pause
+
+$ dots.v $ #pause
+
+$ f(bold(h)_1, bold(theta)_d) = hat(bold(h))_(0), underbrace(#image("figures/lecture_9/kfp1.jpg", height: 20%), bold(x)_T) $ 
+
+==
+```python
+# Compress images to latent sequence
+zs = vmap(cnn_encoder)(frames)
+h0 = zeros(d_h)
+# Compress sequence to latent vector
+hT, hs = scan(rnn_encoder, init=h0, xs=zs)
+# Final state should hold all film info
+# Decompress final state into latent sequence
+recon_zs = scan(rnn_decoder, init=hT, xs=zeros(d_z * T))
+# Decompress latent sequence into images 
+recon_frames = vmap(cnn_decoder)(recon_zs)
+grads = grad(lambda x, xhat: mean((x - xhat) ** 2))(
+  frames, recon_frames
+)
+```
+
+= Applications and Objectives
+==
+Can make many types of autoencoders #pause
+- Graph neural network autoencoders #pause
+- Transformer autoencoders #pause
+
+So far, we considered the reconstruction objective #pause
+
+$ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_j)^2 $ #pause
+
+This objective is useful for compression #pause
+
+Could we use autoencoders for other tasks?
+
+
+/*
+==
+TODO
+Convolutional AE
+ConvTranspose
+Upsample
+UNet
+Recurrent AE
+Elmo
+AEs learn features
+Denoising AE
+Anomoly detection
+Contractive AE 
+Sparse AE
 
 ==
   First coding exercise
@@ -519,7 +884,145 @@
 
   https://www.youtube.com/watch?v=UZDiGooFs54
 
-// Denoising autoencoder
+*/
+
+==
+*Task:* Remove noise from an image #pause
+
+#cimage("figures/lecture_9/denoise.jpg", height: 70%) #pause
+
+Can we do this with autoencoders?
+
+==
+
+  $ "Reconstruction loss" quad cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_j)^2 $ #pause
+
+  #side-by-side[Generate some noise][
+    $ bold(epsilon) tilde cal(N)(bold(mu), bold(sigma)) $
+  ] #pause
+
+  $ "Denoising loss" quad cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f(bold(x)_[i] #redm[$+ bold(epsilon)$], bold(theta)_e), bold(theta)_d)_j)^2 $ #pause
+
+  Add noise to input $bold(x) + bold(epsilon)$, reconstruct $bold(x)$ without noise
+
+  Autoencoder will learn to remove noise when reconstructing image
+
+==
+  *Task:* Remove blurring from an image #pause
+
+  #cimage("figures/lecture_9/blur.jpg", height: 80%)
+
+==
+  $ "Reconstruction loss" quad cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_j)^2 $ #pause
+  
+  #side-by-side[Create blurry image][$ "blur"(bold(x)) $] #pause
+
+  Denoising deblur loss
+
+  $ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f( #redm[blur];(bold(x)_[i]), bold(theta)_e), bold(theta)_d)_j)^2 $ 
+
+==
+*Task:* Fix blurry and noisy image #pause
+
+$ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f( #redm[blur];(bold(x)_[i] + #bluem[$bold(epsilon)$]), bold(theta)_e), bold(theta)_d)_j)^2 $ 
+
+#side-by-side[
+  #cimage("figures/lecture_9/enhance0.jpg")
+][
+  #cimage("figures/lecture_9/enhance1.jpg")
+]
+
+==
+  We can deblur faces from security cameras
+
+  #cimage("figures/lecture_9/deblur.gif", height: 80%)
+
+  Autoencoders are very powerful!
+
+= Emergent Intelligence
+
+==
+Something very interesting happens with autoencoders #pause
+
+This becomes clear when we consider one last application
+
+==
+*Task:* Fix image with missing pixels #pause
+
+
+$ "Reconstruction loss" quad cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_j)^2 $ #pause
+
+
+#side-by-side[Sample Bernoulli noise][$ bold(b) tilde cal(B)(0.2) $] #pause
+
+Masked reconstruction loss
+
+$ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f(bold(x)_[i] #redm[$dot.o bold(b)$] , bold(theta)_e), bold(theta)_d)_j)^2 $ 
+
+==
+#side-by-side(align: left)[
+  #cimage("figures/lecture_9/masked.png") #pause
+][
+  Understanding emerges from reconstruction objectives #pause
+
+  *Without labels*, autoencoders learn what a bird is, what a bear is #pause
+
+  They learn the structure and distribution of the input data $X$ #pause
+
+  If the input data $X$ is from our world, then they begin to understand our world
+
+  //To compress, denoise, deblur, or demask inputs, autoencoders must understand our world #pause
+
+  //Reconstruction losses are a surrogate objective for world understanding 
+]
+
+==
+  #side-by-side(align: left)[
+    #cimage("figures/lecture_9/lung.jpg", height: 100%) #pause
+  ][
+    $X:$ Pictures of human lungs #pause
+
+    $Z in bb(R)^2$ #pause
+
+    Learns the structure of lungs from images #pause
+
+    Differentiates sick and healthy lungs without being told
+
+  ]
+
+==
+  If the dataset is lung images, the model learns the structure of lungs #pause
+
+  If the dataset is pictures from our world, then the autoencoders learn the structure of the world #pause
+
+  Nobody tells an autoencoder what a dog or cat is #pause
+
+  They learn this on their own
+
+==
+  #cimage("figures/lecture_9/clustering.png", height: 100%)
+
+==
+  #cimage("figures/lecture_9/dino.png", height: 100%)
+
+==
+  Some say "neural networks do not understand", they just learn patterns #pause
+
+  Humans are also pattern recognition machines #pause
+
+  #cimage("figures/lecture_9/face.jpg", height: 60%) #pause
+
+  *Opinion:* These networks understand our world as well as humans
+
+==
+Let us demonstrate this 
+  
+https://colab.research.google.com/drive/1UyR_W6NDIujaJXYlHZh6O3NfaCAMscpH#scrollTo=nmyQ8aE2pSbb
+
+https://www.youtube.com/watch?v=UZDiGooFs54
+
+
+/*
 = Applications
 ==
   We can use autoencoders for more than compression #pause
@@ -621,13 +1124,6 @@
 
 = Variational Modeling
 ==
-  #cimage("figures/lecture_9/vae_gen_faces.png", height: 70%) #pause
-
-  These pictures were created by a *variational* autoencoder #pause
-
-  But these people do not exist!
-
-==
   Autoencoders are useful for compression and denoising #pause
 
   But we can also use them as *generative models* #pause
@@ -669,13 +1165,21 @@
   Decode $bold(z)_"new"$ into $bold(x)_"new"$
   ]
 
+/*
+==
+  #cimage("figures/lecture_9/vae_gen_faces.png", height: 70%) #pause
+
+  These pictures were created by a *variational* autoencoder #pause
+
+  But these people do not exist!
+*/
 ==
   #cimage("figures/lecture_9/vae_gen_faces.png", height: 70%) #pause
 
   $ f^(-1)(bold(z)_k + bold(epsilon), bold(theta)_d) $
 
 ==
-  #side-by-side[
+  #side-by-side(align: left)[
   
   But there is a problem, the *curse of dimensionality* #pause
 
@@ -757,11 +1261,17 @@
   $ z: mat("woman", "brown hair", ("frown" | "smile")) $
 
 ==
-  #cimage("figures/lecture_9/vae_slider.png") #pause
+  #cimage("figures/lecture_9/vae_slider.png")
 
   Network can only see $bold(x)$, it cannot directly observe $bold(z)$ #pause
 
   Given $bold(x)$, find the probability that the person is smiling $P(bold(z) | bold(x); bold(theta))$
+
+==
+
+
+
+TODO
 
 ==
   We cast the autoencoding task as a *variational inference* problem #pause
@@ -779,7 +1289,16 @@
   We want to learn both the encoder and decoder: $P(bold(z), bold(x); bold(theta))$
 
 ==
-  $ P(bold(z), bold(x); bold(theta)) = P(bold(x) | bold(z); bold(theta)) space P(bold(z); bold(theta))  $ #pause
+  To generate data, we only need the *marginal* and *decoder* #pause
+
+  #align(center, varinf)
+
+  $ P(bold(x); bold(theta)) = integral_(Z) P(bold(x) | bold(z); bold(theta)) P(bold(z)) $
+
+  But the encoder $P(bold(z) | bold(x); bold(theta))$ is necessary to learn meaningful latent $p(bold(z))$
+
+==
+  $ P(bold(z), bold(x); bold(theta)) = P(bold(x) | bold(z); bold(theta)) space P(bold(z)) $ #pause
 
   We can choose any distribution for $P(bold(z))$ #pause
 
@@ -796,10 +1315,11 @@
 
   We need some error function between $P(bold(x); bold(theta))$ and $P(bold(x))$ #pause
   
-  *Question:* How do we measure the distance between probability distributions? 
+  *Question:* How do we measure error between probability distributions?  #pause
+
+  *Answer:* KL divergence
 
 ==
-  *Answer:* KL divergence #pause
 
   #cimage("figures/lecture_5/forwardkl.png", height: 50%)
   
@@ -811,6 +1331,14 @@
   $ argmin_bold(theta) KL(P(bold(x)), P(bold(x); bold(theta))) $ #pause
 
   Unfortunately, this objective is intractable to optimize #pause
+
+  *Question:* Why? #pause
+
+  $ P(bold(x))= integral_(Z) $
+
+  The support of $P(bold(x))$ is infinitely large: $bb(R)_(d_z)$
+
+==
 
   The paper provides surrogate objective
 
@@ -897,7 +1425,7 @@
 
   $ bold(z) & tilde cal(N)(bold(mu), bold(sigma)) $ 
 
-  $ bold(z) = bold(mu) + bold(sigma) dot.circle bold(epsilon) quad bold(epsilon) tilde cal(N)(bold(0), bold(1)) $ #pause
+  $ bold(z) = bold(mu) + bold(sigma) dot.o bold(epsilon) quad bold(epsilon) tilde cal(N)(bold(0), bold(1)) $ #pause
 
   Gradient can flow through $bold(mu), bold(sigma)$ #pause
 
@@ -914,7 +1442,7 @@
 
   *Step 2:* Generate a sample from distribution
 
-  $ bold(z) = bold(mu) + bold(sigma) dot.circle bold(epsilon) $ #pause
+  $ bold(z) = bold(mu) + bold(sigma) dot.o bold(epsilon) $ #pause
 
   *Step 3:* Decode the sample 
 
@@ -1014,3 +1542,5 @@
   25 Nov - Reinforcement learning
 
   1 Dec - Foundation models (virtual, optional)
+
+*/

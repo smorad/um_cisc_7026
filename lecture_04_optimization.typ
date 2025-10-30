@@ -920,7 +920,7 @@ $ (nabla_bold(theta) f)(bold(x), bold(theta)) = #pause vec( (partial f(bold(x), 
 
   For vector $bold(z)$:
 
-  $ (gradient_bold(z) sigma)(bold(z)) = sigma(bold(z)) dot.circle (1 - sigma(bold(z))) $ 
+  $ (gradient_bold(z) sigma)(bold(z)) = sigma(bold(z)) dot.o (1 - sigma(bold(z))) $ 
 
 // 97:00
 
@@ -931,13 +931,13 @@ $ (nabla_bold(theta) f)(bold(x), bold(theta)) = #pause vec( (partial f(bold(x), 
 
   Plug in the gradient of our new activation function 
   
-  $ (gradient sigma)(bold(z)) = sigma(bold(z)) dot.circle (1 - sigma(bold(z))) $ #pause
+  $ (gradient sigma)(bold(z)) = sigma(bold(z)) dot.o (1 - sigma(bold(z))) $ #pause
 
-  $ (gradient_(bold(theta)) f)(bold(x), bold(theta)) = [sigma(bold(theta)^top overline(bold(x))) dot.circle (1 - sigma(bold(theta)^top overline(bold(x))))] dot.circle overline(bold(x)) $
+  $ (gradient_(bold(theta)) f)(bold(x), bold(theta)) = [sigma(bold(theta)^top overline(bold(x))) dot.o (1 - sigma(bold(theta)^top overline(bold(x))))] dot.o overline(bold(x)) $
 
 
 ==
-  $ (gradient_(bold(theta)) f)(bold(x), bold(theta)) = [sigma(bold(theta)^top overline(bold(x))) dot.circle (1 - sigma(bold(theta)^top overline(bold(x))))] dot.circle overline(bold(x)) $
+  $ (gradient_(bold(theta)) f)(bold(x), bold(theta)) = [sigma(bold(theta)^top overline(bold(x))) dot.o (1 - sigma(bold(theta)^top overline(bold(x))))] dot.o overline(bold(x)) $
 
   This is the gradient for one layer in a neural network #pause
 
@@ -996,7 +996,7 @@ $ (nabla_bold(theta) f)(bold(x), bold(theta)) = #pause vec( (partial f(bold(x), 
 
   Where each layer gradient is 
 
-  $ (gradient_(bold(xi)) f_ell) (bold(z)_(ell - 1), bold(xi)) = (sigma(bold(xi)^top overline(bold(z))_(ell - 1)) dot.circle (1 - sigma(bold(xi)^top overline(bold(z))_(ell - 1)))) overline(bold(z))_(ell - 1) $ 
+  $ (gradient_(bold(xi)) f_ell) (bold(z)_(ell - 1), bold(xi)) = (sigma(bold(xi)^top overline(bold(z))_(ell - 1)) dot.o (1 - sigma(bold(xi)^top overline(bold(z))_(ell - 1)))) overline(bold(z))_(ell - 1) $ 
 
 ==
   We computed the gradient of a neural network layer #pause
@@ -1030,7 +1030,7 @@ $ (nabla_bold(theta) f)(bold(x), bold(theta)) = #pause vec( (partial f(bold(x), 
   ) 
   $ #pause
 
-  $ #redm[$(gradient_(bold(xi)) f_ell) (bold(z)_(ell - 1), bold(xi))$] = [sigma(bold(xi)^top overline(bold(z))_(ell - 1)) dot.circle (1 - sigma(bold(xi)^top overline(bold(z))_(ell - 1)))] overline(bold(z))_(ell - 1) $ 
+  $ #redm[$(gradient_(bold(xi)) f_ell) (bold(z)_(ell - 1), bold(xi))$] = [sigma(bold(xi)^top overline(bold(z))_(ell - 1)) dot.o (1 - sigma(bold(xi)^top overline(bold(z))_(ell - 1)))] overline(bold(z))_(ell - 1) $ 
 
 ==
   *Question:* Why did we spend all this time deriving gradients? #pause

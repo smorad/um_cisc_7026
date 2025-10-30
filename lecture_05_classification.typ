@@ -228,7 +228,7 @@ You should start to form groups soon
   ) 
   $ #pause
 
-  $ #redm[$(gradient_(bold(xi)) f_ell) (bold(z)_(ell - 1), bold(xi))$] = (sigma(bold(xi)^top overline(bold(z))_(ell - 1)) dot.circle (1 - sigma(bold(xi)^top overline(bold(z))_(ell - 1)))) overline(bold(z))_(ell - 1) $ 
+  $ #redm[$(gradient_(bold(xi)) f_ell) (bold(z)_(ell - 1), bold(xi))$] = (sigma(bold(xi)^top overline(bold(z))_(ell - 1)) dot.o (1 - sigma(bold(xi)^top overline(bold(z))_(ell - 1)))) overline(bold(z))_(ell - 1) $ 
 
 ==
   The heaviside step function was not differentiable #pause
@@ -729,7 +729,7 @@ $ P: E -> [0, 1] $ #pause
 
   I will not derive any more gradients, but the softmax gradient nearly identical to the sigmoid function gradient #pause
 
-  $ (gradient_bold(theta) "softmax")(bold(z)) = "softmax"(bold(z)) dot.circle (1 - "softmax"(bold(z))) $ #pause
+  $ (gradient_bold(theta) "softmax")(bold(z)) = "softmax"(bold(z)) dot.o (1 - "softmax"(bold(z))) $ #pause
 
   Softmax is a multi-class generalization of the sigmoid function
 

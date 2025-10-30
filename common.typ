@@ -138,9 +138,9 @@
 
         For($i in 1 dots t$, {
           Assign[$bold(J)$][$(gradient_bold(theta) cal(L))(bold(X), bold(Y), bold(theta))$ \# Represents acceleration]
-          Assign[#redm[$bold(V)$]][#redm[$beta dot bold(V) + (1 - beta) dot bold(J) dot.circle bold(J) $] #text(fill: red)[\# Magnitude]]
+          Assign[#redm[$bold(V)$]][#redm[$beta dot bold(V) + (1 - beta) dot bold(J) dot.o bold(J) $] #text(fill: red)[\# Magnitude]]
           Comment[#text(fill: red)[\# Rescale grad by magnitude of prev updates]]
-          Assign[$bold(theta)$][$bold(theta) - alpha dot #redm[$bold(J) div.circle bold(V)^(dot.circle 1/2)$]$]
+          Assign[$bold(theta)$][$bold(theta) - alpha dot #redm[$bold(J) div.o bold(V)^(dot.o 1/2)$]$]
         })
 
       Return[$bold(theta)$]
@@ -158,12 +158,12 @@
       For($i in 1 dots t$, {
         Assign[$bold(J)$][$(gradient_bold(theta) cal(L))(bold(X), bold(Y), bold(theta))$]
         Assign[#greenm[$bold(M)$]][#greenm[$beta_1 dot bold(M) + (1 - beta_1) dot bold(J)$] #greenm[\# Update momentum]]
-        Assign[#bluem[$bold(V)$]][#bluem[$beta_2 dot bold(V) + (1 - beta_2) dot bold(J) dot.circle bold(J)$] #bluem[\# Update magnitude]]
+        Assign[#bluem[$bold(V)$]][#bluem[$beta_2 dot bold(V) + (1 - beta_2) dot bold(J) dot.o bold(J)$] #bluem[\# Update magnitude]]
         Comment[\# Rescale #greenm[momentum] by #bluem[magnitude]]
         //Assign[$hat(bold(M))$][$bold(M)  "/" (1 - beta_1)$ \# Bias correction]
         //Assign[$hat(bold(V))$][$bold(V) "/" (1 - beta_2)$ \# Bias correction]
 
-        Assign[$bold(theta)$][$bold(theta) - alpha dot #greenm[$bold(M)$] #bluem[$div.circle bold(V)^(dot.circle 1/2)$]$]
+        Assign[$bold(theta)$][$bold(theta) - alpha dot #greenm[$bold(M)$] #bluem[$div.o bold(V)^(dot.o 1/2)$]$]
       })
 
     Return[$bold(theta)$ \# Note, we use biased $bold(M), bold(V)$ for clarity]

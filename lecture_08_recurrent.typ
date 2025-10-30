@@ -8,7 +8,7 @@
 #import algorithmic: style-algorithm, algorithm-figure, algorithm
 #import "@preview/mannot:0.3.0": *
 
-#let handout = false
+#let handout = true
 
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
@@ -936,17 +936,17 @@ Focus on modern methods that solve hard problems #pause
     #side-by-side[*Question:* What is $gradient_bold(theta) scan(f)$?][*Hint:* Chain rule] #pause
 
     $ (gradient_bold(theta) scan(f))(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
-        (gradient_bold(theta)f)(bold(h)_0, bold(x)_1), 
-        (gradient_bold(theta)f)(f(bold(h)_0, bold(x)_1), bold(x)_2) (gradient_bold(theta) f)(bold(h)_0, bold(x)_1), 
+        (gradient_bold(theta) f)(bold(h)_0, bold(x)_1), 
+        (gradient_bold(theta) f)(f(bold(h)_0, bold(x)_1), bold(x)_2) (gradient f)(bold(h)_0, bold(x)_1), 
         dots.v, 
-        (gradient_bold(theta) f)(dots f(bold(h)_0, bold(x)_1) dots, bold(x)_T) dots (gradient_bold(theta) f)(bold(h)_0, bold(x)_1)
+        (gradient_bold(theta) f)(dots f(bold(h)_0, bold(x)_1) dots, bold(x)_T) dots (gradient f)(bold(h)_0, bold(x)_1)
     ) $
 
 ==
     $ (gradient_bold(theta) scan(f))(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
         gradient_bold(theta) f,
-        (gradient_bold(theta) f) space (gradient_bold(theta) f),
-        (gradient_bold(theta) f) space (gradient_bold(theta) f) space (gradient_bold(theta) f),
+        (gradient_bold(theta) f) space (gradient f),
+        (gradient_bold(theta) f) space (gradient f) space (gradient f),
         dots.v
     ) $ #pause
 
@@ -1075,8 +1075,8 @@ All work, and all are recurrent neural networks! #pause
     Recall the gradient for the linear recurrence #pause
     $ gradient_bold(theta) scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(
         gradient_bold(theta) f,
-        (gradient_bold(theta) f) (gradient_bold(theta) f),
-        (gradient_bold(theta) f) (gradient_bold(theta) f) (gradient_bold(theta) f),
+        (gradient_bold(theta) f) (gradient f),
+        (gradient_bold(theta) f) (gradient f) (gradient f),
         dots.v
     ) $ #pause        
 
