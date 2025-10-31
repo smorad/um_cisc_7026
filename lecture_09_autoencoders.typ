@@ -1,7 +1,6 @@
 #import "@preview/touying:0.6.1": *
 #import themes.university: *
 #import "@preview/cetz:0.4.0"
-#import "@preview/fletcher:0.5.8" as fletcher: node, edge, diagram
 #import "common.typ": *
 #import "plots.typ": *
 #import "@preview/algorithmic:1.0.5"
@@ -17,21 +16,11 @@
 #set math.mat(delim: "[")
 
 
-#let varinf = diagram(
-  node-stroke: .1em,
-  spacing: 4em,
-  node((0,0), $bold(z)$, radius: 2em),
-  edge($P(bold(x) | bold(z); bold(theta))$, "-|>"),
-  node((2,0), $bold(x)$, radius: 2em),
-  edge((0,0), (2,0), $P(bold(z) | bold(x); bold(theta))$, "<|-", bend: -40deg),
-)
-
-
 #show: university-theme.with(
   aspect-ratio: "16-9",
   config-common(handout: handout),
   config-info(
-    title: [Autoencoders and Generative Models I],
+    title: [Autoencoders],
     subtitle: [CISC 7026 - Introduction to Deep Learning],
     author: [Steven Morad],
     institution: [University of Macau],
@@ -56,6 +45,62 @@
 
 
 // TODO: Why is encoder tractable but decoder is not?
+
+= Admin
+==
+Exam 2 grades released #pause
+- Mean score: 78.3% #pause
+  - 10% higher than exam 1! #pause
+- Extra credit added to exam score #pause
+  - Students with over 100% have "Exam 2 Extra Credit" #pause
+    - Moodle does not allow more than 100%
+
+==
+Some students got 100% or more on both exams! #pause
+
+Great job! For you, there is no need to take exam 3 #pause
+- Agustin Yan
+- Chen Zhonghong
+- Cui Shuhang
+- Lai Yongchao
+- Gao Yuchen
+- Sheng Junwei
+- Wu Chengqin #pause
+
+Some students are very close (Exam 1: 95%, Exam 2: 100%) #pause
+  - Can also skip exam 3 if you do not care about 5%
+
+==
+Homework 3 fully graded #pause
+- Mean score 97% #pause
+
+Last assignment is RNN! 
+
+==
+Please find groups for final project! #pause
+
+Project plan must contain 2 projects #pause
+- I will check projects to make sure they are possible #pause
+- If project 1 too hard, can do project 2 instead #pause
+
+Things that will make you lose many points #pause
+- Heavy use of LLM/CoPilot #pause
+- Copy dataset and model from Kaggle/GitHub/etc
+
+==
+The final project has two purposes: #pause
+1. Show that you understand the course material enough to apply it #pause
+2. Give you freedom to work on something you like #pause
+  - No supervisor telling you what to work on #pause
+
+Code everything yourself and invest sufficient time and effort #pause
+- You will get good marks #pause
+
+Some projects from last year with full marks: #pause
+- Detecting depression in brain scans #pause
+- Generating MIDI music using RNN #pause
+- Comparing graph neural network architectures
+
 
 = Review
 ==
@@ -104,7 +149,7 @@
     $ f(bold(x), bold(theta)) = sum_(i=1)^T bold(theta)^top overline(bold(x))_i $ #pause
 
     #side-by-side[What if we see a new face? #pause][
-        $ f(bold(x), bold(theta)) = (sum_(i=1)^T bold(theta)^top overline(bold(x))_i) + bold(theta)^top overline(bold(x))_"new" $ #pause
+        $ f(bold(x), bold(theta)) = (sum_(i=1)^T bold(theta)^top overline(bold(x))_i) + bold(theta)^top overline(bold(x))_(T+1) $ #pause
     ]
 
     We repeat the same process for each new face #pause
@@ -112,9 +157,9 @@
     We can rewrite $f$ as a *recurrent function*
 
 ==
-    Let us rewrite composite memory as a recurrent function #pause
+    Rewrote composite memory as a recurrent function #pause
 
-    $ f(bold(x), bold(theta)) = underbrace((sum_(i=1)^T bold(theta)^top overline(bold(x))_i), bold(h)) + bold(theta)^top overline(bold(x))_"new" $ #pause
+    $ f(bold(x), bold(theta)) = underbrace((sum_(i=1)^T bold(theta)^top overline(bold(x))_i), bold(h)) + bold(theta)^top overline(bold(x))_(T+1) $ #pause
 
     $ f(bold(h), bold(x), bold(theta)) = bold(h) + bold(theta)^top overline(bold(x)) $ #pause
 
@@ -137,7 +182,7 @@
     //We *scan* through the inputs $bold(x)_1, bold(x)_2, dots, bold(x)_T$
 
 ==
-    Right now, our model remembers everything #pause
+    This model remembers everything #pause
 
     But $bold(h)$ is a fixed size, what if $T$ is very large? #pause
 
@@ -177,11 +222,11 @@
 ==
     $ f: H times X times Theta |-> H, quad scan(f): H times X^T times Theta |-> H^T $ #pause
 
-    $ scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(h_1, h_2, dots.v, h_T) $ #pause
-    
-    $ scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(f(h_0, x_1, bold(theta)), f(h_1, x_2, bold(theta)), dots.v, f(h_(T-1), x_T, bold(theta))) = vec(f(h_0, x_1), f(f(h_0, x_1), x_2), dots.v, f( dots f(h_0, x_1) dots, x_T)) $
+    $ scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(bold(h)_1, bold(h)_2, dots.v, bold(h)_T) $ #pause
+
+    $ scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(f(bold(h)_0, bold(x)_1, bold(theta)), f(bold(h)_1, bold(x)_2, bold(theta)), dots.v, f(bold(h)_(T-1), bold(x)_T, bold(theta))) = vec(f(bold(h)_0, x_1), f(f(bold(h)_0, bold(x)_1), bold(x)_2), dots.v, f( dots f(bold(h)_0, bold(x)_1) dots, bold(x)_T)) $
 ==
-    Let $g$ define our memory recall function #pause 
+    Let $g$ define the memory recall function #pause 
 
     $ g: H times X times Theta |-> Y $ #pause
 
@@ -200,11 +245,11 @@
 
     *Step 2:* Perform recall on recurrent states #pause
 
-    $ vec(bold(y)_1, dots.v, bold(y)_T) = vec(
+    $ vec(hat(bold(y))_1, dots.v, hat(bold(y))_T) = vec(
         g(bold(h)_1, bold(x)_1, bold(theta)_g),
         dots.v,
         g(bold(h)_T, bold(x)_T, bold(theta)_g),
-    ) $
+    ) $ 
 ==
     The simplest recurrent neural network is the *Elman Network* #pause
 
@@ -247,21 +292,21 @@
     $ #pause
 
     $ 
-    f_2(bold(h), bold(x), bold(theta)) = sigma(
+    f_2(bold(h), bold(x), bold(theta)) = underbrace(sigma(
         bold(theta)_3^top overline(bold(x)) + bold(theta)_4^top 
             f_"forget" (bold(h), bold(x), bold(theta)) dot.o bold(h)
-    ) 
+    ), "Make new memories") 
     $ #pause
 
     $
     f(bold(h), bold(x), bold(theta)) = 
-        f_"forget" (bold(h), bold(x), bold(theta)) dot.o bold(h) + (1 - f_"forget" (bold(h), bold(x), bold(theta))) dot.o f_2(bold(h), bold(x), bold(theta))
+        underbrace(
+          f_"forget" (bold(h), bold(x), bold(theta)) dot.o bold(h)
+        , "Forget old memories") + 
+        underbrace((1 - f_"forget" (bold(h), bold(x), bold(theta))), "Replace") dot.o underbrace(f_2(bold(h), bold(x), bold(theta)), "New memories")
     $ #pause
 
-    Left term forgets old, right term replaces forgotten memories
-
-==
-    Jax RNN https://colab.research.google.com/drive/147z7FNGyERV8oQ_4gZmxDVdeoNt0hKta#scrollTo=TUMonlJ1u8Va
+    Only forget when we have new information to remember
 
 = Compression
   // See a movie (shrek), how do you tell a friend?
@@ -547,7 +592,7 @@ To expand the signal, we must "invert" convolution and pooling
 ==
 Let us first try and "invert" pooling #pause
 
-Consider sum pooling (adaptive $2 times 2$) #pause
+Consider mean pooling (adaptive $2 times 2$) #pause
 
   #let c = cetz-canvas({
     import cetz.draw: *
@@ -565,6 +610,7 @@ Consider sum pooling (adaptive $2 times 2$) #pause
     )
 
   content((2, -1), text(size: 40pt)[$sum$])
+  content((0, -3.15), text(size: 40pt)[$1/4 dot$])
 
   draw_filter(
     1, -4,
@@ -592,6 +638,8 @@ Consider sum pooling (adaptive $2 times 2$) #pause
     )
 
   content((2, -1), text(size: 40pt)[$sum$])
+
+  content((0, -3.15), text(size: 40pt)[$1/4 dot$])
 
   draw_filter(
     1, -4,
@@ -697,7 +745,7 @@ draw_filter(
 Transposed convolution is similar to upsampling #pause
 - Unlike upsampling, we learn the filters (parameters) #pause
 
-New "inverse" operations let us construct a convolutional decoder
+New "inverse" operations let us construct a convolutional decoder #pause
 - Many different ways to do this
 
 ==
@@ -734,7 +782,7 @@ Symmetric convolution-only autoencoder
 ]
 
 ==
-Modern architectures use asymmetric `conv -> upsample` blocks
+Other architectures use asymmetric `conv -> upsample` blocks
 
 #side-by-side(align: top)[
   ```python
@@ -766,9 +814,9 @@ Modern architectures use asymmetric `conv -> upsample` blocks
 ]
 
 ==
-Asymmetric upsample autoencoders tend to work better #pause
+I find that asymmetric upsample autoencoders tend to work better #pause
 - `Upsample -> Conv -> Activation` #pause
-- Finding filter size, stride, etc that produce the same shape is painful #pause
+- Finding filter size, stride, etc that produce the correct shape is painful #pause
 
 I use symmetric autoencoders because they are easier to implement #pause
 - `ConvTranspose -> Activation` #pause
@@ -786,9 +834,9 @@ I use symmetric autoencoders because they are easier to implement #pause
 ][
   *Task:* Compress entire film (sequence of images) #pause
 
-  *Step 1:* Compress image to $bold(z)$ #pause
+  *Step 1:* Compress image with CNN $ -> bold(x)$ #pause
 
-  *Step 2:* #pause Compress $bold(z)_1, dots bold(z)_T -> bold(h)$ #pause
+  *Step 2:* #pause Compress $bold(x)_1, dots bold(x)_T -> bold(h)$ #pause
 
   *Question:* What models process a sequence of inputs? #pause
 
@@ -833,19 +881,25 @@ $ f(bold(h)_1, bold(theta)_d) = hat(bold(h))_(0), underbrace(#image("figures/lec
 ==
 ```python
 # Compress images to latent sequence
-zs = vmap(cnn_encoder)(frames)
-h0 = zeros(d_h)
+zs = vmap(cnn_enc)(frames)
+h0 = zeros(d_h) # Initial state
 # Compress sequence to latent vector
-hT, hs = scan(rnn_encoder, init=h0, xs=zs)
+hT, hs = scan(rnn_enc, init=h0, xs=zs)
 # Final state should hold all film info
 # Decompress final state into latent sequence
-recon_zs = scan(rnn_decoder, init=hT, xs=zeros(d_z * T))
+recon_zT, recon_zs = scan(rnn_dec, init=hT, length=T)
 # Decompress latent sequence into images 
-recon_frames = vmap(cnn_decoder)(recon_zs)
+recon_frames = vmap(cnn_dec)(recon_zs)
+# Compute loss and update params
 grads = grad(lambda x, xhat: mean((x - xhat) ** 2))(
-  frames, recon_frames
-)
+  frames, recon_frames)
+model = update((cnn_enc, rnn_enc, rnn_dec, cnn_dec), grads)
 ```
+
+==
+Older language models used this approach #pause
+- Encode sequence of characters into meaning #pause
+- ELMo was a precursor to GPT 
 
 = Applications and Objectives
 ==
@@ -860,31 +914,6 @@ $ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)
 This objective is useful for compression #pause
 
 Could we use autoencoders for other tasks?
-
-
-/*
-==
-TODO
-Convolutional AE
-ConvTranspose
-Upsample
-UNet
-Recurrent AE
-Elmo
-AEs learn features
-Denoising AE
-Anomoly detection
-Contractive AE 
-Sparse AE
-
-==
-  First coding exercise
-
-  https://colab.research.google.com/drive/1UyR_W6NDIujaJXYlHZh6O3NfaCAMscpH#scrollTo=nmyQ8aE2pSbb
-
-  https://www.youtube.com/watch?v=UZDiGooFs54
-
-*/
 
 ==
 *Task:* Remove noise from an image #pause
@@ -903,7 +932,7 @@ Can we do this with autoencoders?
 
   $ "Denoising loss" quad cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f(bold(x)_[i] #redm[$+ bold(epsilon)$], bold(theta)_e), bold(theta)_d)_j)^2 $ #pause
 
-  Add noise to input $bold(x) + bold(epsilon)$, reconstruct $bold(x)$ without noise
+  Add noise to input $bold(x) + bold(epsilon)$, reconstruct $bold(x)$ without noise #pause
 
   Autoencoder will learn to remove noise when reconstructing image
 
@@ -922,9 +951,14 @@ Can we do this with autoencoders?
   $ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f( #redm[blur];(bold(x)_[i]), bold(theta)_e), bold(theta)_d)_j)^2 $ 
 
 ==
+  #cimage("figures/lecture_9/deblur.gif", height: 80%) #pause
+
+  No more privacy in 2025
+
+==
 *Task:* Fix blurry and noisy image #pause
 
-$ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f( #redm[blur];(bold(x)_[i] + #bluem[$bold(epsilon)$]), bold(theta)_e), bold(theta)_d)_j)^2 $ 
+$ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f( #redm[blur];(bold(x)_[i] + #bluem[$bold(epsilon)$]), bold(theta)_e), bold(theta)_d)_j)^2 $ #pause
 
 #side-by-side[
   #cimage("figures/lecture_9/enhance0.jpg")
@@ -932,12 +966,6 @@ $ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)
   #cimage("figures/lecture_9/enhance1.jpg")
 ]
 
-==
-  We can deblur faces from security cameras
-
-  #cimage("figures/lecture_9/deblur.gif", height: 80%)
-
-  Autoencoders are very powerful!
 
 = Emergent Intelligence
 
@@ -986,7 +1014,8 @@ $ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)
 
     Learns the structure of lungs from images #pause
 
-    Differentiates sick and healthy lungs without being told
+    Separates sick from healthy lungs without labels #pause
+    - "Sick" or "healthy" information improves compression
 
   ]
 
@@ -1020,6 +1049,17 @@ Let us demonstrate this
 https://colab.research.google.com/drive/1UyR_W6NDIujaJXYlHZh6O3NfaCAMscpH#scrollTo=nmyQ8aE2pSbb
 
 https://www.youtube.com/watch?v=UZDiGooFs54
+
+= Final Project Groups
+==
+You must stay 10 minutes to find a group of 4-5 people #pause
+
+Groups with 4 members, the lonely students are often smart #pause 
+- Please consider inviting them to your group #pause
+
+Following groups have 5 members and can leave now
+- H, O, A, L, S, P, M, AA, X
+
 
 
 /*

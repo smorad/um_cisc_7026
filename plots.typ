@@ -49,6 +49,19 @@
 })}
 
 //
+// Flow Charts
+//
+
+#let varinf = fletcher-diagram(
+  node-stroke: .1em,
+  spacing: 4em,
+  node((0,0), $bold(z)$, radius: 2em),
+  edge($P(bold(x) | bold(z); bold(theta))$, "-|>"),
+  node((2,0), $bold(x)$, radius: 2em),
+  edge((0,0), (2,0), $P(bold(z) | bold(x); bold(theta))$, "<|-", bend: -40deg),
+)
+
+//
 // Activation Functions
 //
 
