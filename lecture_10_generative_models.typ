@@ -62,14 +62,14 @@
 #side-by-side(align: left)[
   #cimage("figures/lecture_9/fashion-latent.png", height: 85%)
 ][
-  Autoencoder latent space $Z in bb(R)^3$ 
+  Autoencoder latent space $Z in bb(R)^3$ #pause
 
-  Images with similar semantic meaning (sneaker, sandal) cluster in Z
+  Images with similar semantic meaning (sneaker, sandal) cluster in Z #pause
 
-  $Z$ forms a semantic manifold
-  - Euclidean space near each point
+  $Z$ forms a semantic manifold #pause
+  - Local Euclidean dynamics at each datapoint #pause
 
-  Network learns what sneakers, shirts, etc are
+  Network learns what sneakers, shirts, etc are #pause
   - Can we use this to generate *new* images?
 ]
 
@@ -77,15 +77,15 @@
 #side-by-side(align: left)[
   #cimage("figures/lecture_9/fashion-latent.png", height: 85%)
 ][
-  Each $bold(z)$ corresponds to $bold(x)$ in the dataset
+  Each $bold(z)$ corresponds to $bold(x)$ in the dataset #pause
 
-  Consider a datapoint $bold(x)_[i]$ (shirt)
+  Consider a datapoint $bold(x)_[i]$ (shirt) #pause
 
-  We can encode $bold(x)_[i]$
+  We can encode $bold(x)_[i]$ 
 
-  $ bold(z)_[i] = f (bold(x)_[i], bold(theta)_e) $
+  $ bold(z)_[i] = f (bold(x)_[i], bold(theta)_e) $ #pause
 
-  And decode $bold(z)_[i]$
+  And decode $bold(z)_[i]$ 
 
   $ hat(bold(x))_[i] = f^(-1) (bold(z)_[i], bold(theta)_d) $
 ]
@@ -95,13 +95,13 @@
     #cimage("figures/lecture_9/fashion-latent.png", height: 85%)
   ][
      $ bold(z)_[i] &= f (bold(x)_[i], bold(theta)_e) \
-     hat(bold(x))_[i] &= f^(-1) (bold(z)_[i], bold(theta)_d) $
+     hat(bold(x))_[i] &= f^(-1) (bold(z)_[i], bold(theta)_d) $ #pause
      
-     Let us we perturb $bold(z)$ with noise $bold(epsilon)$, then decode it
+     Let us perturb $bold(z)$ with noise $bold(epsilon)$, then decode it #pause
 
-     $ f^(-1) (bold(z)_[i] + #redm[$bold(epsilon)$], bold(theta)_d) $
+     $ f^(-1) (bold(z)_[i] + #redm[$bold(epsilon)$], bold(theta)_d) $ #pause
 
-     *Question:* What happens?
+     *Question:* What happens? #pause
 
      *Hint:* $Z$ is a semantic manifold (locally Euclidean)
 ]
@@ -111,15 +111,15 @@
     #cimage("figures/lecture_9/fashion-latent.png", height: 85%)
   ][
 
-    $ f^(-1) (bold(z)_[i] + #redm[$bold(epsilon)$], bold(theta)_d) $
+    $ f^(-1) (bold(z)_[i] + #redm[$bold(epsilon)$], bold(theta)_d) $ #pause
 
-    We will create an image of a new datapoint
-    - Not in the dataset
-    - Semantically similar to $bold(x)_i$
-      - But different!
+    We will create an image of a new datapoint #pause
+    - Not in the dataset #pause
+    - Semantically similar to $bold(x)_i$ #pause
+      - But *new* and different! #pause
 
     $ bold(z)_[i] &-> "blue shirt" \ 
-    bold(z)_[i] + bold(epsilon) &-> "red shirt" $
+    bold(z)_[i] + bold(epsilon) &-> "red shirt" $ #pause
 
     Idea powers generative models
 ]
@@ -130,26 +130,26 @@
 ][
 
 ]
-This idea only works for small $d_z$
+This autoencoder only works for small $d_z$ #pause
 
-As $d_z$ grows, points spread out
-- Curse of dimensionality
-- For large $d_z$. one cluster for each datapoint
+As $d_z$ grows, points spread out #pause
+- Curse of dimensionality #pause
+- For large $d_z$. one cluster for each datapoint #pause
 
-Our generative autoencoder only works for small $d_z$
+Our autoencoder only works for small $d_z$ #pause
 - Interesting problems are high-dimensional (large $d_z$)
 
 
 = Probabilistic Generative Models
 
 ==
-*Question:* How do we explain autoencoders learning our world?
+*Question:* How do we explain autoencoders learning our world? #pause
 
-*Answer:* They implicitly model the *dataset distribution*
-- If the dataset contains our world, autoencoders learn the world
+*Answer:* They implicitly model the *dataset distribution* #pause
+- If the dataset contains our world, autoencoders learn the world #pause
 
-We will examine learning through probability and distributions
-- Best way to learn generative models
+We will examine learning through probability and distributions #pause
+- Best way to learn generative models #pause
 
 Let us consider a dataset of dog pictures
 
@@ -159,34 +159,34 @@ Let us consider a dataset of dog pictures
   $ bold(x)_([i]) $
   #pause
 ][
-  *Domain:* $X = {0 dots 255}^{3 times 28 times 28}$ 
-  - How we represent datapoints
-  - $bold(x) in X$
+  *Domain:* $X = {0 dots 255}^{3 times 28 times 28}$ #pause
+  - How we represent datapoints #pause
+  - $bold(x)_([i]) in X$ #pause
 
-  *Dataset (Evidence):* $bold(X) = mat(bold(x)_([1]), dots, bold(x)_([n]))^top$
-  - Finite collection of datapoints 
+  *Dataset (Evidence):* $bold(X) = mat(bold(x)_([1]), dots, bold(x)_([n]))^top$ #pause
+  - Finite collection of $n$ datapoints #pause
 
-  *Dataset distribution:* $P_bold(X) (bold(x)_([i]))$
-  - Probability of sampling $bold(x)_([i])$ from $bold(X)$
-  - $1/n$ if $bold(x)_([i])$ in dataset, else 0
+  *Dataset distribution:* $P_bold(X) (bold(x)_([i]))$ #pause
+  - Probability of sampling $bold(x)_([i])$ from $bold(X)$ #pause
+  - $1/n$ if $bold(x)_([i])$ in dataset, else 0 #pause
 
-  *True data distribution:* $p_* (bold(x)_([i]))$
-  - How likely is $bold(x)_([i])$ in the universe?
-  - Superset of the dataset $bold(X)$
+  *True data distribution:* $p_* (bold(x)_([i]))$ #pause
+  - How likely is $bold(x)_([i])$ in the universe? 
+  //- Superset of the dataset $bold(X)$
 ]
 
 ==
 
 #side-by-side(align: left)[
-  $ P_bold(X)(#cimage("figures/lecture_1/dog.png", height: 30%) ) = 1 / n $
+  $ P_bold(X)(#cimage("figures/lecture_1/dog.png", height: 30%) ) = #pause 1 / n $ #pause
 ][
-  $ P_bold(X)(#cimage("figures/lecture_1/muffin.png", height: 30%) ) = 0 $
+  $ P_bold(X)(#cimage("figures/lecture_1/muffin.png", height: 30%) ) #pause = 0 $ #pause
 ]
 
 $ p_*(#cimage("figures/lecture_1/dog.png", height: 30%)) quad vec(delim: #none, =, <, >) quad p_*(#cimage("figures/lecture_1/muffin.png", height: 30%)) $
 
 ==
-We want to approximate distribution so we can generate samples
+We want to approximate a distribution so we can generate samples #pause
 
 #side-by-side[
   *Question:*
@@ -196,27 +196,26 @@ $ bold(x)_([i]) tilde P_bold(X) (bold(x); bold(theta)) $
 or
 ][
 $ bold(x)_([i]) tilde p_* (bold(x); bold(theta)) $
-]
+] #pause
 
-$P_bold(X) (bold(x); bold(theta))$ samples existing datapoints, must be $p_* (bold(x); bold(theta))$
+$P_bold(X) (bold(x); bold(theta))$ samples existing datapoints, must be $p_* (bold(x); bold(theta))$ #pause
 
-Only have $P_bold(X) (bold(x); bold(theta))$, not $p_* (bold(x); bold(theta))$
-- How to approximate $p_* (bold(x); bold(theta))$?
+Only have $P_bold(X) (bold(x); bold(theta))$, not $p_* (bold(x); bold(theta))$ #pause
+- How to approximate $p_* (bold(x); bold(theta))$? #pause
 
-*Key idea:* Learn a continuous distribution $p (bold(x); bold(theta))$ using $P_bold(X) (bold(x))$
+*Key idea:* Learn a continuous distribution $p (bold(x); bold(theta))$ using $P_bold(X) (bold(x))$ #pause
 
-$ p (bold(x); bold(theta)) = P_bold(X) (bold(x)) => p (bold(x); bold(theta)) approx p_* (bold(x)) $
+$ p (bold(x); bold(theta)) = P_bold(X) (bold(x)) => p (bold(x); bold(theta)) approx p_* (bold(x)) $ #pause
 
 We call $p (bold(x); bold(theta))$ a *probabilistic generative model*
 
 ==
-Understanding generative models probabilistically is very hard 
-- Requires statistics background most CS students lack
-- Students always struggle with this lecture
-- I change it every year to try to improve it
+Understanding generative models probabilistically is very hard #pause
+- Requires statistics background most CS students lack #pause
+- I try and make it easier every year #pause
 
-If you understand this concept, all generative models become easy
-- Same objective, just different approximation methods
+If you understand this concept, all generative models become easy #pause
+- Same objective, just different approximation methods #pause
   - GAN
   - VAE
   - Diffusion
@@ -225,25 +224,25 @@ If you understand this concept, all generative models become easy
   - ...
 
 ==
-Let us think about the objective function
-- We have the dataset distribution $P_bold(X) (bold(x))$
-- We have a model that outputs a distribution $p (bold(x); bold(theta))$
-- Output distribution must match the dataset distribution 
+Let us think about the objective function #pause
+- We have the dataset distribution $P_bold(X) (bold(x))$ #pause
+- We have a model that outputs a distribution $p (bold(x); bold(theta))$ #pause
+- Output distribution must match the dataset distribution  #pause
 
-*Question:* What is our objective?
+*Question:* What is our objective? #pause
 
-$ argmax_(bold(theta)) space KL(P_bold(X) (bold(x)), p(bold(x); bold(theta))) $
+$ argmax_(bold(theta)) space KL(P_bold(X) (bold(x)), p(bold(x); bold(theta))) $ #pause
 
-Same idea as classification
-- Almost all generative models use this objective
+Same idea as classification #pause
+- Almost all generative models use this objective #pause
   - They represent it in different ways
 
 ==
-To summarize, probabilistic generative models:
-+ Use a dataset distribution $P_bold(X)(bold(x))$
-+ To approximate the true data distribution $p_* (bold(x))$
-+ By learning a *continuous* distribution $p(bold(x); bold(theta))$
-+ That minimizes some approximation of $KL(p(bold(x); bold(theta)), P_bold(X)(bold(x)))$
+To summarize, probabilistic generative models: #pause
++ Use a dataset distribution $P_bold(X)(bold(x))$ #pause
++ To approximate the true data distribution $p_* (bold(x))$ #pause
++ By learning a *continuous* distribution $p(bold(x); bold(theta))$ #pause
++ That minimizes some approximation of $KL(p(bold(x); bold(theta)), P_bold(X)(bold(x)))$ #pause
 
 总结来说，概率生成模型：
 + 使用数据集的经验分布 $P_bold(X)(bold(x))$
@@ -254,165 +253,103 @@ To summarize, probabilistic generative models:
 
 = Bayesian Inference
 ==
+Bayesian inference is the usual way we learn generative models #pause
 
 #side-by-side(columns: (0.4fr, 1.0fr), align: left)[
   #cimage("figures/lecture_1/dog.png") 
-  $ bold(x) $
+  $ bold(x)_([i]) $ #pause
 ][
-- Model $=p(bold(x); bold(theta))$
-- Objective $approx KL(p(bold(x); bold(theta)), P_bold(X)(bold(x)))$
-*Question:* Represent $p(bold(x); bold(theta))$?
-- $bold(x)$ is very high dimensional
-  - $bold(x) in {0 dots 255}^(3 times 28 times 28)$
-- Complex relationships between pixels
-- Generally intractable
+- Model $=p(bold(x); bold(theta))$ #pause
+- Objective $approx KL(p(bold(x); bold(theta)), P_bold(X)(bold(x)))$ #pause
+*Question:* Represent $p(bold(x); bold(theta))$? #pause
+- $bold(x)$ is very high dimensional #pause
+  - $bold(x) in {0 dots 255}^(3 times 28 times 28)$ #pause
+- Complex relationships between pixels #pause
+- Generally intractable #pause
 ]
-*Key idea:* Use low-dimensional representation of $bold(x)$ 
+*Key idea:* Use low-dimensional representation of $bold(x)$ #pause
 - Can reason over low-dimensional representation
 
-/*
-*Question:* How?
-
-*Answer:* Autoencoders!
-- Learns semantic, low-dimensional representation $bold(z)$
-*/
-
 ==
-Let $bold(y)_([i])$ be a low-dimensional label of $bold(x)_([i])$
+Let $bold(y)_([i])$ be a low-dimensional label of $bold(x)_([i])$ #pause
 
 #side-by-side(align: horizon)[
-  $ bold(y)_([i]) = vec("Small", "Ugly") $
+  $ bold(y)_([i]) = vec("Small", "Ugly") $ #pause
 ][
-  $ bold(x)_([i]) = #cimage("figures/lecture_1/dog.png", height: 25%) $
+  $ bold(x)_([i]) = #cimage("figures/lecture_1/dog.png", height: 25%) $ #pause
 ]
 
-Probabilistic model should output distribution
+Probabilistic model should output distribution #pause
 
 $ underbrace(#cimage("figures/lecture_1/dog.png", height: 25%), bold(x)_([i])) tilde p(underbrace("Small ugly dog pictures", bold(x)) mid(|) underbrace(vec("Small", "Ugly"), bold(y)_([i])); bold(theta)) $
 
 ==
-We must consider all possible $bold(y)$ to represent all possible dog pictures
+We must consider all possible $bold(y)$ to represent all possible dog pictures #pause
 
-$ vec("Small", "Ugly"), vec("Medium", "Ugly"), vec("Big", "Not ugly"), dots $
+$ vec("Small", "Ugly"), vec("Medium", "Ugly"), vec("Big", "Not ugly"), dots $ #pause
 
-We also need to know the label distribution $bold(y)$
-- How common or rare are ugly dogs? Big dogs? Small dogs?
+We also need to know the label distribution $bold(y)$ #pause
+- How common or rare are ugly dogs? Big dogs? Small dogs? #pause
 
-$ p(bold(x); bold(theta)) = integral underbrace(p(bold(x) | bold(y); bold(theta)), "Image from label") overbrace(p(bold(y)), "Label distribution") dif bold(y) $
+$ p(bold(x); bold(theta)) = integral underbrace(p(bold(x) | bold(y); bold(theta)), "Image from label") overbrace(p(bold(y)), "Label distribution") dif bold(y) $ #pause
 
 This is the definition of a conditional distribution
 
 ==
+Bayesian inference model: #pause
 
-/*
-*Question:* Do we know $bold(z)$ in unsupervised learning?
+$ p(bold(x); bold(theta)) = integral p(bold(x) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y) $ #pause
 
-*Answer:* No! Only have $bold(x)$, not $bold(z)$
+*Question:* What was the objective? #pause
 
-*Question:* Can we learn $p(bold(x), bold(z); bold(theta))$ with only $bold(x)$? How? *Hint:* Marginal
-
-
-$ p(bold(x); bold(theta)) = integral p(bold(x), bold(z); bold(theta)) dif bold(z) $
-
-==
-$ p(bold(x); bold(theta)) = integral p(bold(x), bold(z); bold(theta)) dif bold(z) $
-
-Recall the original problem is $bold(x)$ being continuous and high-dimensional
-
-*Question:* What is the problem with this integral?
-
-*Answer:* $p(bold(x), bold(z); bold(theta))$ is even higher dimensional than $p(bold(x); bold(theta))$
-- Made the problem even harder, impossible to learn this distribution
-- Factorize problem to make it easier
-
-From the definition of conditional probability
-$ p(bold(x), bold(z); bold(theta)) = p(bold(x) | bold(z); bold(theta)) dot p(bold(z); bold(theta)) $
-
-*/
-==
-Bayesian inference model 
-
-$ p(bold(x); bold(theta)) = integral p(bold(x) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y) $
-
-*Question:* What was the objective?
-
-$ argmax_bold(theta) KL(P_bold(X)(bold(x)), p(bold(x); bold(theta))) $
+$ argmax_bold(theta) KL(P_bold(X)(bold(x)), p(bold(x); bold(theta))) $ #pause
 
 This is Bayesian inference! 
 
 ==
 #side-by-side[
-  $ p(bold(x); bold(theta)) = integral underbrace(p(bold(x) | bold(y); bold(theta)), "Learn it") dot p(bold(y)) dif bold(y) $
+  $ p(bold(x); bold(theta)) = integral underbrace(p(bold(x) | bold(y); bold(theta)), "Learn it") dot p(bold(y)) dif bold(y) $ #pause
 ][
-  $ argmax_bold(theta) KL(P_bold(X)(bold(x)), p(bold(x); bold(theta))) $
+  $ argmax_bold(theta) KL(P_bold(X)(bold(x)), p(bold(x); bold(theta))) $ #pause
 ]
 
-Aftering learning $p(bold(x) | bold(y); bold(theta))$ we can generate new datapoints
+Aftering learning $p(bold(x) | bold(y); bold(theta))$ we can generate new datapoints #pause
 
-+ Either choose or sample label $bold(y)_([i]) tilde p(bold(y))$
-+ Predict conditional distribution $p(bold(x) | bold(y)_([i]); bold(theta))$
-+ Sample from conditional distribution $bold(x)_([i]) tilde p(bold(x) | bold(y)_([i]); bold(theta))$
++ Either choose or sample label $bold(y)_([i]) tilde p(bold(y))$ #pause
++ Predict conditional distribution $p(bold(x) | bold(y)_([i]); bold(theta))$ #pause
++ Sample from conditional distribution $bold(x)_([i]) tilde p(bold(x) | bold(y)_([i]); bold(theta))$ #pause
 
-Very easy! But this requires labels $bold(y)$
-- Can we do this unsupervised (without labels)?
+Very easy! But this requires labels $bold(y)$ #pause
+- Can we do this unsupervised (without labels)? #pause
 - Then, model can learn labels $bold(y)$ without human help
 
 = Variational Autoencoders
 ==
-Consider Bayesian inference *without labels* $bold(y)$
+Consider Bayesian inference *without labels* $bold(y)$ #pause
 - We will *learn* a low-dimensional latent description $bold(z)$ instead
-  - $bold(z)$ encodes the structure of the dataset (and the world)
+  - $bold(z)$ encodes the structure of the dataset (and the world) #pause
 
-$ p(bold(x); bold(theta)) = integral p(bold(x) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y) => integral p(bold(x) | bold(z); bold(theta)) dot p(bold(z)) dif bold(z) $
+$ p(bold(x); bold(theta)) = integral p(bold(x) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y) => integral p(bold(x) | bold(z); bold(theta)) dot p(bold(z)) dif bold(z) $ #pause
 
-We no longer have a label distribution $p(bold(y))$
-- Replace with a latent distribution $p(bold(z))$
-- We can choose this distribution! Gaussian, Bernoulli, ...
+We no longer have a label distribution $p(bold(y))$ #pause
+- Replace with a latent distribution $p(bold(z))$ #pause
+- We can choose this distribution! Gaussian, Bernoulli, ... #pause
 - For now, make it easy $p(bold(z)) = cal(N)(bold(0), bold(I))$
 
 ==
-*Question:* How can we learn $bold(z)$?
+*Question:* How can we learn $bold(z)$? #pause
 
-*Answer:* Autoencoding! 
+*Answer:* Autoencoding! #pause
 
-$ hat(bold(x)) = f^(-1)(underbrace(f(bold(x), bold(theta)_e), bold(z)), bold(theta)_d) $
+$ hat(bold(x)) = f^(-1)(underbrace(f(bold(x), bold(theta)_e), bold(z)), bold(theta)_d) $ #pause
 
 But our models are probabilistic, so it is more complex
 
 ==
 
-/*
 #side-by-side[
-  #fletcher-diagram(
-    node-stroke: .15em,
-    node-fill: blue.lighten(50%),
-    edge-stroke: .1em,
-    
-    node((0,0), $ bold(x) $, radius: 2em, name: <A>),
-    node((1,0), $ bold(z) $, fill: gray.lighten(50%), radius: 2em, name: "B"),
-    // Define edges
-    edge(<A>, <B>, "-|>"),
-    )
-
-    Encoder $p(bold(z) | bold(x); bold(theta)_e)$
-
+$ p(bold(x)) = integral p(bold(x) | bold(z); bold(theta)) p(bold(z)) dif bold(z) $ #pause
 ][
-  #fletcher-diagram(
-  node-stroke: .15em,
-  node-fill: blue.lighten(50%),
-  edge-stroke: .1em,
-  
-  node((0,0), $ bold(x) $, radius: 2em, name: <A>),
-  node((1,0), $ bold(z) $, fill: gray.lighten(50%), radius: 2em, name: "B"),
-  // Define edges
-  edge(<A>, <B>, "<|-"),
-  )
-
-  Decoder $p(bold(x) | bold(z); bold(theta)_d)$
-]
-*/
-
-#side-by-side[
   #fletcher-diagram(
     node-stroke: .15em,
     node-fill: blue.lighten(50%),
@@ -423,14 +360,12 @@ But our models are probabilistic, so it is more complex
     // Define edges
     edge(<A>, <B>, "-|>", bend: 45deg, $ "Encoder" p(bold(z) | bold(x); bold(theta)_e) $),
     edge(<A>, <B>, "<|-", bend: -45deg, $ "Decoder" p(bold(x) | bold(z); bold(theta)_d) $),
-  )
-][
-$ p(bold(x)) = integral p(bold(x) | bold(z); bold(theta)) p(bold(z)) dif bold(z) $
+  ) #pause
 ]
 
-+ Use encoder and decoder to learn latent structure $bold(z)$ 
-+ After learning, delete encoder (encoder only needed to learn $bold(z)$)
-+ Do Bayesian inference with decoder and latent distribution
++ Use encoder and decoder to learn latent structure $bold(z)$ #pause
++ After learning, delete encoder (encoder only needed to learn $bold(z)$) #pause
++ Do Bayesian inference with decoder and latent distribution #pause
 
 Sound too easy? Implementation is much harder
 
