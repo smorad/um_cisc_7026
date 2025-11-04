@@ -178,25 +178,19 @@ Let us consider a dataset of dog pictures
 ==
 
 #side-by-side(align: left)[
-  #cimage("figures/lecture_1/dog.png", height: 40%) 
-
-  $ bold(x)_([i]) $
-
-  $ P_bold(X)(bold(x)_([i])) = 1 / n $
+  $ P_bold(X)(#cimage("figures/lecture_1/dog.png", height: 30%) ) = 1 / n $
 ][
-  #cimage("figures/lecture_1/muffin.png", height: 40%) 
-
-  $ bold(x)_([j]) $
-
-  $ P_bold(X)(bold(x)_([j])) = 0 $
+  $ P_bold(X)(#cimage("figures/lecture_1/muffin.png", height: 30%) ) = 0 $
 ]
 
-$ p_*(bold(x)_([i])) quad ? quad p_*(bold(x)_([j])) $
+$ p_*(#cimage("figures/lecture_1/dog.png", height: 30%)) quad vec(delim: #none, =, <, >) quad p_*(#cimage("figures/lecture_1/muffin.png", height: 30%)) $
 
 ==
-We want to model a distribution so we can generate samples
+We want to approximate distribution so we can generate samples
 
 #side-by-side[
+  *Question:*
+][
 $ bold(x)_([i]) tilde P_bold(X) (bold(x); bold(theta)) $
 ][
 or
@@ -204,13 +198,14 @@ or
 $ bold(x)_([i]) tilde p_* (bold(x); bold(theta)) $
 ]
 
-If we model $P_bold(X) (bold(x); bold(theta))$ we just sample existing datapoints
+$P_bold(X) (bold(x); bold(theta))$ samples existing datapoints, must be $p_* (bold(x); bold(theta))$
 
-Only have dataset, not true distribution, how to model $p_* (bold(x); bold(theta))$?
+Only have $P_bold(X) (bold(x); bold(theta))$, not $p_* (bold(x); bold(theta))$
+- How to approximate $p_* (bold(x); bold(theta))$?
 
-*Key idea:* Learn a continuous distribution $p (bold(x); bold(theta))$ to model $P_bold(X) (bold(x))$
+*Key idea:* Learn a continuous distribution $p (bold(x); bold(theta))$ using $P_bold(X) (bold(x))$
 
-$ p (bold(x); bold(theta)) = P_bold(X) (bold(X)) => p (bold(x); bold(theta)) approx p_* (bold(x)) $
+$ p (bold(x); bold(theta)) = P_bold(X) (bold(x)) => p (bold(x); bold(theta)) approx p_* (bold(x)) $
 
 We call $p (bold(x); bold(theta))$ a *probabilistic generative model*
 
@@ -257,133 +252,138 @@ To summarize, probabilistic generative models:
 + 该分布通过最小化 $KL(p(bold(x); bold(theta)), P_bold(X)(bold(x)))$ 来进行近似。
 
 
-= Variational Autoencoders
+= Bayesian Inference
 ==
-Want to approximate a continuous (infinite) distribution $p_*(bold(x))$
-
-We will create a model $p(bold(x); bold(theta))$
 
 #side-by-side(columns: (0.4fr, 1.0fr), align: left)[
   #cimage("figures/lecture_1/dog.png") 
   $ bold(x) $
 ][
+- Model $=p(bold(x); bold(theta))$
+- Objective $approx KL(p(bold(x); bold(theta)), P_bold(X)(bold(x)))$
 *Question:* Represent $p(bold(x); bold(theta))$?
 - $bold(x)$ is very high dimensional
   - $bold(x) in {0 dots 255}^(3 times 28 times 28)$
 - Complex relationships between pixels
 - Generally intractable
 ]
-*Key idea:* Learn low-dimensional representation of $bold(x)$
+*Key idea:* Use low-dimensional representation of $bold(x)$ 
+- Can reason over low-dimensional representation
 
-==
-*Question:* How to learn a low-dimensional representation of the data?
+/*
+*Question:* How?
 
 *Answer:* Autoencoders!
 - Learns semantic, low-dimensional representation $bold(z)$
-
-#side-by-side(columns: (0.4fr, 1.0fr), align: left)[
-  #cimage("figures/lecture_1/dog.png") 
-  $ bold(x) $
-][
-  Let $bold(z)$ be a low-dimensional representation of $bold(x)$
-
-  $ bold(z) = vec("Dog", "Small", "Ugly", dots.v) $
+*/
 
 ==
+Let $bold(y)_([i])$ be a low-dimensional label of $bold(x)_([i])$
 
-
-  $ p(bold(x); bold(theta)) $
-  Want a low-dimensional representation of $bold(x)$ 
-
-  *Question:* How to make low-dimensional representations?
-
-  *Answer:* Autoencoder with $d_z < d_x$
+#side-by-side(align: horizon)[
+  $ bold(y)_([i]) = vec("Small", "Ugly") $
+][
+  $ bold(x)_([i]) = #cimage("figures/lecture_1/dog.png", height: 25%) $
 ]
 
-= Variational Autoencoders
+Probabilistic model should output distribution
 
+$ underbrace(#cimage("figures/lecture_1/dog.png", height: 25%), bold(x)_([i])) tilde p(underbrace("Small ugly dog pictures", bold(x)) mid(|) underbrace(vec("Small", "Ugly"), bold(y)_([i])); bold(theta)) $
 
+==
+We must consider all possible $bold(y)$ to represent all possible dog pictures
 
-= Probabilistic Graphical Models
+$ vec("Small", "Ugly"), vec("Medium", "Ugly"), vec("Big", "Not ugly"), dots $
+
+We also need to know the label distribution $bold(y)$
+- How common or rare are ugly dogs? Big dogs? Small dogs?
+
+$ p(bold(x); bold(theta)) = integral underbrace(p(bold(x) | bold(y); bold(theta)), "Image from label") overbrace(p(bold(y)), "Label distribution") dif bold(y) $
+
+This is the definition of a conditional distribution
 
 ==
 
+/*
+*Question:* Do we know $bold(z)$ in unsupervised learning?
+
+*Answer:* No! Only have $bold(x)$, not $bold(z)$
+
+*Question:* Can we learn $p(bold(x), bold(z); bold(theta))$ with only $bold(x)$? How? *Hint:* Marginal
+
+
+$ p(bold(x); bold(theta)) = integral p(bold(x), bold(z); bold(theta)) dif bold(z) $
+
+==
+$ p(bold(x); bold(theta)) = integral p(bold(x), bold(z); bold(theta)) dif bold(z) $
+
+Recall the original problem is $bold(x)$ being continuous and high-dimensional
+
+*Question:* What is the problem with this integral?
+
+*Answer:* $p(bold(x), bold(z); bold(theta))$ is even higher dimensional than $p(bold(x); bold(theta))$
+- Made the problem even harder, impossible to learn this distribution
+- Factorize problem to make it easier
+
+From the definition of conditional probability
+$ p(bold(x), bold(z); bold(theta)) = p(bold(x) | bold(z); bold(theta)) dot p(bold(z); bold(theta)) $
+
+*/
+==
+Bayesian inference model 
+
+$ p(bold(x); bold(theta)) = integral p(bold(x) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y) $
+
+*Question:* What was the objective?
+
+$ argmax_bold(theta) KL(P_bold(X)(bold(x)), p(bold(x); bold(theta))) $
+
+This is Bayesian inference! 
+
+==
 #side-by-side[
-
-#fletcher-diagram(
-  debug: true,
-  node-stroke: .15em,
-  node-fill: blue.lighten(50%),
-  edge-stroke: .1em,
-  
-  node((0,0), $ A $, radius: 2em, name: <A>),
-  node((0,1), $ B $, fill: gray.lighten(50%), radius: 2em, name: "B"),
-  node((1,0.5), $ C $, radius: 2em, name: <C>),
-  // Define edges
-  edge(<A>, <C>, "-|>"),
-  edge(<B>, <C>, "-|>"),
-  )
+  $ p(bold(x); bold(theta)) = integral underbrace(p(bold(x) | bold(y); bold(theta)), "Learn it") dot p(bold(y)) dif bold(y) $
 ][
-  $ P(A, B, C) = P(C | A, B) dot P(B) dot P(A) $
-
-  $B$ is *unobserved* variable or latent variable
-
-  *Question:* How to find $P(C)$?
-
-
-]
-  $ P(C) = integral integral P(C | A, B) dot P(B) dot P(A) dif  A dif B $
-
-==
-
-#side-by-side[
-#fletcher-diagram(
-  debug: true,
-  node-stroke: .15em,
-  node-fill: blue.lighten(50%),
-  edge-stroke: .1em,
-  
-  node((0,0), $ A $, radius: 2em, name: <A>),
-  node((0,1), $ B $, fill: gray.lighten(50%), radius: 2em, name: "B"),
-  node((1,0.5), $ C $, radius: 2em, name: <C>),
-  // Define edges
-  edge(<A>, <B>, "-|>"),
-  edge(<A>, <C>, "-|>"),
-  edge(<B>, <C>, "-|>"),
-  )
-][
-  $ P(A, B, C) = \ P(C | A, B) dot P(B | A) dot P(A) $
-  
-  *Question:* How to find $P(B)$?
-
+  $ argmax_bold(theta) KL(P_bold(X)(bold(x)), p(bold(x); bold(theta))) $
 ]
 
-$ P(B) = integral P(B | A) dot P(A) dif A $
+Aftering learning $p(bold(x) | bold(y); bold(theta))$ we can generate new datapoints
 
++ Either choose or sample label $bold(y)_([i]) tilde p(bold(y))$
++ Predict conditional distribution $p(bold(x) | bold(y)_([i]); bold(theta))$
++ Sample from conditional distribution $bold(x)_([i]) tilde p(bold(x) | bold(y)_([i]); bold(theta))$
 
-==
-#fletcher-diagram(
-  debug: true,
-  node-stroke: .15em,
-  node-fill: blue.lighten(50%),
-  edge-stroke: .1em,
-  
-  node((0,0), $ A $, radius: 2em, name: <A>),
-  node((0,1), $ B $, fill: gray.lighten(50%), radius: 2em, name: "B"),
-  node((1,0.5), $ C $, radius: 2em, name: <C>),
-  // Define edges
-  edge(<B>, <A>, "-|>"),
-  edge(<C>, <B>, "-|>"),
-  )
-
-  $ P(A, B, C) = P(A | B) dot P(B | C) dot P(C) $
+Very easy! But this requires labels $bold(y)$
+- Can we do this unsupervised (without labels)?
+- Then, model can learn labels $bold(y)$ without human help
 
 = Variational Autoencoders
 ==
+Consider Bayesian inference *without labels* $bold(y)$
+- We will *learn* a low-dimensional latent description $bold(z)$ instead
+  - $bold(z)$ encodes the structure of the dataset (and the world)
 
+$ p(bold(x); bold(theta)) = integral p(bold(x) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y) => integral p(bold(x) | bold(z); bold(theta)) dot p(bold(z)) dif bold(z) $
+
+We no longer have a label distribution $p(bold(y))$
+- Replace with a latent distribution $p(bold(z))$
+- We can choose this distribution! Gaussian, Bernoulli, ...
+- For now, make it easy $p(bold(z)) = cal(N)(bold(0), bold(I))$
+
+==
+*Question:* How can we learn $bold(z)$?
+
+*Answer:* Autoencoding! 
+
+$ hat(bold(x)) = f^(-1)(underbrace(f(bold(x), bold(theta)_e), bold(z)), bold(theta)_d) $
+
+But our models are probabilistic, so it is more complex
+
+==
+
+/*
 #side-by-side[
   #fletcher-diagram(
-    debug: true,
     node-stroke: .15em,
     node-fill: blue.lighten(50%),
     edge-stroke: .1em,
@@ -394,11 +394,10 @@ $ P(B) = integral P(B | A) dot P(A) dif A $
     edge(<A>, <B>, "-|>"),
     )
 
-    Encoder
+    Encoder $p(bold(z) | bold(x); bold(theta)_e)$
 
 ][
   #fletcher-diagram(
-  debug: true,
   node-stroke: .15em,
   node-fill: blue.lighten(50%),
   edge-stroke: .1em,
@@ -409,20 +408,96 @@ $ P(B) = integral P(B | A) dot P(A) dif A $
   edge(<A>, <B>, "<|-"),
   )
 
-  Decoder
+  Decoder $p(bold(x) | bold(z); bold(theta)_d)$
+]
+*/
+
+#side-by-side[
+  #fletcher-diagram(
+    node-stroke: .15em,
+    node-fill: blue.lighten(50%),
+    edge-stroke: .1em,
+    
+    node((0,0), $ bold(x) $, radius: 2em, name: <A>),
+    node((1,0), $ bold(z) $, radius: 2em, fill: gray.lighten(50%), name: <B>),
+    // Define edges
+    edge(<A>, <B>, "-|>", bend: 45deg, $ "Encoder" p(bold(z) | bold(x); bold(theta)_e) $),
+    edge(<A>, <B>, "<|-", bend: -45deg, $ "Decoder" p(bold(x) | bold(z); bold(theta)_d) $),
+  )
+][
+$ p(bold(x)) = integral p(bold(x) | bold(z); bold(theta)) p(bold(z)) dif bold(z) $
 ]
 
++ Use encoder and decoder to learn latent structure $bold(z)$ 
++ After learning, delete encoder (encoder only needed to learn $bold(z)$)
++ Do Bayesian inference with decoder and latent distribution
 
-  $ P(bold(x), bold(z)) = P(bold(z) | bold(x)) P(bold(x)) $
+Sound too easy? Implementation is much harder
 
-  $ P(bold(x), bold(z)) = P(bold(x) | bold(z)) P(bold(z)) $
+= Implementation Details
+==
+TODO: Should this go after HVAE and Diffusion?
+==
+#side-by-side[
+  $ p(bold(x); bold(theta)_d) = integral underbrace(p(bold(x) | bold(z); bold(theta)_d), "Decoder") p(bold(z)) dif bold(z) $
+][
+  $ underbrace(p(bold(z) | bold(x); bold(theta)_e), "Encoder") $
+]
+  $ argmax_bold(theta) KL(P_bold(X)(bold(x)), p(bold(x); bold(theta))) $
++ Encoder must map to marginal distribution $p(bold(z))$
++ Integral is intractable
++ Objective (KL divergence) is intractable
 
-  $ P(bold(x)) = integral P(bold(x) | bold(z)) P(bold(z)) dif bold(z) $
 
 
 = Hierarchical VAEs
+==
+  #fletcher-diagram(
+    node-stroke: .15em,
+    node-fill: blue.lighten(50%),
+    edge-stroke: .1em,
+    
+    node((0,0), $ bold(x) $, radius: 2em, name: <A>),
+    node((1,0), $ bold(z)_1 $, fill: gray.lighten(50%), radius: 2em, name: <B>),
+    node((2,0), $ bold(z)_2 $, fill: gray.lighten(50%), radius: 2em, name: <C>),
+    node((2.75,0), $ dots $, fill: none, stroke: none, radius: 2em, name: <D>),
+    node((3.75,0), $ bold(z)_T $, fill: gray.lighten(50%), radius: 2em, name: <E>),
+    // Define edges
+    edge(<A>, <B>, "-|>", bend: 45deg, $ p(bold(z)_1 | bold(x); bold(theta)_(e 1)) $),
+    edge(<B>, <C>, "-|>", bend: 45deg, $ p(bold(z)_2 | bold(z)_1; bold(theta)_(e 2)) $),
+    edge(<C>, <D>, "-", bend: 45deg),
+    edge(<D>, <E>, "-|>", bend: 45deg, $ p(bold(z)_T | bold(z)_(T-1); bold(theta)_(e T)) $),
+
+    edge(<A>, <B>, "<|-", bend: -45deg, $ p(bold(x) | bold(z)_1; bold(theta)_(d 1)) $),
+    edge(<B>, <C>, "<|-", bend: -45deg, $ p(bold(z)_1 | bold(z)_2; bold(theta)_(d 2)) $),
+    edge(<C>, <D>, "-", bend: -45deg),
+    edge(<D>, <E>, "<|-", bend: -45deg, $ p(bold(z)_(T-1) | bold(z)_T; bold(theta)_(d T)) $),
+    )
+
 
 = Diffusion Models
+==
+  #fletcher-diagram(
+    node-stroke: .15em,
+    node-fill: blue.lighten(50%),
+    edge-stroke: .1em,
+    
+    node((0,0), $ bold(x) $, radius: 2em, name: <A>),
+    node((1,0), $ bold(z)_1 $, fill: gray.lighten(50%), radius: 2em, name: <B>),
+    node((2,0), $ bold(z)_2 $, fill: gray.lighten(50%), radius: 2em, name: <C>),
+    node((2.75,0), $ dots $, fill: none, stroke: none, radius: 2em, name: <D>),
+    node((3.75,0), $ bold(z)_T $, fill: gray.lighten(50%), radius: 2em, name: <E>),
+    // Define edges
+    edge(<A>, <B>, "-|>", bend: 45deg, $ p(bold(z)_1 | bold(x)) $),
+    edge(<B>, <C>, "-|>", bend: 45deg, $ p(bold(z)_2 | bold(z)_1) $),
+    edge(<C>, <D>, "-", bend: 45deg),
+    edge(<D>, <E>, "-|>", bend: 45deg, $ p(bold(z)_T | bold(z)_(T-1)) $),
+
+    edge(<A>, <B>, "<|-", bend: -45deg, $ p(bold(x) | bold(z)_1; bold(theta)) $),
+    edge(<B>, <C>, "<|-", bend: -45deg, $ p(bold(z)_1 | bold(z)_2; bold(theta)) $),
+    edge(<C>, <D>, "-", bend: -45deg),
+    edge(<D>, <E>, "<|-", bend: -45deg, $ p(bold(z)_(T-1) | bold(z)_T; bold(theta)) $),
+    )
 
 
 = Backup
