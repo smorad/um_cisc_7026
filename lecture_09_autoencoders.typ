@@ -7,14 +7,10 @@
 #import algorithmic: style-algorithm, algorithm-figure, algorithm
 #import "@preview/mannot:0.3.0": *
 
-#let handout = false 
-
-
-// FUTURE TODO: Repeat self too much on locality/equivariance, restructure and replace with something else
+#let handout = true
 
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
-
 
 #show: university-theme.with(
   aspect-ratio: "16-9",
@@ -39,11 +35,6 @@
 )
 
 
-
-#set math.vec(delim: "[")
-#set math.mat(delim: "[")
-
-
 // TODO: Why is encoder tractable but decoder is not?
 
 = Admin
@@ -51,14 +42,16 @@
 Exam 2 grades released #pause
 - Mean score: 78.3% #pause
   - 10% higher than exam 1! #pause
-- Extra credit added to exam score #pause
+
+Extra credit #pause
+  - Students with less than 100% have credit added to Exam 2 score #pause
   - Students with over 100% have "Exam 2 Extra Credit" #pause
     - Moodle does not allow more than 100%
 
 ==
 Some students got 100% or more on both exams! #pause
 
-Great job! For you, there is no need to take exam 3 #pause
+Great job! There is no need for you to take exam 3 #pause
 - Agustin Yan
 - Chen Zhonghong
 - Cui Shuhang
@@ -74,23 +67,24 @@ Some students are very close (Exam 1: 95%, Exam 2: 100%) #pause
 Homework 3 fully graded #pause
 - Mean score 97% #pause
 
-Last assignment is RNN! 
+Last assignment is RNN! #pause
+- Assignment is longer than others, start soon!
 
 ==
 Please find groups for final project! #pause
 
 Project plan must contain 2 projects #pause
-- I will check projects to make sure they are possible #pause
-- If project 1 too hard, can do project 2 instead #pause
+- I will check projects to make sure they are ok #pause
+- If project 1 too hard, do project 2 instead #pause
 
-Things that will make you lose many points #pause
+Things that will make you lose points #pause
 - Heavy use of LLM/CoPilot #pause
 - Copy dataset and model from Kaggle/GitHub/etc
 
 ==
 The final project has two purposes: #pause
 1. Show that you understand the course material enough to apply it #pause
-2. Give you freedom to work on something you like #pause
+2. Let you work on something you like #pause
   - No supervisor telling you what to work on #pause
 
 Code everything yourself and invest sufficient time and effort #pause
@@ -108,11 +102,11 @@ Some projects from last year with full marks: #pause
 
     Recurrent neural networks only work with time #pause
 
-    Convolution makes use of locality and translation equivariance properties #pause
+    Convolution uses locality and translation equivariance properties #pause
 
     Recurrent models do not assume locality or equivariance #pause
 
-    Equivariance and locality make learning more efficient, but not all problems have this structure
+    Choose convolution or RNN based on problem structure
 
 ==
     How do humans process temporal data? #pause
@@ -143,13 +137,13 @@ Some projects from last year with full marks: #pause
 
     Composite photography/memory uses a weighted sum #pause
 
-    $ f(bold(x), bold(theta)) = sum_(i=1)^T bold(theta)^top overline(bold(x))_i $
+    $ f(bold(X), bold(theta)) = sum_(i=1)^T bold(theta)^top overline(bold(x))_i $
 
 ==
-    $ f(bold(x), bold(theta)) = sum_(i=1)^T bold(theta)^top overline(bold(x))_i $ #pause
+    $ f(bold(X), bold(theta)) = sum_(i=1)^T bold(theta)^top overline(bold(x))_i $ #pause
 
     #side-by-side[What if we see a new face? #pause][
-        $ f(bold(x), bold(theta)) = (sum_(i=1)^T bold(theta)^top overline(bold(x))_i) + bold(theta)^top overline(bold(x))_(T+1) $ #pause
+        $ f(bold(X), bold(theta)) = (sum_(i=1)^T bold(theta)^top overline(bold(x))_i) + bold(theta)^top overline(bold(x))_(T+1) $ #pause
     ]
 
     We repeat the same process for each new face #pause
@@ -159,11 +153,9 @@ Some projects from last year with full marks: #pause
 ==
     Rewrote composite memory as a recurrent function #pause
 
-    $ f(bold(x), bold(theta)) = underbrace((sum_(i=1)^T bold(theta)^top overline(bold(x))_i), bold(h)) + bold(theta)^top overline(bold(x))_(T+1) $ #pause
+    $ f(bold(X), bold(theta)) = underbrace((sum_(i=1)^T bold(theta)^top overline(bold(x))_i), bold(h)) + bold(theta)^top overline(bold(x))_(T+1) $ #pause
 
-    $ f(bold(h), bold(x), bold(theta)) = bold(h) + bold(theta)^top overline(bold(x)) $ #pause
-
-    $ bold(x) in bb(R)^(d_x), quad bold(h) in bb(R)^(d_h) $
+    $ f(bold(h), bold(x), bold(theta)) = bold(h) + bold(theta)^top overline(bold(x)) $ 
 
 ==
     #side-by-side[$  bold(x) in bb(R)^(d_x), quad bold(h) in bb(R)^(d_h) $][
@@ -218,7 +210,7 @@ Some projects from last year with full marks: #pause
 
     $ scan(f): H times X^T times Theta |-> H^T $ #pause
 
-    $ scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(h_1, h_2, dots.v, h_T) $ 
+    $ scan(f)(bold(h)_0, vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = vec(bold(h)_1, bold(h)_2, dots.v, bold(h)_T) $ 
 ==
     $ f: H times X times Theta |-> H, quad scan(f): H times X^T times Theta |-> H^T $ #pause
 
@@ -346,14 +338,18 @@ Some projects from last year with full marks: #pause
 
   $ f(vec(bold(x)_1, dots.v, bold(x)_n)) = "Fat panda saves village" $ #pause
 
-  In compression, we reduce the size of data by removing information #pause
+  In compression, we reduce the size of data by either: #pause
+  - Rewriting data in more efficient format (lossless) #pause
+  - Removing less important data (lossy) #pause
 
   Let us examine a more principled form of video compression
 
 ==
-  Kung Fu Panda in 4k UHD: $ X in {0, dots, 255}^(3 times 3840 times 2160), X^(90 times 60 times 24) $ #pause
+  Kung Fu Panda in 4k UHD #pause
 
-  *Question:* How many GB? #pause
+  $ X in {0, dots, 255}^(3 times 3840 times 2160), space X^(90 times 60 times 24) $ #pause
+
+  *Question:* 1 byte represents 256 values. How many GB? #pause
 
   *Answer:* 3000 GB #pause
 
@@ -430,11 +426,11 @@ Some projects from last year with full marks: #pause
 ==
     In supervised learning, humans provide the model with *inputs* $bold(X)$ and corresponding *outputs* $bold(Y)$ #pause
 
-    $ bold(X) = mat(x_[1], x_[2], dots, x_[n])^top quad bold(Y) = mat(y_[1], y_[2], dots, y_[n])^top $ #pause
+    $ bold(X) = mat(bold(x)_[1], bold(x)_[2], dots, bold(x)_[n])^top quad bold(Y) = mat(bold(y)_[1], bold(y)_[2], dots, bold(y)_[n])^top $ #pause
 
     In unsupervised learning, humans only provide *input* #pause
 
-    $ bold(X) = mat(x_[1], x_[2], dots, x_[n])^top $ #pause
+    $ bold(X) = mat(bold(x)_[1], bold(x)_[2], dots, bold(x)_[n])^top $ #pause
 
     The training algorithm will learn *unsupervised* (only from $bold(X)$) #pause
     - Humans do not need to provide labels!
@@ -876,7 +872,7 @@ $ f(bold(h)_T, bold(theta)_d) = hat(bold(h))_(T - 1), underbrace(#image("figures
 
 $ dots.v $ #pause
 
-$ f(bold(h)_1, bold(theta)_d) = hat(bold(h))_(0), underbrace(#image("figures/lecture_9/kfp1.jpg", height: 20%), bold(x)_T) $ 
+$ f(hat(bold(h))_1, bold(theta)_d) = hat(bold(h))_(0), underbrace(#image("figures/lecture_9/kfp1.jpg", height: 20%), bold(x)_T) $ 
 
 ==
 ```python
