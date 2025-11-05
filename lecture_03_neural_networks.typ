@@ -71,36 +71,6 @@
 })
 
 
-#let polynomial = canvas(length: 1cm, {
-  plot.plot(size: (12, 6),
-    x-tick-step: 4,
-    y-tick-step: 10,
-    y-min: -10,
-    y-max: 10,
-    x-min: -5,
-    x-max: 5,
-    {
-      plot.add(
-        domain: (-5, 5), 
-        x => 2 - x - 2 * calc.pow(x, 2) + calc.pow(x, 3),
-        style: (stroke: (paint: orange, thickness: 4pt)),
-      )
-      plot.add((
-        (0, 2), 
-        ( 0.25    ,  1.640625),
-        ( 0.5     ,  1.125   ),
-        ( 0.75    ,  0.546875),
-        ( 1.      ,  0.      ),
-        ( 1.25    , -0.421875),
-        ( 1.5     , -0.625   ),
-        ( 1.75    , -0.515625)
-      ),
-        mark: "o",
-        mark-style: (stroke: none, fill: black, thickness: 10pt),
-        style: (stroke: none))
-      })
-})
-
 #title-slide()
 
 == Outline <touying:hidden>

@@ -53,6 +53,13 @@
 
 
 = Admin
+==
+Final project groups #pause
+- If not in group must respond to message #pause
+  - I will put you in a group #pause
+  - If you do not respond, I will think you left the course #pause
+    - No final project group, 0 on final project
+
 
 = Review
 
@@ -211,8 +218,8 @@ We call $p (bold(x); bold(theta))$ a *probabilistic generative model*
 
 ==
 Understanding generative models probabilistically is very hard #pause
-- Requires statistics background most CS students lack #pause
-- I try and make it easier every year #pause
+- Took me years, I still do not fully understand #pause
+- I try and make it easier every year, but requires statistics #pause
 
 If you understand this concept, all generative models become easy #pause
 - Same objective, just different approximation methods #pause
@@ -231,41 +238,120 @@ Let us think about the objective function #pause
 
 *Question:* What is our objective? #pause
 
-$ argmax_(bold(theta)) space KL(P_bold(X) (bold(x)), p(bold(x); bold(theta))) $ #pause
+$ argmin_(bold(theta)) space KL(P_bold(X) (bold(x)), p(bold(x); bold(theta))) $ #pause
 
 Same idea as classification #pause
-- Almost all generative models use this objective #pause
-  - They represent it in different ways
+- Let us see if we can simplify the objective
+
+==
+$ argmin_bold(theta) KL(P_bold(X)(bold(x)), p(bold(x); bold(theta))) $ #pause
+
+From the definition of $KL$
+
+$ argmin_bold(theta) KL(P_bold(X)(bold(x)),  p(bold(x); bold(theta))) = \
+
+argmin_bold(theta) sum_(i=1)^n P_bold(X) (bold(x)_([i])) (
+  P_bold(X) (bold(x)_([i]))
+) / (
+  p(bold(x)_([i]); bold(theta))
+)
+$ #pause
+
+However, we know the probability for all datapoints $P_bold(X) (bold(x))$ #pause
+
+*Question:* What is it? #pause *Answer:* $1 / n$ if $bold(x)_([i])$ in dataset, else 0
+
+==
+$ argmin_bold(theta) sum_(i=1)^n P_bold(X) (bold(x)_([i])) (
+  P_bold(X) (bold(x)_([i]))
+) / (
+  p(bold(x)_([i]); bold(theta))
+)
+$ #pause
+
+With a constant $P_bold(X)$, we can simplify the expression #pause
+
+*Question:* How do we simplify? #pause *Hint:* Same as cross entropy loss #pause
+
+*Answer:* $P_bold(X)$ is constant $1/n$, can remove from optimization objective
+
+$ argmin_bold(theta) sum_(i=1)^n 1 / (p(bold(x)_([i]); bold(theta))) $ #pause
+
+==
+
+$ argmin_bold(theta) sum_(i=1)^n 1 / (p(bold(x)_([i]); bold(theta))) $ #pause
+
+Instead of minimizing ratio, maximize ($p$ always positive) #pause
+
+$ argmax_bold(theta) sum_(i=1)^n p(bold(x)_([i]); bold(theta)) $ #pause
+
+In statistics, we often optimize $log(f)$ instead of $f$ #pause
+- Yields same optima, often helps with optimization #pause
+
+$ argmax_bold(theta) sum_(i=1)^n log p(bold(x)_([i]); bold(theta)) $
+
+==
+$ argmax_bold(theta) sum_(i=1)^n log p(bold(x)_([i]); bold(theta)) $ #pause
+
+This is known as the *log likelihood* #pause
+- Used all over statistics and machine learning #pause
+
+The log likelihood objective: 
+- Learns the parameters $bold(theta)$ of a continuous distribution $p(bold(x); bold(theta))$
+- That maximizes the probability of each datapoint $bold(x)_([i])$ under the model
+
+==
+#align(center, pdf_pmf)
+
+$ p: Theta |-> Delta(X) $
+
+==
+
+$ argmax_bold(theta) sum_(i=1)^n log p(bold(x)_([i]); bold(theta)) $ #pause
+
+- Log likelihood for gradient ascent #pause
+- *Negative log likelihood* for gradient descent #pause
+
+$ argmin_bold(theta) sum_(i=1)^n - log p(bold(x)_([i]); bold(theta)) $ #pause
+
+Same thing, different names
+
 
 ==
 To summarize, probabilistic generative models: #pause
 + Use a dataset distribution $P_bold(X)(bold(x))$ #pause
 + To approximate the true data distribution $p_* (bold(x))$ #pause
 + By learning a *continuous* distribution $p(bold(x); bold(theta))$ #pause
-+ That minimizes some approximation of $KL(p(bold(x); bold(theta)), P_bold(X)(bold(x)))$ #pause
++ That maximizes some approximation of log likelihood objective #pause
 
-总结来说，概率生成模型：
-+ 使用数据集的经验分布 $P_bold(X)(bold(x))$
-+ 来近似真实的数据分布 $p_*(bold(x))$
-+ 其方法是学习一个 *连续* 的参数化分布 $p(bold(x); bold(theta))$
-+ 该分布通过最小化 $KL(p(bold(x); bold(theta)), P_bold(X)(bold(x)))$ 来进行近似。
+#side-by-side[
+  Generative model
+][
+  $ p(bold(x); bold(theta)) $
+]
+#side-by-side[
+  Log likelihood objective
+ ][
+ $ argmax_bold(theta) sum_(i=1)^n log p(bold(x)_([i]); bold(theta)) $
+]
+  
 
 
-= Bayesian Inference
+= Bayesian Generative Models
 ==
-Bayesian inference is the usual way we learn generative models #pause
+Let us take a closer look at generative models #pause
 
 #side-by-side(columns: (0.4fr, 1.0fr), align: left)[
   #cimage("figures/lecture_1/dog.png") 
   $ bold(x)_([i]) $ #pause
 ][
-- Model $=p(bold(x); bold(theta))$ #pause
-- Objective $approx KL(p(bold(x); bold(theta)), P_bold(X)(bold(x)))$ #pause
-*Question:* Represent $p(bold(x); bold(theta))$? #pause
+- Model $approx p(bold(x); bold(theta))$ #pause
+- Objective $approx argmax_bold(theta) sum_(i=1)^n log p(bold(x)_([i]); bold(theta))$ #pause
+*Question:* How to represent $p(bold(x); bold(theta))$? #pause
 - $bold(x)$ is very high dimensional #pause
-  - $bold(x) in {0 dots 255}^(3 times 28 times 28)$ #pause
+  - $bold(x) in [0, 1]^(3 times 28 times 28)$ #pause
 - Complex relationships between pixels #pause
-- Generally intractable #pause
+- Generally intractable to learn #pause
 ]
 *Key idea:* Use low-dimensional representation of $bold(x)$ #pause
 - Can reason over low-dimensional representation
@@ -276,10 +362,11 @@ Let $bold(y)_([i])$ be a low-dimensional label of $bold(x)_([i])$ #pause
 #side-by-side(align: horizon)[
   $ bold(y)_([i]) = vec("Small", "Ugly") $ #pause
 ][
-  $ bold(x)_([i]) = #cimage("figures/lecture_1/dog.png", height: 25%) $ #pause
+  $ bold(x)_([i]) = #cimage("figures/lecture_1/dog.png", height: 20%) $ #pause
 ]
 
-Probabilistic model should output distribution #pause
+The label tells us which $bold(x)$ to generate #pause
+- Many possible dog pictures, should be specific (condition on label) #pause
 
 $ underbrace(#cimage("figures/lecture_1/dog.png", height: 25%), bold(x)_([i])) tilde p(underbrace("Small ugly dog pictures", bold(x)) mid(|) underbrace(vec("Small", "Ugly"), bold(y)_([i])); bold(theta)) $
 
@@ -288,7 +375,7 @@ We must consider all possible $bold(y)$ to represent all possible dog pictures #
 
 $ vec("Small", "Ugly"), vec("Medium", "Ugly"), vec("Big", "Not ugly"), dots $ #pause
 
-We also need to know the label distribution $bold(y)$ #pause
+We also need to know the label distribution $p(bold(y))$ #pause
 - How common or rare are ugly dogs? Big dogs? Small dogs? #pause
 
 $ p(bold(x); bold(theta)) = integral underbrace(p(bold(x) | bold(y); bold(theta)), "Image from label") overbrace(p(bold(y)), "Label distribution") dif bold(y) $ #pause
@@ -296,22 +383,26 @@ $ p(bold(x); bold(theta)) = integral underbrace(p(bold(x) | bold(y); bold(theta)
 This is the definition of a conditional distribution
 
 ==
-Bayesian inference model: #pause
+Bayesian generative model: #pause
 
 $ p(bold(x); bold(theta)) = integral p(bold(x) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y) $ #pause
 
 *Question:* What was the objective? #pause
 
-$ argmax_bold(theta) KL(P_bold(X)(bold(x)), p(bold(x); bold(theta))) $ #pause
+$ argmax_bold(theta) sum_(i=1)^n log p(bold(x)_([i]); bold(theta)) $ #pause
 
-This is Bayesian inference! 
+Can plug model into objective
+
+$ argmax_bold(theta) sum_(i=1)^n log integral p(bold(x)_([i]) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y) $ #pause
 
 ==
+/*
 #side-by-side[
   $ p(bold(x); bold(theta)) = integral underbrace(p(bold(x) | bold(y); bold(theta)), "Learn it") dot p(bold(y)) dif bold(y) $ #pause
 ][
-  $ argmax_bold(theta) KL(P_bold(X)(bold(x)), p(bold(x); bold(theta))) $ #pause
-]
+  $ argmin_bold(theta) KL(P_bold(X)(bold(x)), p(bold(x); bold(theta))) $ #pause
+]*/
+$ underbrace(argmax_bold(theta) sum_(i=1)^n log overbrace(integral p(bold(x)_([i]) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y), "Model"), "Objective") $
 
 Aftering learning $p(bold(x) | bold(y); bold(theta))$ we can generate new datapoints #pause
 
@@ -320,24 +411,22 @@ Aftering learning $p(bold(x) | bold(y); bold(theta))$ we can generate new datapo
 + Sample from conditional distribution $bold(x)_([i]) tilde p(bold(x) | bold(y)_([i]); bold(theta))$ #pause
 
 Very easy! But this requires labels $bold(y)$ #pause
-- Can we do this unsupervised (without labels)? #pause
-- Then, model can learn labels $bold(y)$ without human help
+- Can we do this unsupervised (without labels/humans)?
 
 = Variational Autoencoders
 ==
-Consider Bayesian inference *without labels* $bold(y)$ #pause
-- We will *learn* a low-dimensional latent description $bold(z)$ instead
+Consider a generative model *without labels* $bold(y)$ #pause
+- We will *learn* a low-dimensional latent description $bold(z)$ instead #pause
   - $bold(z)$ encodes the structure of the dataset (and the world) #pause
 
 $ p(bold(x); bold(theta)) = integral p(bold(x) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y) => integral p(bold(x) | bold(z); bold(theta)) dot p(bold(z)) dif bold(z) $ #pause
 
-We no longer have a label distribution $p(bold(y))$ #pause
-- Replace with a latent distribution $p(bold(z))$ #pause
-- We can choose this distribution! Gaussian, Bernoulli, ... #pause
+Replace label distribution $p(bold(y))$ with latent distribution $p(bold(z))$ #pause
+- We can choose this distribution, Gaussian, Bernoulli, ... #pause
 - For now, make it easy $p(bold(z)) = cal(N)(bold(0), bold(I))$
 
 ==
-*Question:* How can we learn $bold(z)$? #pause
+*Question:* How can we learn structure of $bold(z)$? #pause
 
 *Answer:* Autoencoding! #pause
 
@@ -348,7 +437,7 @@ But our models are probabilistic, so it is more complex
 ==
 
 #side-by-side[
-$ p(bold(x)) = integral p(bold(x) | bold(z); bold(theta)) p(bold(z)) dif bold(z) $ #pause
+$ p(bold(x); bold(theta)) = integral p(bold(x) | bold(z); bold(theta)) p(bold(z)) dif bold(z) $ #pause
 ][
   #fletcher-diagram(
     node-stroke: .15em,
@@ -365,12 +454,87 @@ $ p(bold(x)) = integral p(bold(x) | bold(z); bold(theta)) p(bold(z)) dif bold(z)
 
 + Use encoder and decoder to learn latent structure $bold(z)$ #pause
 + After learning, delete encoder (encoder only needed to learn $bold(z)$) #pause
-+ Do Bayesian inference with decoder and latent distribution #pause
++ Use decoder and latent distribution for generation #pause
 
-Sound too easy? Implementation is much harder
+Sound too easy? It is, making it tractable is much harder
 
-= Implementation Details
+= Practical Considerations
 ==
+Most generative models follow a similar approach #pause
+
+$ underbrace(argmax_bold(theta) sum_(i=1)^n log overbrace(integral p(bold(x)_([i]) | bold(z); bold(theta)) dot p(bold(z)) dif bold(z), "Model"), "Objective") $
+
+However, this expression is  often intractable #pause
+
+*Question:* Why? #pause *Answer:* Cannot solve integral #pause 
+- No analytical solution if $p(bold(x) | bold(z); bold(theta))$ is neural network #pause
+- Indefinite integration over continuous/infinite variable $bold(z)$
+
+==
+$ underbrace(argmax_bold(theta) sum_(i=1)^n log overbrace(integral p(bold(x)_([i]) | bold(z); bold(theta)) dot p(bold(z)) dif bold(z), "Model"), "Objective") $ #pause
+
+Variational inference methods (like VAEs) approximate this objective using the *evidence lower bound* (ELBO) #pause
+- Lower bounds the true log likelihood #pause
+
+The derivation is interesting, but requires concepts you do not know #pause
+- Expected values, Jensen's inequality, etc #pause
+- Instead, I will show you the final result
+
+==
+The original objective
+
+$ argmax_bold(theta) sum_(i=1)^n log integral p(bold(x)_([i]) | bold(z); bold(theta)) dot p(bold(z)) dif bold(z) $ #pause
+
+The surrogate objective (ELBO)
+
+$ argmax_bold(theta) sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)))[
+ log p(bold(x)_([i]) | bold(z); bold(theta))
+]
+-KL(p(bold(z) | bold(x) ; bold(theta)), p(bold(z)))  $ #pause
+
+Very scary looking expression #pause
+- Let us try to understand it
+
+==
+
+#v(1em)
+$ argmax_bold(theta) sum_(i=1)^n 
+  markrect(bb(E)_(bold(z) tilde 
+  markhl(p(bold(z) | bold(x)_([i]) ; bold(theta)),tag: #<1>, color: #orange))[
+    log markhl(p(bold(x)_([i]) | bold(z); bold(theta)), tag: #<2>, color: #blue)
+  ], stroke: #3pt, color: #red, radius: #5pt, tag: #<4>)
+- markrect(KL(
+  markhl(p(bold(z) | bold(x) ; bold(theta)), tag: #<3>, color: #orange),
+  p(bold(z))), stroke: #3pt, color: #purple, radius: #5pt, tag: #<5>) $ 
+
+#annot((<1>), pos: top, dy: -1em, annot-text-props: (size: 1em))[Encoder]
+#annot((<3>), pos: top, dy: -1em, annot-text-props: (size: 1em))[Encoder]
+#annot(<2>, pos: top, dy: -1em, annot-text-props: (size: 1em))[Decoder]
+#annot(<4>, pos: bottom,  annot-text-props: (size: 1em))[Reconstruction]
+#annot(<5>, pos: bottom,  annot-text-props: (size: 1em))[Marginal matching]
+
+
+#align(center, fletcher-diagram(
+  node-stroke: .15em,
+  node-fill: blue.lighten(50%),
+  edge-stroke: .1em,
+  
+  node((0,0), $ bold(x) $, radius: 2em, name: <A>),
+  node((1,0), $ bold(z) $, radius: 2em, fill: gray.lighten(50%), name: <B>),
+  // Define edges
+  edge(<A>, <B>, "-|>", bend: 45deg, $ "Encoder" p(bold(z) | bold(x); bold(theta)_e) $),
+  edge(<A>, <B>, "<|-", bend: -45deg, $ "Decoder" p(bold(x) | bold(z); bold(theta)_d) $),
+))
+
+==
+
+
+VAEs approximate the model with *variational inference* #pause
+- Assume the latent space $p(bold(z))$ follows a tractable distribution #pause
+
+$ p(bold(x); bold(theta)) = integral p(bold(x) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y) $
+
+
 TODO: Should this go after HVAE and Diffusion?
 ==
 #side-by-side[
@@ -378,7 +542,7 @@ TODO: Should this go after HVAE and Diffusion?
 ][
   $ underbrace(p(bold(z) | bold(x); bold(theta)_e), "Encoder") $
 ]
-  $ argmax_bold(theta) KL(P_bold(X)(bold(x)), p(bold(x); bold(theta))) $
+  $ argmin_bold(theta) KL(P_bold(X)(bold(x)), p(bold(x); bold(theta))) $
 + Encoder must map to marginal distribution $p(bold(z))$
 + Integral is intractable
 + Objective (KL divergence) is intractable

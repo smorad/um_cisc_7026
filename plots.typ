@@ -28,6 +28,44 @@
     })
 })}
 
+#let pdf_pmf = canvas(length: 1cm, {
+  plot.plot(size: (16, 10),
+    x-tick-step: 2,
+    y-tick-step: 0.2,
+    y-min: 0,
+    y-max: .4,
+    x-label: [$ bold(x) $],
+    y-label: none,
+    {
+      plot.add(
+        domain: (-4, 4), 
+        label: $ p(bold(x); bold(theta)) $,
+        style: (stroke: (thickness: 5pt, paint: red)),
+        x => 1 / (2 * 3.14) * calc.pow(calc.e, -(0.5 * calc.pow(x, 2)))
+      )
+      plot.add(
+        domain: (-4, 4), 
+        label: $ p_*(bold(x)) $,
+        style: (stroke: (thickness: 5pt, paint: blue)),
+        x => 1 / (2 * 3.14 * 2) * calc.pow(calc.e, -(0.5 * calc.pow(x, 2) / 2))
+      )
+      plot.add((
+        (1.5, 0.03), 
+        (1, 0.03), 
+        (0.2, 0.03), 
+        (0.3, 0.03), 
+        (0, 0.03), 
+        (-0.3, 0.03), 
+        (-1.1, 0.03), 
+      ), 
+      label: $ P_bold(X) (bold(x)) $,
+      mark: "o",
+      mark-style: (stroke: none, fill: black, thickness: 10pt),
+      style: (stroke: none)
+       )
+    })
+})
+
 #let forgetting = { 
     set text(size: 22pt)
     canvas(length: 1cm, {
@@ -47,6 +85,38 @@
       )
     })
 })}
+
+#let polynomial = canvas(length: 1cm, {
+  plot.plot(size: (12, 6),
+    x-tick-step: 4,
+    y-tick-step: 10,
+    y-min: -10,
+    y-max: 10,
+    x-min: -5,
+    x-max: 5,
+    {
+      plot.add(
+        domain: (-5, 5), 
+        x => 2 - x - 2 * calc.pow(x, 2) + calc.pow(x, 3),
+        style: (stroke: (paint: orange, thickness: 4pt)),
+      )
+      plot.add((
+        (0, 2), 
+        ( 0.25    ,  1.640625),
+        ( 0.5     ,  1.125   ),
+        ( 0.75    ,  0.546875),
+        ( 1.      ,  0.      ),
+        ( 1.25    , -0.421875),
+        ( 1.5     , -0.625   ),
+        ( 1.75    , -0.515625)
+      ),
+        mark: "o",
+        mark-style: (stroke: none, fill: black, thickness: 10pt),
+        style: (stroke: none))
+      })
+})
+
+
 
 //
 // Flow Charts
