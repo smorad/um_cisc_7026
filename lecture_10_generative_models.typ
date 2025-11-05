@@ -396,12 +396,6 @@ Can plug model into objective
 $ argmax_bold(theta) sum_(i=1)^n log integral p(bold(x)_([i]) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y) $ #pause
 
 ==
-/*
-#side-by-side[
-  $ p(bold(x); bold(theta)) = integral underbrace(p(bold(x) | bold(y); bold(theta)), "Learn it") dot p(bold(y)) dif bold(y) $ #pause
-][
-  $ argmin_bold(theta) KL(P_bold(X)(bold(x)), p(bold(x); bold(theta))) $ #pause
-]*/
 $ underbrace(argmax_bold(theta) sum_(i=1)^n log overbrace(integral p(bold(x)_([i]) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y), "Model"), "Objective") $
 
 Aftering learning $p(bold(x) | bold(y); bold(theta))$ we can generate new datapoints #pause
@@ -439,17 +433,7 @@ But our models are probabilistic, so it is more complex
 #side-by-side[
 $ p(bold(x); bold(theta)) = integral p(bold(x) | bold(z); bold(theta)) p(bold(z)) dif bold(z) $ #pause
 ][
-  #fletcher-diagram(
-    node-stroke: .15em,
-    node-fill: blue.lighten(50%),
-    edge-stroke: .1em,
-    
-    node((0,0), $ bold(x) $, radius: 2em, name: <A>),
-    node((1,0), $ bold(z) $, radius: 2em, fill: gray.lighten(50%), name: <B>),
-    // Define edges
-    edge(<A>, <B>, "-|>", bend: 45deg, $ "Encoder" p(bold(z) | bold(x); bold(theta)_e) $),
-    edge(<A>, <B>, "<|-", bend: -45deg, $ "Decoder" p(bold(x) | bold(z); bold(theta)_d) $),
-  ) #pause
+  #vae_flow #pause
 ]
 
 + Use encoder and decoder to learn latent structure $bold(z)$ #pause
@@ -504,355 +488,32 @@ $ argmax_bold(theta) sum_(i=1)^n
     log markhl(p(bold(x)_([i]) | bold(z); bold(theta)), tag: #<2>, color: #blue)
   ], stroke: #3pt, color: #red, radius: #5pt, tag: #<4>)
 - markrect(KL(
-  markhl(p(bold(z) | bold(x) ; bold(theta)), tag: #<3>, color: #orange),
+  markhl(p(bold(z) | bold(x)_([i]) ; bold(theta)), tag: #<3>, color: #orange),
   p(bold(z))), stroke: #3pt, color: #purple, radius: #5pt, tag: #<5>) $ 
 
 #annot((<1>), pos: top, dy: -1em, annot-text-props: (size: 1em))[Encoder]
-#annot((<3>), pos: top, dy: -1em, annot-text-props: (size: 1em))[Encoder]
-#annot(<2>, pos: top, dy: -1em, annot-text-props: (size: 1em))[Decoder]
+#annot((<3>), pos: top, annot-text-props: (size: 1em))[Encoder]
+#annot(<2>, pos: top, annot-text-props: (size: 1em))[Decoder]
 #annot(<4>, pos: bottom,  annot-text-props: (size: 1em))[Reconstruction]
 #annot(<5>, pos: bottom,  annot-text-props: (size: 1em))[Marginal matching]
 
-
-#align(center, fletcher-diagram(
-  node-stroke: .15em,
-  node-fill: blue.lighten(50%),
-  edge-stroke: .1em,
-  
-  node((0,0), $ bold(x) $, radius: 2em, name: <A>),
-  node((1,0), $ bold(z) $, radius: 2em, fill: gray.lighten(50%), name: <B>),
-  // Define edges
-  edge(<A>, <B>, "-|>", bend: 45deg, $ "Encoder" p(bold(z) | bold(x); bold(theta)_e) $),
-  edge(<A>, <B>, "<|-", bend: -45deg, $ "Decoder" p(bold(x) | bold(z); bold(theta)_d) $),
-))
-
-==
-
-
-VAEs approximate the model with *variational inference* #pause
-- Assume the latent space $p(bold(z))$ follows a tractable distribution #pause
-
-$ p(bold(x); bold(theta)) = integral p(bold(x) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y) $
-
-
-TODO: Should this go after HVAE and Diffusion?
-==
-#side-by-side[
-  $ p(bold(x); bold(theta)_d) = integral underbrace(p(bold(x) | bold(z); bold(theta)_d), "Decoder") p(bold(z)) dif bold(z) $
-][
-  $ underbrace(p(bold(z) | bold(x); bold(theta)_e), "Encoder") $
-]
-  $ argmin_bold(theta) KL(P_bold(X)(bold(x)), p(bold(x); bold(theta))) $
-+ Encoder must map to marginal distribution $p(bold(z))$
-+ Integral is intractable
-+ Objective (KL divergence) is intractable
-
-
-
-= Hierarchical VAEs
-==
-  #fletcher-diagram(
-    node-stroke: .15em,
-    node-fill: blue.lighten(50%),
-    edge-stroke: .1em,
-    
-    node((0,0), $ bold(x) $, radius: 2em, name: <A>),
-    node((1,0), $ bold(z)_1 $, fill: gray.lighten(50%), radius: 2em, name: <B>),
-    node((2,0), $ bold(z)_2 $, fill: gray.lighten(50%), radius: 2em, name: <C>),
-    node((2.75,0), $ dots $, fill: none, stroke: none, radius: 2em, name: <D>),
-    node((3.75,0), $ bold(z)_T $, fill: gray.lighten(50%), radius: 2em, name: <E>),
-    // Define edges
-    edge(<A>, <B>, "-|>", bend: 45deg, $ p(bold(z)_1 | bold(x); bold(theta)_(e 1)) $),
-    edge(<B>, <C>, "-|>", bend: 45deg, $ p(bold(z)_2 | bold(z)_1; bold(theta)_(e 2)) $),
-    edge(<C>, <D>, "-", bend: 45deg),
-    edge(<D>, <E>, "-|>", bend: 45deg, $ p(bold(z)_T | bold(z)_(T-1); bold(theta)_(e T)) $),
-
-    edge(<A>, <B>, "<|-", bend: -45deg, $ p(bold(x) | bold(z)_1; bold(theta)_(d 1)) $),
-    edge(<B>, <C>, "<|-", bend: -45deg, $ p(bold(z)_1 | bold(z)_2; bold(theta)_(d 2)) $),
-    edge(<C>, <D>, "-", bend: -45deg),
-    edge(<D>, <E>, "<|-", bend: -45deg, $ p(bold(z)_(T-1) | bold(z)_T; bold(theta)_(d T)) $),
-    )
-
-
-= Diffusion Models
-==
-  #fletcher-diagram(
-    node-stroke: .15em,
-    node-fill: blue.lighten(50%),
-    edge-stroke: .1em,
-    
-    node((0,0), $ bold(x) $, radius: 2em, name: <A>),
-    node((1,0), $ bold(z)_1 $, fill: gray.lighten(50%), radius: 2em, name: <B>),
-    node((2,0), $ bold(z)_2 $, fill: gray.lighten(50%), radius: 2em, name: <C>),
-    node((2.75,0), $ dots $, fill: none, stroke: none, radius: 2em, name: <D>),
-    node((3.75,0), $ bold(z)_T $, fill: gray.lighten(50%), radius: 2em, name: <E>),
-    // Define edges
-    edge(<A>, <B>, "-|>", bend: 45deg, $ p(bold(z)_1 | bold(x)) $),
-    edge(<B>, <C>, "-|>", bend: 45deg, $ p(bold(z)_2 | bold(z)_1) $),
-    edge(<C>, <D>, "-", bend: 45deg),
-    edge(<D>, <E>, "-|>", bend: 45deg, $ p(bold(z)_T | bold(z)_(T-1)) $),
-
-    edge(<A>, <B>, "<|-", bend: -45deg, $ p(bold(x) | bold(z)_1; bold(theta)) $),
-    edge(<B>, <C>, "<|-", bend: -45deg, $ p(bold(z)_1 | bold(z)_2; bold(theta)) $),
-    edge(<C>, <D>, "-", bend: -45deg),
-    edge(<D>, <E>, "<|-", bend: -45deg, $ p(bold(z)_(T-1) | bold(z)_T; bold(theta)) $),
-    )
-
-
-= Backup
-= Variational Modeling
-==
-  Autoencoders are useful for compression and denoising #pause
-
-  But we can also use them as *generative models* #pause
-
-  A generative model learns the structure of data #pause
-
-  Using this structure, it generates *new* data #pause
-
-  - Train on face dataset, generate *new* pictures #pause
-  - Train on book dataset, write a *new* book #pause
-  - Train on protein dataset, create *new* proteins #pause
-
-  How does this work?
-
-==
-  Latent space $Z$ after training on the clothes dataset with $d_z = 3$
-
-  #cimage("figures/lecture_9/fashion-latent.png", height: 85%)
-
-  // #cimage("figures/lecture_9/latent_space.png") #pause
-
-==
-  What happens if we decode a new point?
-
-  #cimage("figures/lecture_9/fashion-latent.png", height: 85%)
-
-==
-  #side-by-side[
-    #cimage("figures/lecture_9/fashion-latent.png")
-  ][
-  Autoencoder generative model: #pause
-  
-  Encode $ vec(bold(x)_[1], dots.v, bold(x)_[n])$ into $vec(bold(z)_[1], dots.v, bold(z)_[n]) $ #pause
-
-  Pick a point $bold(z)_[k]$ #pause
-
-  Add some noise $bold(z)_"new" = bold(z)_[k] + bold(epsilon)$ #pause
-
-  Decode $bold(z)_"new"$ into $bold(x)_"new"$
-  ]
-
-/*
-==
-  #cimage("figures/lecture_9/vae_gen_faces.png", height: 70%) #pause
-
-  These pictures were created by a *variational* autoencoder #pause
-
-  But these people do not exist!
-*/
-==
-  #cimage("figures/lecture_9/vae_gen_faces.png", height: 70%) #pause
-
-  $ f^(-1)(bold(z)_k + bold(epsilon), bold(theta)_d) $
-
-==
-  #side-by-side(align: left)[
-  
-  But there is a problem, the *curse of dimensionality* #pause
-
-  As $d_z$ increases, points move further and further apart #pause
-
-  ][
-    #cimage("figures/lecture_9/curse.png") #pause
-  ]
-
-  $f^(-1)(bold(z) + epsilon)$ will produce either garbage, or $bold(z)$
-
-==
-  *Question:* What can we do? #pause
-
-  *Answer:* Force the points to be close together! #pause
-
-  We will use a *variational autoencoder* (VAE)
-
-==
-  VAE discovered by Diederik Kingma (also adam optimizer) #pause
-
-  #cimage("figures/lecture_9/durk.jpg", height: 80%) 
-
-==
-  Variational autoencoders (VAEs) do three things: #pause
-  + Make it easy to sample random $bold(z)$ #pause
-  + Keep all $bold(z)_[1], dots bold(z)_[n]$ close together in a small region #pause
-  + Ensure that $bold(z) + bold(epsilon)$ is always meaningful #pause
-
-  How? #pause
-
-  Make $bold(z)_[1], dots, bold(z)_[n]$ normally distributed #pause
-
-  $ bold(z) tilde cal(N)(mu, sigma), quad mu = 0, sigma = 1 $
-
-==
-  //#cimage("figures/lecture_2/normal_dist.png")
-  #align(center, normal)
-
-==
-  If $bold(z)_[1], dots, bold(z)_[n]$ are distributed following $cal(N)(0, 1)$: #pause
-
-  + 99.7% of $bold(z)_[1], dots, bold(z)_[n]$ lie within $3 sigma = [-3, 3]$ #pause
-
-  + Make it easy to generate new $bold(z)$, just sample $bold(z) tilde cal(N)(0, 1)$
-
-==
-  So how do we ensure that $bold(z)_[1], dots, bold(z)_[n]$ are normally distributed? #pause
-
-  We have to remember conditional probabilities #pause
-
-  $ P("rain" | "cloud") = "Probability of rain, given that it is cloudy" $ #pause
-
-  //First, let us assume we already have some latent variable $bold(z)$, and focus on the decoder #pause
-
-==
-  *Key idea 1:* We want to model the distribution over the dataset $X$
-
-  $ P(bold(x); bold(theta)), quad bold(x) tilde bold(X) $ #pause
-
-  We want to learn $bold(theta)$ that best models the distribution of possible faces #pause
-
-  #side-by-side[
-    Large $P(bold(x); bold(theta))$
-  ][
-    $P(bold(x); bold(theta)) approx 0$
-  ]
-  #side-by-side[
-    #cimage("figures/lecture_9/vae_gen_faces.png", height: 40%)
-  ][
-    #cimage("figures/lecture_1/muffin.png", height: 40%)
-  ]
-
-==
-  *Key idea 2:* There is some latent variable $bold(z)$ which generates data $bold(x)$ #pause
-
-  $ x: #cimage("figures/lecture_9/vae_slider.png") $
-
-  $ z: mat("woman", "brown hair", ("frown" | "smile")) $
-
-==
-  #cimage("figures/lecture_9/vae_slider.png")
-
-  Network can only see $bold(x)$, it cannot directly observe $bold(z)$ #pause
-
-  Given $bold(x)$, find the probability that the person is smiling $P(bold(z) | bold(x); bold(theta))$
-
-==
-
-
-
-TODO
-
-==
-  We cast the autoencoding task as a *variational inference* problem #pause
-
-  #align(center, varinf)
-
-  #side-by-side[
-    Decoder 
-    $ P(bold(x) | bold(z); bold(theta)) $
-  ][
-    Encoder 
-    $ P(bold(z) | bold(x); bold(theta)) $
-  ] #pause
-
-  We want to learn both the encoder and decoder: $P(bold(z), bold(x); bold(theta))$
-
-==
-  To generate data, we only need the *marginal* and *decoder* #pause
-
-  #align(center, varinf)
-
-  $ P(bold(x); bold(theta)) = integral_(Z) P(bold(x) | bold(z); bold(theta)) P(bold(z)) $
-
-  But the encoder $P(bold(z) | bold(x); bold(theta))$ is necessary to learn meaningful latent $p(bold(z))$
-
-==
-  $ P(bold(z), bold(x); bold(theta)) = P(bold(x) | bold(z); bold(theta)) space P(bold(z)) $ #pause
-
-  We can choose any distribution for $P(bold(z))$ #pause
-
-  $ P(bold(z)) = cal(N)(bold(0), bold(1)) $ #pause
-
-  We can generate all possible $bold(x)$ by sampling $bold(z) tilde cal(N)(bold(0), bold(1))$ #pause
-
-  We can randomly generate $bold(z)$, which we can decode into new $bold(x)$!
-
-==
-  Now, all we must do is find $bold(theta)$ that best explains the dataset distribution #pause
-
-  Learned distribution $P(bold(x); bold(theta))$ to be close to dataset $P(bold(x)), quad bold(x) tilde X$ #pause
-
-  We need some error function between $P(bold(x); bold(theta))$ and $P(bold(x))$ #pause
-  
-  *Question:* How do we measure error between probability distributions?  #pause
-
-  *Answer:* KL divergence
-
-==
-
-  #cimage("figures/lecture_5/forwardkl.png", height: 50%)
-  
-  $ KL(P, Q) = sum_i P(i) log P(i) / Q(i) $
-
-==
-  Learn the parameters for our model #pause
-
-  $ argmin_bold(theta) KL(P(bold(x)), P(bold(x); bold(theta))) $ #pause
-
-  Unfortunately, this objective is intractable to optimize #pause
-
-  *Question:* Why? #pause
-
-  $ P(bold(x))= integral_(Z) $
-
-  The support of $P(bold(x))$ is infinitely large: $bb(R)_(d_z)$
-
-==
-
-  The paper provides surrogate objective
-
-  $ argmin_bold(theta) [ -log P(bold(x) | bold(z); bold(theta)) + 1 / 2 KL(P(bold(z) | bold(x); bold(theta)), P(bold(z)))] $ #pause
-
-  We call this the *Evidence Lower Bound Objective* (ELBO) 
-
-==
-  $ argmin_bold(theta)  [- log P(bold(x) | bold(z); bold(theta)) + 1/2 KL(P(bold(z) | bold(x); bold(theta)), P(bold(z))) ] $ #pause
-
-  How is this ELBO helpful? #pause
-
-  #side-by-side[
-    Decoder 
-    $ P(bold(x) | bold(z); bold(theta)) $
-  ][
-    Encoder 
-    $ P(bold(z) | bold(x); bold(theta)) $
-  ][
-    Prior
-    $ P(bold(z)) = cal(N)(bold(0), bold(1)) $
-  ] #pause
-
-  $  argmin_bold(theta) [ underbrace(-log P(bold(x) | bold(z); bold(theta)), "Reconstruction error") + 1 / 2 underbrace(KL(P(bold(z) | bold(x); bold(theta)), P(bold(z))), "Constrain latent") ] $ #pause
-
-  Now we know how to train our autoencoder!
+#align(center, vae_flow)
 
 = Implementation
 ==
-  How do we implement $f$ (i.e., $P(bold(z) | bold(x); bold(theta))$ )? #pause
+If you did not understand the theory, it is ok #pause
+
+But pay attention now, we will implement the VAE #pause
+- Will use autoencoder notation to simplify when possible
+==
+  How do we implement encoder $f$ (i.e., $p(bold(z) | bold(x); bold(theta))$ )? #pause
 
   $ f : X times Theta |-> Delta Z $ #pause
 
-  Normal distribution has a mean $mu in bb(R)$ and standard deviation $sigma in bb(R)_+$ #pause
-
-  Our encoder should output $d_z$ means and $d_z$ standard deviations #pause
+  Recall we let $p(bold(z)) = cal(N)(bold(0), bold(I))$ #pause
+  - Encoder should output normal distribution for analytical KL term #pause
+  - Normal distribution has a mean $mu in bb(R)$ and standard deviation $sigma in bb(R)_+$ #pause
+  - Our encoder should output $d_z$ means and $d_z$ standard deviations #pause
 
   $ f : X times Theta |-> bb(R)^(d_z) times bb(R)_+^(d_z) $
 
@@ -864,8 +525,6 @@ TODO
   # But sigma must be positive
   # Output log sigma, because e^(sigma) is always positive
   log_sigma_layer = nn.Linear(d_h, d_z)
-  # Alternatively, one sigma for all data
-  log_sigma = jnp.ones((d_z,))
 
   tmp = core(x)
   mu = mu_layer(tmp)
@@ -876,11 +535,11 @@ TODO
 ==
   We covered the encoder
 
-  $ f: X times Theta |-> Delta Z $
+  $ f: X times Theta |-> Delta Z $ #pause
   
   We can use the same decoder as a standard autoencoder #pause
 
-  $ f^(-1): Z times Theta |-> X $
+  $ f^(-1): Z times Theta |-> X $ #pause
 
   *Question:* Any issues? #pause
 
@@ -907,9 +566,7 @@ TODO
 
   Gradient can flow through $bold(mu), bold(sigma)$ #pause
 
-  We can sample and use gradient descent #pause
-
-  This trick only works with certain distributions
+  We can sample and use gradient descent
 
 ==
   Put it all together #pause
@@ -924,72 +581,80 @@ TODO
 
   *Step 3:* Decode the sample 
 
-  $ bold(x) = f^(-1)(bold(z), bold(theta)_d) $
+  $ hat(bold(x)) = f^(-1)(bold(z), bold(theta)_d) $
 
 ==
-  One last thing, implement the loss function #pause
+  Last thing, implement the loss function (ELBO) #pause
 
 
   #side-by-side[
     Decoder 
-    $ P(bold(x) | bold(z); bold(theta)) $
+    $ p(bold(x) | bold(z); bold(theta)) $
   ][
     Encoder 
-    $ P(bold(z) | bold(x); bold(theta)) $
+    $ p(bold(z) | bold(x); bold(theta)) $
   ][
-    Prior
-    $ P(bold(z)) = cal(N)(bold(0), bold(1)) $
+    Marginal 
+    $ p(bold(z)) = cal(N)(bold(0), bold(1)) $
   ] #pause
 
-  $ cal(L)(bold(x), bold(theta)) = argmin_bold(theta) [ underbrace(-log P(bold(x) | bold(z); bold(theta)), "Reconstruction error") + underbrace( 1 / 2 KL(P(bold(z) | bold(x); bold(theta)), P(bold(z))), "Constrain latent") ] $ #pause
+$ argmax_bold(theta) sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)))[
+ log p(bold(x)_([i]) | bold(z); bold(theta))
+]
+-KL(p(bold(z) | bold(x) ; bold(theta)), p(bold(z))) $ #pause
 
-  Start with the KL term first
+Rewrite objective ass loss function for gradient descent #pause
+
+$ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)))[
+ -log p(bold(x)_([i]) | bold(z); bold(theta))
+]
++ KL(p(bold(z) | bold(x) ; bold(theta)), p(bold(z))) $ #pause
 
 ==
-  $ cal(L)(bold(x), bold(theta)) = argmin_bold(theta) [ -log P(bold(x) | bold(z); bold(theta)) + 1 / 2 KL(P(bold(z) | bold(x); bold(theta)), P(bold(z))) ] $ #pause
+  $ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)))[
+  -log p(bold(x)_([i]) | bold(z); bold(theta))
+  ]
+  + KL(p(bold(z) | bold(x) ; bold(theta)), p(bold(z))) $ #pause
 
   First, rewrite KL term using our encoder $f$ #pause
 
-  $ cal(L)(bold(x), bold(theta)) = argmin_bold(theta) [ -log P(bold(x) | bold(z)) + 1 / 2 KL(f(bold(x), bold(theta)_e), P(bold(z))) ] $ #pause
+  $ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)))[
+  -log p(bold(x)_([i]) | bold(z); bold(theta))
+  ]
+  + KL(f(bold(x), bold(theta)_e), p(bold(z))) $ #pause
 
-  $P(bold(z))$ and $f(bold(x), bold(theta)_e)$ are Gaussian, we can simplify KL term
+  //$ cal(L)(bold(x), bold(theta)) = argmin_bold(theta) [ -log P(bold(x) | bold(z)) + 1 / 2 KL(f(bold(x), bold(theta)_e), P(bold(z))) ] $ #pause
 
-  $ cal(L)(bold(x), bold(theta)) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $
+  $p(bold(z))$ and $f(bold(x), bold(theta)_e)$ are Gaussian, we can simplify KL term
 
-==
-  $ cal(L)(bold(x), bold(theta)) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $ #pause
+  $ = sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)))[
+  -log p(bold(x)_([i]) | bold(z); bold(theta))
+  ]
+  + 0.5 (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $ #pause
 
-  Next, plug in square error for reconstruction error #pause
-
-  $ = sum_(j=1)^d_z (x_j - f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d)_j )^2 - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $ #pause
-
-  $ cal(L)(bold(x), bold(theta)) = sum_(j=1)^d_z (x_j - f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d)_j )^2 - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $
-
-==
-  $ cal(L)(bold(x), bold(theta)) = sum_(j=1)^d_z (x_j - f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d)_j )^2 - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $ #pause
-
-  Finally, define over the entire dataset
-
-  $ cal(L)(bold(X), bold(theta)) &= sum_(i=1)^n sum_(j=1)^d_z (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_(j) )^2 - \ 
-  &(sum_(i=1)^n sum_(j=1)^d_z mu^2_([i],j) + sigma^2_([i],j) - log(sigma_([i], j)^2) - 1) $
+  //$ cal(L)(bold(x), bold(theta)) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $
 
 ==
-  $ cal(L)(bold(X), bold(theta)) &= sum_(i=1)^n sum_(j=1)^d_z (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_(j) )^2 - \ 
-   &(sum_(i=1)^n sum_(j=1)^d_z mu^2_([i],j) + sigma^2_([i],j) - log(sigma_([i], j)^2) - 1) $
+  //$ cal(L)(bold(x), bold(theta)) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $ #pause
 
-  Scale of two terms can vary, we do not want one term to dominate
+  $ = sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)))[
+  -log p(bold(x)_([i]) | bold(z); bold(theta))
+  ]
+  + 0.5 sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1 $ #pause
+
+  Log probability for Gaussian is just mean square error #pause
+
+  $ = sum_(i=1)^n sum_(j=1)^d_z (x_([i], j) - f^(-1)(f(bold(x)_([i]), bold(theta)_e), bold(theta)_d)_j )^2 - 0.5 (mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $ #pause
+
+
 
 ==
-  Paper suggests using minibatch size $m$ and dataset size $n$ #pause
+  $ = sum_(i=1)^n sum_(j=1)^d_z (x_([i], j) - f^(-1)(f(bold(x)_([i]), bold(theta)_e), bold(theta)_d)_j )^2 - 0.5 (mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $ #pause
 
-  $ cal(L)(bold(X), bold(theta)) &= #redm[$m / n$] sum_(i=1)^n sum_(j=1)^d_z (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_(j) )^2 - \ 
-   &(sum_(i=1)^n sum_(j=1)^d_z mu^2_([i],j) + sigma^2_([i],j) - log(sigma_([i], j)^2) - 1) $
+  Scale of two terms can vary, we do not want one term to dominate #pause
+  - Modern VAEs introduce a hyperparameter $beta$ #pause
 
-==
-  Another paper finds hyperparameter $beta$ also helps #pause
-
-  $ cal(L)(bold(X), bold(theta)) &= #redm[$m / n$] sum_(i=1)^n sum_(j=1)^d_z (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_(j) )^2 - \ 
-   & #redm[$beta$] (sum_(i=1)^n sum_(j=1)^d_z mu^2_([i],j) + sigma^2_([i],j) - log(sigma_([i], j)^2) - 1) $
+  $ = sum_(i=1)^n sum_(j=1)^d_z (x_([i], j) - f^(-1)(f(bold(x)_([i]), bold(theta)_e), bold(theta)_d)_j )^2 - #redm[$beta$] (mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $
 
 ==
   ```python
@@ -1002,5 +667,111 @@ TODO
     recon = jnp.sum((x - pred_x) ** 2)
     kl = jnp.sum(mu ** 2 + sigma ** 2 - jnp.log(sigma ** 2) - 1)
 
-    return m / n * recon + kl
+    return recon + beta * kl
   ```
+
+= Hierarchical VAEs
+==
+VAEs are just too easy #pause
+
+Some crazy people decided to make them more complex #pause
+- *Hierarchical VAEs* are many VAEs stacked together #pause
+  - Provide better results than VAEs
+==
+
+  #align(center, scale(80%, reflow: true, vae_flow)) #pause
+
+  #align(center, scale(80%, reflow: true, hvae_flow))
+
+==
+
+$ cal(L)_"VAE" (bold(X), bold(theta)) = sum_(i=1)^n underbrace(bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)))[
+ -log p(bold(x)_([i]) | bold(z); bold(theta))
+], "Reconstruction")
++ underbrace(KL(p(bold(z) | bold(x) ; bold(theta)), p(bold(z))), "Marginal match") $ #pause
+
+$ cal(L)_H = sum_(i=1)^n underbrace(bb(E)_(bold(z)_1 tilde p(bold(z)_1 | bold(x)_([i]) ; bold(theta)_(e 1)))[
+ -log p(bold(x)_([i]) | bold(z)_1; bold(theta)_(d 1))
+], "Reconstruction")
++ underbrace(KL(p(bold(z) | bold(x) ; bold(theta)_(e 1)), p(bold(z))), "Mariginal match") \
++ sum_(t=2)^T underbrace(KL(
+  p (bold(z)_t | bold(z)_(t-1) ; bold(theta)_(e t)),  
+  p (bold(z)_t | bold(z)_(t+1) ; bold(theta)_(d t))
+), "Consistency") $ 
+
+==
+
+$ sum_(t=2)^T underbrace(KL(
+  p (bold(z)_t | bold(z)_(t-1) ; bold(theta)_(e t)),  
+  p (bold(z)_t | bold(z)_(t+1) ; bold(theta)_(d t))
+), "Consistency") $ 
+#hvae_flow
+
+
+= Diffusion Models
+==
+Diffusion models are simplified HVAEs #pause
+- Instead of learning encoder, use fixed encoder #pause
+  - Operates in input space $X$ instead of latent space $Z$ #pause
+- Share parameters for all decoders #pause
+==
+
+  #align(center, scale(80%, reflow: true, hvae_flow)) #pause
+  #align(center, scale(80%, reflow: true, diffusion_flow))
+
+==
+
+$ cal(L)_"H" = sum_(i=1)^n bb(E)_(bold(z)_1 tilde p(bold(z)_1 | bold(x)_([i]) ; bold(theta)_(e 1)))[
+ -log p(bold(x)_([i]) | bold(z)_1; bold(theta)_(d 1))
+]
++ KL(p(bold(z) | bold(x) ; bold(theta)_(e 1)), p(bold(z))) \
++ sum_(t=2)^T KL(
+  p (bold(z)_t | bold(z)_(t-1) ; bold(theta)_(e t)),  
+  p (bold(z)_t | bold(z)_(t+1) ; bold(theta)_(d t))
+) $ #pause
+
+$ cal(L)_"Dif" = sum_(i=1)^n underbrace(bb(E)_(bold(z)_1 tilde p(bold(x)_2 | bold(x)_(1, [i])))[
+ -log p(bold(x)_(1, [i]) | bold(x)_2; bold(theta))
+], "Reconstruction")
+ \
++ sum_(t=2)^T underbrace(KL(
+  p (bold(x)_t | bold(x)_(t-1)),  
+  p (bold(x)_t | bold(x)_(t+1) ; bold(theta))
+), "Consistency (Denoising)") $ 
+
+==
+What is encoder $p (bold(x)_t | bold(x)_(t-1))$?
+
+Gaussian noise #pause
+
+$ p (bold(x)_t | bold(x)_(t-1)) = bold(x)_(t-1) + cal(N)(bold(0), bold(I)) $
+
+It is actually slightly more complicated, but same idea
+
+$ p (bold(x)_t | bold(x)_(t-1)) = cal(N)(sqrt(alpha_t) dot bold(x)_(t-1), (1 - alpha_t) dot bold(I) ) $ #pause
+
+*Question:* How is this different than VAE encoder? #pause
+- VAE *learns* to output $cal(N)(bold(0), bold(I))$, diffusion model outputs fixed $cal(N)(bold(0), bold(I))$ #pause
+  - VAE noise in latent space, diffusion in input space #pause
+- Hierarchical VAEs strictly more powerful than diffusion models 
+
+==
+How should I choose VAE/HVAE/diffusion model?
+
+Choose VAE for: #pause
+- Low-dimensional representation $bold(z)$ #pause
+- Simpler problem #pause
+
+Choose HVAE for: #pause
+- Low-dimensional representation $bold(z)$ #pause
+- Harder problem #pause
+
+Choose diffusion model if: #pause
+- Do not care about $bold(z)$ #pause
+- Have 16 GPUs
+
+= Coding
+==
+Let's code a VAE
+
+https://colab.research.google.com/drive/1UyR_W6NDIujaJXYlHZh6O3NfaCAMscpH#scrollTo=NLTDp6ipBtJU

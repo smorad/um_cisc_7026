@@ -122,6 +122,62 @@
 // Flow Charts
 //
 
+#let vae_flow = fletcher-diagram(
+    node-stroke: .15em,
+    node-fill: blue.lighten(50%),
+    edge-stroke: .1em,
+    
+    node((0,0), $ bold(x) $, radius: 2em, name: <A>),
+    node((1,0), $ bold(z) $, radius: 2em, fill: gray.lighten(50%), name: <B>),
+    // Define edges
+    edge(<A>, <B>, "-|>", bend: 45deg, $ "Encoder" p(bold(z) | bold(x); bold(theta)_e) $),
+    edge(<A>, <B>, "<|-", bend: -45deg, $ "Decoder" p(bold(x) | bold(z); bold(theta)_d) $),
+  ) 
+
+#let hvae_flow = fletcher-diagram(
+    node-stroke: .15em,
+    node-fill: blue.lighten(50%),
+    edge-stroke: .1em,
+    
+    node((0,0), $ bold(x) $, radius: 2em, name: <A>),
+    node((1,0), $ bold(z)_1 $, fill: gray.lighten(50%), radius: 2em, name: <B>),
+    node((2,0), $ bold(z)_2 $, fill: gray.lighten(50%), radius: 2em, name: <C>),
+    node((2.75,0), $ dots $, fill: none, stroke: none, radius: 2em, name: <D>),
+    node((3.75,0), $ bold(z)_T $, fill: gray.lighten(50%), radius: 2em, name: <E>),
+    // Define edges
+    edge(<A>, <B>, "-|>", bend: 45deg, $ p(bold(z)_1 | bold(x); bold(theta)_(e 1)) $),
+    edge(<B>, <C>, "-|>", bend: 45deg, $ p(bold(z)_2 | bold(z)_1; bold(theta)_(e 2)) $),
+    edge(<C>, <D>, "-", bend: 45deg),
+    edge(<D>, <E>, "-|>", bend: 45deg, $ p(bold(z)_T | bold(z)_(T-1); bold(theta)_(e T)) $),
+
+    edge(<A>, <B>, "<|-", bend: -45deg, $ p(bold(x) | bold(z)_1; bold(theta)_(d 1)) $),
+    edge(<B>, <C>, "<|-", bend: -45deg, $ p(bold(z)_1 | bold(z)_2; bold(theta)_(d 2)) $),
+    edge(<C>, <D>, "-", bend: -45deg),
+    edge(<D>, <E>, "<|-", bend: -45deg, $ p(bold(z)_(T-1) | bold(z)_T; bold(theta)_(d T)) $),
+    )
+
+#let diffusion_flow = fletcher-diagram(
+    node-stroke: .15em,
+    node-fill: blue.lighten(50%),
+    edge-stroke: .1em,
+    
+    node((0,0), $ bold(x)_1 $, radius: 2em, name: <A>),
+    node((1,0), $ bold(x)_2 $, fill: gray.lighten(50%), radius: 2em, name: <B>),
+    node((2,0), $ bold(x)_3 $, fill: gray.lighten(50%), radius: 2em, name: <C>),
+    node((2.75,0), $ dots $, fill: none, stroke: none, radius: 2em, name: <D>),
+    node((3.75,0), $ bold(x)_T $, fill: gray.lighten(50%), radius: 2em, name: <E>),
+    // Define edges
+    edge(<A>, <B>, "-|>", bend: 45deg, $ p(bold(x)_2 | bold(x)_1) $),
+    edge(<B>, <C>, "-|>", bend: 45deg, $ p(bold(x)_3 | bold(x)_2) $),
+    edge(<C>, <D>, "-", bend: 45deg),
+    edge(<D>, <E>, "-|>", bend: 45deg, $ p(bold(x)_T | bold(x)_(T-1)) $),
+
+    edge(<A>, <B>, "<|-", bend: -45deg, $ p(bold(x)_1 | bold(x)_2; bold(theta)) $),
+    edge(<B>, <C>, "<|-", bend: -45deg, $ p(bold(x)_2 | bold(x)_3; bold(theta)) $),
+    edge(<C>, <D>, "-", bend: -45deg),
+    edge(<D>, <E>, "<|-", bend: -45deg, $ p(bold(x)_(T-1) | bold(x)_T; bold(theta)) $),
+    )
+
 #let varinf = fletcher-diagram(
   node-stroke: .1em,
   spacing: 4em,
