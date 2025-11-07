@@ -54,14 +54,129 @@
 
 = Admin
 ==
+How was the last homework? #pause
+- Finished with homework! #pause
+
+What's left: #pause
+- Final exam (for some students) #pause
+- Group project
+==
 Final project groups #pause
-- If not in group must respond to message #pause
+- If not in group must respond to Moodle message #pause
   - I will put you in a group #pause
   - If you do not respond, I will think you left the course #pause
-    - No final project group, 0 on final project
+    - No final project group, 0 on final project #pause
+  - Still must submit project plan #pause
+    - Extension until Tuesday 11 Nov
 
 
 = Review
+
+==
+#side-by-side(align: left)[#cimage("figures/lecture_9/kungfu.jpg", height: 100%) #pause][
+  *Question:* You watch a film. How do you communicate information about the film with a friend? #pause
+
+  *Answer:* Fat panda becomes kung fu master to defend his village from an evil snow leopard. #pause
+
+  *Question:* What is missing? #pause
+
+  *Answer:* Goose father, tortoise teacher, tiger friend, magic scroll, etc
+]
+
+==
+  When you discuss films with friends, you summarize them #pause
+
+  This is a form of *compression* #pause
+
+  $ f(vec(bold(x)_1, dots.v, bold(x)_n)) = "Fat panda saves village" $ 
+
+==
+  Encoders and decoders for images, videos, and music are functions #pause
+
+  Neural networks can represent any continuous function #pause
+
+  We can use neural networks to represent encoders and decoders #pause
+
+  $ f: X times Theta |-> Z $ #pause
+
+  $ f^(-1): Z times Theta |-> X $ #pause
+
+  We call this an *autoencoder* #pause
+
+  Notice no labels $Y$ this time 
+
+==
+  In supervised learning, humans provide the model with *inputs* $bold(X)$ and corresponding *outputs* $bold(Y)$ #pause
+
+  $ bold(X) = mat(bold(x)_[1], bold(x)_[2], dots, bold(x)_[n])^top quad bold(Y) = mat(bold(y)_[1], bold(y)_[2], dots, bold(y)_[n])^top $ #pause
+
+  In unsupervised learning, humans only provide *input* #pause
+
+  $ bold(X) = mat(bold(x)_[1], bold(x)_[2], dots, bold(x)_[n])^top $ #pause
+
+  The training algorithm will learn *unsupervised* (only from $bold(X)$) #pause
+  - Humans do not need to provide labels!
+==
+  $f, f^(-1)$ may be any neural network #pause
+
+  $ bold(x) = f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d) $ #pause
+
+  Turn this into a loss function using the square error #pause
+
+  $ cal(L)(bold(x), bold(theta)) = sum_(j=1)^(d_x) (x_j - f^(-1)(f(bold(x), bold(theta)_e), bold(theta)_d)_j)^2 $ #pause
+
+  Forces the networks to compress and reconstruct $bold(x)$
+
+==
+Can make many types of autoencoders #pause
+- Convolutional autoencoder #pause
+- Recurrent autoencoder #pause
+- Graph neural network autoencoders #pause
+- Transformer autoencoders #pause
+
+The reconstruction objective is useful for compression 
+
+$ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_j)^2 $ #pause
+
+Could we use autoencoders for other tasks?
+
+==
+*Task:* Fix blurry and noisy image #pause
+
+$ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f( #redm[blur];(bold(x)_[i] + #bluem[$bold(epsilon)$]), bold(theta)_e), bold(theta)_d)_j)^2 $ #pause
+
+#side-by-side[
+  #cimage("figures/lecture_9/enhance0.jpg")
+][
+  #cimage("figures/lecture_9/enhance1.jpg")
+]
+
+==
+
+*Task:* Fix image with missing pixels #pause
+
+
+$ "Reconstruction loss" quad cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f(bold(x)_[i], bold(theta)_e), bold(theta)_d)_j)^2 $ #pause
+
+
+#side-by-side[Sample Bernoulli noise][$ bold(b) tilde cal(B)(0.2) $] #pause
+
+Masked reconstruction loss
+
+$ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n sum_(j=1)^(d_x) (x_([i],j) - f^(-1)(f(bold(x)_[i] #redm[$dot.o bold(b)$] , bold(theta)_e), bold(theta)_d)_j)^2 $ 
+
+==
+#side-by-side(align: left)[
+  #cimage("figures/lecture_9/masked.png") #pause
+][
+  Understanding emerges from reconstruction objectives #pause
+
+  *Without labels*, autoencoders learn what a bird is, what a bear is #pause
+
+  They learn the structure and distribution of the input data $X$ #pause
+
+  If the input data $X$ is from our world, then they begin to understand our world
+]
 
 = Generative Models
 ==
@@ -74,7 +189,7 @@ Final project groups #pause
   Images with similar semantic meaning (sneaker, sandal) cluster in Z #pause
 
   $Z$ forms a semantic manifold #pause
-  - Local Euclidean dynamics at each datapoint #pause
+  - Each datapoint locally Euclidean #pause
 
   Network learns what sneakers, shirts, etc are #pause
   - Can we use this to generate *new* images?
@@ -121,7 +236,7 @@ Final project groups #pause
     $ f^(-1) (bold(z)_[i] + #redm[$bold(epsilon)$], bold(theta)_d) $ #pause
 
     We will create an image of a new datapoint #pause
-    - Not in the dataset #pause
+    - Image not in the dataset #pause
     - Semantically similar to $bold(x)_i$ #pause
       - But *new* and different! #pause
 
@@ -132,19 +247,42 @@ Final project groups #pause
 ]
 
 ==
-#side-by-side[
+Generating new clothing pictures is not so exciting #pause
 
-][
+But we can apply generative models to many exciting problems #pause
+- Train on books, generate new stories #pause
+- Train on music, generate new music #pause
+- Train on medicine, generate new medicine #pause
 
-]
+Is it that easy? Train autoencoder on medicine to create new medicines? #pause
+
+Unfortunately, no. We can do it, but not with a simple autoencoder 
+
+==
 This autoencoder only works for small $d_z$ #pause
+- More interesting problems are high-dimensional (large $d_z$) #pause
 
-As $d_z$ grows, points spread out #pause
-- Curse of dimensionality #pause
-- For large $d_z$. one cluster for each datapoint #pause
+#cimage("figures/lecture_9/curse.png") #pause
 
-Our autoencoder only works for small $d_z$ #pause
-- Interesting problems are high-dimensional (large $d_z$)
+As $d_z$ grows, points spread out (curse of dimensionality) #pause
+- For large $d_z$, one cluster for each datapoint
+
+==
+#side-by-side[
+  #cimage("figures/lecture_9/curse.png") #pause
+][
+$ f^(-1) (bold(z) + bold(epsilon)); d_z >> 0 $ #pause
+]
+
+Adding noise and decoding does not work for large $d_z$ #pause
+
+#cimage("figures/lecture_9/fail_recon.png", height: 40%)
+
+==
+Autoencoder latent space has learned structure #pause
+- We must enforce some latent structure for generative models #pause
+- We use a probabilistic framework for this #pause
+- Very active area of research 
 
 
 = Probabilistic Generative Models
@@ -155,8 +293,10 @@ Our autoencoder only works for small $d_z$ #pause
 *Answer:* They implicitly model the *dataset distribution* #pause
 - If the dataset contains our world, autoencoders learn the world #pause
 
-We will examine learning through probability and distributions #pause
-- Best way to learn generative models #pause
+Must rethink machine learning to understand generative models #pause
+- Most lectures I try to skip/ignore probability theory #pause
+- Understanding probability is necessary for generative models #pause
+  - Please try your best to pay attention! #pause
 
 Let us consider a dataset of dog pictures
 
@@ -166,7 +306,7 @@ Let us consider a dataset of dog pictures
   $ bold(x)_([i]) $
   #pause
 ][
-  *Domain:* $X = {0 dots 255}^{3 times 28 times 28}$ #pause
+  *Domain:* $X = [0, 1]^{3 times 28 times 28}$ #pause
   - How we represent datapoints #pause
   - $bold(x)_([i]) in X$ #pause
 
@@ -174,11 +314,11 @@ Let us consider a dataset of dog pictures
   - Finite collection of $n$ datapoints #pause
 
   *Dataset distribution:* $P_bold(X) (bold(x)_([i]))$ #pause
-  - Probability of sampling $bold(x)_([i])$ from $bold(X)$ #pause
+  - Probability of uniformly sampling $bold(x)_([i])$ from $bold(X)$ #pause
   - $1/n$ if $bold(x)_([i])$ in dataset, else 0 #pause
 
   *True data distribution:* $p_* (bold(x)_([i]))$ #pause
-  - How likely is $bold(x)_([i])$ in the universe? 
+  - How likely is $bold(x)_([i])$ to exist in the universe? 
   //- Superset of the dataset $bold(X)$
 ]
 
@@ -190,7 +330,15 @@ Let us consider a dataset of dog pictures
   $ P_bold(X)(#cimage("figures/lecture_1/muffin.png", height: 30%) ) #pause = 0 $ #pause
 ]
 
-$ p_*(#cimage("figures/lecture_1/dog.png", height: 30%)) quad vec(delim: #none, =, <, >) quad p_*(#cimage("figures/lecture_1/muffin.png", height: 30%)) $
+$ p_*(#cimage("figures/lecture_1/dog.png", height: 30%)) quad vec(delim: #none, =, <, >) quad p_*(#cimage("figures/lecture_1/muffin.png", height: 30%)) $ #pause
+
+The probability of a point in a continuous distribution is always 0 #pause
+- For continuous distributions, we consider density not probability #pause
+
+==
+#cimage("figures/lecture_9/prob-vs-density.png")
+
+We let small $p$ represent likelihood
 
 ==
 We want to approximate a distribution so we can generate samples #pause
@@ -205,7 +353,7 @@ or
 $ bold(x)_([i]) tilde p_* (bold(x); bold(theta)) $
 ] #pause
 
-$P_bold(X) (bold(x); bold(theta))$ samples existing datapoints, must be $p_* (bold(x); bold(theta))$ #pause
+$P_bold(X) (bold(x); bold(theta))$ samples finite, existing datapoints, must be $p_* (bold(x); bold(theta))$ #pause
 
 Only have $P_bold(X) (bold(x); bold(theta))$, not $p_* (bold(x); bold(theta))$ #pause
 - How to approximate $p_* (bold(x); bold(theta))$? #pause
@@ -217,9 +365,11 @@ $ p (bold(x); bold(theta)) = P_bold(X) (bold(x)) => p (bold(x); bold(theta)) app
 We call $p (bold(x); bold(theta))$ a *probabilistic generative model*
 
 ==
-Understanding generative models probabilistically is very hard #pause
+#align(center, pdf_pmf)
+
+==
+Truly understanding generative models is very hard #pause
 - Took me years, I still do not fully understand #pause
-- I try and make it easier every year, but requires statistics #pause
 
 If you understand this concept, all generative models become easy #pause
 - Same objective, just different approximation methods #pause
@@ -231,12 +381,12 @@ If you understand this concept, all generative models become easy #pause
   - ...
 
 ==
-Let us think about the objective function #pause
+Let us think about the objective function for a generative model #pause
 - We have the dataset distribution $P_bold(X) (bold(x))$ #pause
 - We have a model that outputs a distribution $p (bold(x); bold(theta))$ #pause
 - Output distribution must match the dataset distribution  #pause
 
-*Question:* What is our objective? #pause
+*Question:* What is our objective? #pause *Hint:* Two distributions #pause
 
 $ argmin_(bold(theta)) space KL(P_bold(X) (bold(x)), p(bold(x); bold(theta))) $ #pause
 
@@ -250,7 +400,7 @@ From the definition of $KL$
 
 $ argmin_bold(theta) KL(P_bold(X)(bold(x)),  p(bold(x); bold(theta))) = \
 
-argmin_bold(theta) sum_(i=1)^n P_bold(X) (bold(x)_([i])) (
+argmin_bold(theta) sum_(i=1)^n P_bold(X) (bold(x)_([i])) log (
   P_bold(X) (bold(x)_([i]))
 ) / (
   p(bold(x)_([i]); bold(theta))
@@ -262,43 +412,86 @@ However, we know the probability for all datapoints $P_bold(X) (bold(x))$ #pause
 *Question:* What is it? #pause *Answer:* $1 / n$ if $bold(x)_([i])$ in dataset, else 0
 
 ==
-$ argmin_bold(theta) sum_(i=1)^n P_bold(X) (bold(x)_([i])) (
+$ argmin_bold(theta) sum_(i=1)^n P_bold(X) (bold(x)_([i])) log (
   P_bold(X) (bold(x)_([i]))
 ) / (
   p(bold(x)_([i]); bold(theta))
 )
 $ #pause
 
-With a constant $P_bold(X)$, we can simplify the expression #pause
+//Since $P_bold(X)$ is constant, let us try and factor it out #pause
+//- Then we can remove it from the objective #pause
 
-*Question:* How do we simplify? #pause *Hint:* Same as cross entropy loss #pause
+$ argmin_bold(theta) sum_(i=1)^n P_bold(X) (bold(x)_([i])) [ log 
+  P_bold(X) (bold(x)_([i]))
+ - log p(bold(x)_([i]); bold(theta))
+ ]
+$ #pause
 
-*Answer:* $P_bold(X)$ is constant $1/n$, can remove from optimization objective
+$ argmin_bold(theta) sum_(i=1)^n P_bold(X) (bold(x)_([i]))  log 
+  P_bold(X) (bold(x)_([i]))
+ - P_bold(X) (bold(x)_([i])) log p(bold(x)_([i]); bold(theta))
+$ 
 
-$ argmin_bold(theta) sum_(i=1)^n 1 / (p(bold(x)_([i]); bold(theta))) $ #pause
+$ argmin_bold(theta) (sum_(i=1)^n P_bold(X) (bold(x)_([i])) log 
+  P_bold(X) (bold(x)_([i]))) 
+ - (sum_(i=1)^n P_bold(X) (bold(x)_([i])) log p(bold(x)_([i]); bold(theta)))
+$ #pause
+
 
 ==
 
-$ argmin_bold(theta) sum_(i=1)^n 1 / (p(bold(x)_([i]); bold(theta))) $ #pause
+$ argmin_bold(theta) (sum_(i=1)^n P_bold(X) (bold(x)_([i])) log 
+  P_bold(X) (bold(x)_([i]))) 
+ - (sum_(i=1)^n P_bold(X) (bold(x)_([i])) log p(bold(x)_([i]); bold(theta)))
+$ #pause
 
-Instead of minimizing ratio, maximize ($p$ always positive) #pause
+First term is constant and does not depend on $bold(theta)$, can delete it!
 
-$ argmax_bold(theta) sum_(i=1)^n p(bold(x)_([i]); bold(theta)) $ #pause
+$ argmin_bold(theta) sum_(i=1)^n - P_bold(X) (bold(x)_([i])) log p(bold(x)_([i]); bold(theta))
+$ 
 
-In statistics, we often optimize $log(f)$ instead of $f$ #pause
-- Yields same optima, often helps with optimization #pause
-
-$ argmax_bold(theta) sum_(i=1)^n log p(bold(x)_([i]); bold(theta)) $
+Very similar to classification loss derivation so far 
 
 ==
+$ argmin_bold(theta) - sum_(i=1)^n P_bold(X) (bold(x)_([i])) log p(bold(x)_([i]); bold(theta)) $ #pause
+
+Let us think about $P_bold(X) (bold(x)_([i]))$, can we rewrite it? #pause
+- *Hint:* The sum is over the dataset #pause
+- *Hint:* What is $P_bold(X)$ for a datapoint in the dataset? #pause
+
+$ P_bold(X) (bold(x)_([i])) = 1 / n $ #pause
+
+$ argmin_bold(theta) - sum_(i=1)^n 1 / n log p(bold(x)_([i]); bold(theta)) $ #pause
+
+==
+
+$ argmin_bold(theta) - sum_(i=1)^n 1 / n log p(bold(x)_([i]); bold(theta)) $ #pause
+
+$1 / n$ is a constant, does not affect minima #pause
+
+$ argmin_bold(theta) - sum_(i=1)^n log p(bold(x)_([i]); bold(theta)) $ #pause
+
+==
+$ argmin_bold(theta) - sum_(i=1)^n log p(bold(x)_([i]); bold(theta)) $ #pause
+
+$ argmin_bold(theta) sum_(i=1)^n - log p(bold(x)_([i]); bold(theta)) $ #pause
+
+This is the *negative log likelihood* #pause
+- Used all over statistics and machine learning (e.g. LLM) #pause
+
+The log likelihood objective: #pause
+- Learns the parameters $bold(theta)$ of a continuous distribution $p(bold(x); bold(theta))$ #pause
+- That maximizes the likelihood of each datapoint $bold(x)_([i])$ under the model
+==
+
+$ argmin_bold(theta) sum_(i=1)^n - log p(bold(x)_([i]); bold(theta)) $ #pause
+
+Can also think of the equivalent maximization, it is more intuitive #pause
+
 $ argmax_bold(theta) sum_(i=1)^n log p(bold(x)_([i]); bold(theta)) $ #pause
 
-This is known as the *log likelihood* #pause
-- Used all over statistics and machine learning #pause
-
-The log likelihood objective: 
-- Learns the parameters $bold(theta)$ of a continuous distribution $p(bold(x); bold(theta))$
-- That maximizes the probability of each datapoint $bold(x)_([i])$ under the model
+Find $bold(theta)$ so probability is maximized at datapoints $bold(x)_([i])$
 
 ==
 #align(center, pdf_pmf)
@@ -306,20 +499,8 @@ The log likelihood objective:
 $ p: Theta |-> Delta(X) $
 
 ==
-
-$ argmax_bold(theta) sum_(i=1)^n log p(bold(x)_([i]); bold(theta)) $ #pause
-
-- Log likelihood for gradient ascent #pause
-- *Negative log likelihood* for gradient descent #pause
-
-$ argmin_bold(theta) sum_(i=1)^n - log p(bold(x)_([i]); bold(theta)) $ #pause
-
-Same thing, different names
-
-
-==
 To summarize, probabilistic generative models: #pause
-+ Use a dataset distribution $P_bold(X)(bold(x))$ #pause
++ Use a finite dataset distribution $P_bold(X)(bold(x))$ #pause
 + To approximate the true data distribution $p_* (bold(x))$ #pause
 + By learning a *continuous* distribution $p(bold(x); bold(theta))$ #pause
 + That maximizes some approximation of log likelihood objective #pause
@@ -332,37 +513,37 @@ To summarize, probabilistic generative models: #pause
 #side-by-side[
   Log likelihood objective
  ][
- $ argmax_bold(theta) sum_(i=1)^n log p(bold(x)_([i]); bold(theta)) $
+ $ argmin_bold(theta) sum_(i=1)^n - log p(bold(x)_([i]); bold(theta)) $
 ]
   
 
 
 = Bayesian Generative Models
 ==
-Let us take a closer look at generative models #pause
+Let us start to implement generative models #pause
 
 #side-by-side(columns: (0.4fr, 1.0fr), align: left)[
   #cimage("figures/lecture_1/dog.png") 
   $ bold(x)_([i]) $ #pause
 ][
 - Model $approx p(bold(x); bold(theta))$ #pause
-- Objective $approx argmax_bold(theta) sum_(i=1)^n log p(bold(x)_([i]); bold(theta))$ #pause
+- Objective $approx argmin_bold(theta) sum_(i=1)^n - log p(bold(x)_([i]); bold(theta))$ #pause
 *Question:* How to represent $p(bold(x); bold(theta))$? #pause
 - $bold(x)$ is very high dimensional #pause
   - $bold(x) in [0, 1]^(3 times 28 times 28)$ #pause
 - Complex relationships between pixels #pause
-- Generally intractable to learn #pause
+  - Generally intractable to approximate $p_* (bold(x))$ #pause
 ]
-*Key idea:* Use low-dimensional representation of $bold(x)$ #pause
+*Key idea:* Approximate low-dimensional representation of $bold(x)$ #pause
 - Can reason over low-dimensional representation
 
 ==
 Let $bold(y)_([i])$ be a low-dimensional label of $bold(x)_([i])$ #pause
 
 #side-by-side(align: horizon)[
-  $ bold(y)_([i]) = vec("Small", "Ugly") $ #pause
-][
   $ bold(x)_([i]) = #cimage("figures/lecture_1/dog.png", height: 20%) $ #pause
+][
+  $ bold(y)_([i]) = vec("Small", "Ugly") $ #pause
 ]
 
 The label tells us which $bold(x)$ to generate #pause
@@ -389,14 +570,14 @@ $ p(bold(x); bold(theta)) = integral p(bold(x) | bold(y); bold(theta)) dot p(bol
 
 *Question:* What was the objective? #pause
 
-$ argmax_bold(theta) sum_(i=1)^n log p(bold(x)_([i]); bold(theta)) $ #pause
+$ argmin_bold(theta) sum_(i=1)^n - log p(bold(x)_([i]); bold(theta)) $ #pause
 
 Can plug model into objective
 
-$ argmax_bold(theta) sum_(i=1)^n log integral p(bold(x)_([i]) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y) $ #pause
+$ argmin_bold(theta) sum_(i=1)^n - log integral p(bold(x)_([i]);  | bold(y); bold(theta)) dot p(bold(y)) dif bold(y) $ #pause
 
 ==
-$ underbrace(argmax_bold(theta) sum_(i=1)^n log overbrace(integral p(bold(x)_([i]) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y), "Model"), "Objective") $
+$ underbrace(argmin_bold(theta) sum_(i=1)^n - log overbrace(integral p(bold(x)_([i]) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y), "Model"), "Objective") $
 
 Aftering learning $p(bold(x) | bold(y); bold(theta))$ we can generate new datapoints #pause
 
@@ -412,11 +593,13 @@ Very easy! But this requires labels $bold(y)$ #pause
 Consider a generative model *without labels* $bold(y)$ #pause
 - We will *learn* a low-dimensional latent description $bold(z)$ instead #pause
   - $bold(z)$ encodes the structure of the dataset (and the world) #pause
+  - Replace label distribution $p(bold(y))$ with latent distribution $p(bold(z))$ #pause
 
-$ p(bold(x); bold(theta)) = integral p(bold(x) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y) => integral p(bold(x) | bold(z); bold(theta)) dot p(bold(z)) dif bold(z) $ #pause
+$ p(bold(x); bold(theta)) = integral p(bold(x) | bold(y); bold(theta)) dot p(bold(y)) dif bold(y) $ #pause
 
-Replace label distribution $p(bold(y))$ with latent distribution $p(bold(z))$ #pause
-- We can choose this distribution, Gaussian, Bernoulli, ... #pause
+$ p(bold(x); bold(theta)) = integral p(bold(x) | bold(z); bold(theta)) dot p(bold(z)) dif bold(z) $ #pause
+
+We can choose this distribution, Gaussian, Bernoulli, ... #pause
 - For now, make it easy $p(bold(z)) = cal(N)(bold(0), bold(I))$
 
 ==
@@ -446,7 +629,7 @@ Sound too easy? It is, making it tractable is much harder
 ==
 Most generative models follow a similar approach #pause
 
-$ underbrace(argmax_bold(theta) sum_(i=1)^n log overbrace(integral p(bold(x)_([i]) | bold(z); bold(theta)) dot p(bold(z)) dif bold(z), "Model"), "Objective") $
+$ underbrace(argmin_bold(theta) sum_(i=1)^n - log overbrace(integral p(bold(x)_([i]) | bold(z); bold(theta)) dot p(bold(z)) dif bold(z), "Model"), "Objective") $ #pause
 
 However, this expression is  often intractable #pause
 
@@ -455,7 +638,7 @@ However, this expression is  often intractable #pause
 - Indefinite integration over continuous/infinite variable $bold(z)$
 
 ==
-$ underbrace(argmax_bold(theta) sum_(i=1)^n log overbrace(integral p(bold(x)_([i]) | bold(z); bold(theta)) dot p(bold(z)) dif bold(z), "Model"), "Objective") $ #pause
+$ underbrace(argmin_bold(theta) sum_(i=1)^n - log overbrace(integral p(bold(x)_([i]) | bold(z); bold(theta)) dot p(bold(z)) dif bold(z), "Model"), "Objective") $
 
 Variational inference methods (like VAEs) approximate this objective using the *evidence lower bound* (ELBO) #pause
 - Lower bounds the true log likelihood #pause
@@ -467,28 +650,27 @@ The derivation is interesting, but requires concepts you do not know #pause
 ==
 The original objective
 
-$ argmax_bold(theta) sum_(i=1)^n log integral p(bold(x)_([i]) | bold(z); bold(theta)) dot p(bold(z)) dif bold(z) $ #pause
+$ underbrace(argmin_bold(theta) sum_(i=1)^n - log overbrace(integral p(bold(x)_([i]) | bold(z); bold(theta)) dot p(bold(z)) dif bold(z), "Model"), "Objective") $
 
 The surrogate objective (ELBO)
 
-$ argmax_bold(theta) sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)))[
- log p(bold(x)_([i]) | bold(z); bold(theta))
+$ argmin_bold(theta) sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)_e))[
+ -log p(bold(x)_([i]) | bold(z); bold(theta)_d)
 ]
--KL(p(bold(z) | bold(x) ; bold(theta)), p(bold(z)))  $ #pause
++KL(p(bold(z) | bold(x) ; bold(theta)_e), p(bold(z)))  $ #pause
 
-Very scary looking expression #pause
-- Let us try to understand it
+This is a *variational autoencoder* (VAE)
 
 ==
 
 #v(1em)
-$ argmax_bold(theta) sum_(i=1)^n 
+$ argmin_bold(theta) sum_(i=1)^n 
   markrect(bb(E)_(bold(z) tilde 
-  markhl(p(bold(z) | bold(x)_([i]) ; bold(theta)),tag: #<1>, color: #orange))[
-    log markhl(p(bold(x)_([i]) | bold(z); bold(theta)), tag: #<2>, color: #blue)
+  markhl(p(bold(z) | bold(x)_([i]) ; bold(theta)_e),tag: #<1>, color: #orange))[
+    - log markhl(p(bold(x)_([i]) | bold(z); bold(theta)_d), tag: #<2>, color: #blue)
   ], stroke: #3pt, color: #red, radius: #5pt, tag: #<4>)
-- markrect(KL(
-  markhl(p(bold(z) | bold(x)_([i]) ; bold(theta)), tag: #<3>, color: #orange),
++ markrect(KL(
+  markhl(p(bold(z) | bold(x)_([i]) ; bold(theta)_e), tag: #<3>, color: #orange),
   p(bold(z))), stroke: #3pt, color: #purple, radius: #5pt, tag: #<5>) $ 
 
 #annot((<1>), pos: top, dy: -1em, annot-text-props: (size: 1em))[Encoder]
@@ -511,7 +693,7 @@ But pay attention now, we will implement the VAE #pause
   $ f : X times Theta |-> Delta Z $ #pause
 
   Recall we let $p(bold(z)) = cal(N)(bold(0), bold(I))$ #pause
-  - Encoder should output normal distribution for analytical KL term #pause
+  - Encoder should output normal distribution so KL term is analytical #pause
   - Normal distribution has a mean $mu in bb(R)$ and standard deviation $sigma in bb(R)_+$ #pause
   - Our encoder should output $d_z$ means and $d_z$ standard deviations #pause
 
@@ -589,72 +771,67 @@ But pay attention now, we will implement the VAE #pause
 
   #side-by-side[
     Decoder 
-    $ p(bold(x) | bold(z); bold(theta)) $
+    $ p(bold(x) | bold(z); bold(theta)_d) $
   ][
     Encoder 
-    $ p(bold(z) | bold(x); bold(theta)) $
+    $ p(bold(z) | bold(x); bold(theta)_e) $
   ][
     Marginal 
     $ p(bold(z)) = cal(N)(bold(0), bold(1)) $
   ] #pause
 
-$ argmax_bold(theta) sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)))[
- log p(bold(x)_([i]) | bold(z); bold(theta))
+$ argmin_bold(theta) sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)_e))[
+ - log p(bold(x)_([i]) | bold(z); bold(theta)_d)
 ]
--KL(p(bold(z) | bold(x) ; bold(theta)), p(bold(z))) $ #pause
++ KL(p(bold(z) | bold(x) ; bold(theta)_e), p(bold(z))) $ #pause
 
 Rewrite objective ass loss function for gradient descent #pause
 
-$ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)))[
- -log p(bold(x)_([i]) | bold(z); bold(theta))
+$ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)_e))[
+ - log p(bold(x)_([i]) | bold(z); bold(theta)_d)
 ]
-+ KL(p(bold(z) | bold(x) ; bold(theta)), p(bold(z))) $ #pause
++ KL(p(bold(z) | bold(x) ; bold(theta)_e), p(bold(z))) $ 
 
 ==
-  $ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)))[
-  -log p(bold(x)_([i]) | bold(z); bold(theta))
-  ]
-  + KL(p(bold(z) | bold(x) ; bold(theta)), p(bold(z))) $ #pause
+$ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)_e))[
+ - log p(bold(x)_([i]) | bold(z); bold(theta)_d)
+]
++ KL(p(bold(z) | bold(x) ; bold(theta)_e), p(bold(z))) $ #pause
 
   First, rewrite KL term using our encoder $f$ #pause
 
-  $ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)))[
-  -log p(bold(x)_([i]) | bold(z); bold(theta))
+  $ cal(L)(bold(X), bold(theta)) = sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)_e))[
+  -log p(bold(x)_([i]) | bold(z); bold(theta)_d)
   ]
   + KL(f(bold(x), bold(theta)_e), p(bold(z))) $ #pause
 
-  //$ cal(L)(bold(x), bold(theta)) = argmin_bold(theta) [ -log P(bold(x) | bold(z)) + 1 / 2 KL(f(bold(x), bold(theta)_e), P(bold(z))) ] $ #pause
+  $p(bold(z))$ and $f(bold(x), bold(theta)_e) = bold(mu), bold(sigma)$ are Gaussian, we can simplify KL term
 
-  $p(bold(z))$ and $f(bold(x), bold(theta)_e)$ are Gaussian, we can simplify KL term
-
-  $ = sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)))[
-  -log p(bold(x)_([i]) | bold(z); bold(theta))
+  $ = sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)_e))[
+  -log p(bold(x)_([i]) | bold(z); bold(theta)_d)
   ]
-  + 0.5 (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $ #pause
-
-  //$ cal(L)(bold(x), bold(theta)) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $
-
-==
-  //$ cal(L)(bold(x), bold(theta)) = underbrace(log P(bold(x) | bold(z)), "Reconstruction error") - (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $ #pause
-
-  $ = sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)))[
-  -log p(bold(x)_([i]) | bold(z); bold(theta))
-  ]
-  + 0.5 sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1 $ #pause
-
-  Log probability for Gaussian is just mean square error #pause
-
-  $ = sum_(i=1)^n sum_(j=1)^d_z (x_([i], j) - f^(-1)(f(bold(x)_([i]), bold(theta)_e), bold(theta)_d)_j )^2 - 0.5 (mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $ #pause
-
+  + 0.5 (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $ 
 
 
 ==
-  $ = sum_(i=1)^n sum_(j=1)^d_z (x_([i], j) - f^(-1)(f(bold(x)_([i]), bold(theta)_e), bold(theta)_d)_j )^2 - 0.5 (mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $ #pause
+  $ = sum_(i=1)^n bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)_e))[
+  -log p(bold(x)_([i]) | bold(z); bold(theta)_d)
+  ]
+  + 0.5 (sum_(j=1)^d_z mu^2_j + sigma^2_j - log(sigma^2) - 1) $  #pause
+
+  Log probability for unit Gaussian is just mean square error #pause
+
+  $ log p prop log exp((x - mu)^2) = (x - mu)^2  $ #pause
+
+  $ sum_(i=1)^n (sum_(j=1)^d_x (x_([i], j) - f^(-1)(f(bold(x)_([i]), bold(theta)_e), bold(theta)_d)_j )^2 - 0.5 sum_(j=1)^d_z (mu^2_j + sigma^2_j - log(sigma^2_j) - 1)) $ 
+
+==
+  $ sum_(i=1)^n (sum_(j=1)^d_x (x_([i], j) - f^(-1)(f(bold(x)_([i]), bold(theta)_e), bold(theta)_d)_j )^2 - 0.5 sum_(j=1)^d_z (mu^2_j + sigma^2_j - log(sigma^2_j) - 1)) $ #pause
 
   Scale of two terms can vary, we do not want one term to dominate #pause
   - Modern VAEs introduce a hyperparameter $beta$ #pause
 
-  $ = sum_(i=1)^n sum_(j=1)^d_z (x_([i], j) - f^(-1)(f(bold(x)_([i]), bold(theta)_e), bold(theta)_d)_j )^2 - #redm[$beta$] (mu^2_j + sigma^2_j - log(sigma^2_j) - 1) $
+  $ sum_(i=1)^n (sum_(j=1)^d_x (x_([i], j) - f^(-1)(f(bold(x)_([i]), bold(theta)_e), bold(theta)_d)_j )^2 - 0.5 #redm[$beta$] sum_(j=1)^d_z (mu^2_j + sigma^2_j - log(sigma^2_j) - 1)) $ #pause
 
 ==
   ```python
@@ -685,10 +862,10 @@ Some crazy people decided to make them more complex #pause
 
 ==
 
-$ cal(L)_"VAE" (bold(X), bold(theta)) = sum_(i=1)^n underbrace(bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)))[
- -log p(bold(x)_([i]) | bold(z); bold(theta))
+$ cal(L)_"VAE" (bold(X), bold(theta)) = sum_(i=1)^n underbrace(bb(E)_(bold(z) tilde p(bold(z) | bold(x)_([i]) ; bold(theta)_e))[
+ -log p(bold(x)_([i]) | bold(z); bold(theta)_d)
 ], "Reconstruction")
-+ underbrace(KL(p(bold(z) | bold(x) ; bold(theta)), p(bold(z))), "Marginal match") $ #pause
++ underbrace(KL(p(bold(z) | bold(x) ; bold(theta)_e), p(bold(z))), "Marginal match") $ #pause
 
 $ cal(L)_H = sum_(i=1)^n underbrace(bb(E)_(bold(z)_1 tilde p(bold(z)_1 | bold(x)_([i]) ; bold(theta)_(e 1)))[
  -log p(bold(x)_([i]) | bold(z)_1; bold(theta)_(d 1))

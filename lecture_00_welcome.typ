@@ -4,6 +4,13 @@
 #import "@preview/fletcher:0.5.8" as fletcher: node, edge
 #import "common.typ": *
 
+// TODO from 2025-2026 year
+  // Change order to: RNN -> attention -> autoencoder -> generative model -> transformer
+  // construct attention from rnn
+  // Base generative model on autoencoder
+  // Now we introduce nll in generative model
+  // can cast transformer as generative model w/ nll
+
 // For students: you may want to change this to true
 // otherwise you will get one slide for each new line
 #let handout = true
