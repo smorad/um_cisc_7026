@@ -59,16 +59,19 @@ How was the last homework? #pause
 
 What's left: #pause
 - Final exam (for some students) #pause
-- Group project
+- Group project (for everyone)
 ==
 Final project groups #pause
-- If not in group must respond to Moodle message #pause
-  - I will put you in a group #pause
-  - If you do not respond, I will think you left the course #pause
-    - No final project group, 0 on final project #pause
-  - Still must submit project plan #pause
-    - Extension until Tuesday 11 Nov
+- Merged group G (2 people) and group R (3 people) #pause
+- Added last student to group E (randomly selected) #pause
+- All groups should be 4-5 students now #pause
 
+Groups G, E have extension for project plan #pause
+- Submit by 11 Nov for full credit #pause
+
+*If you are not in a group of 4-5, you cannot submit final project* #pause
+- You must be in a group #pause
+- Come see me immediately
 
 = Review
 
@@ -487,11 +490,13 @@ The log likelihood objective: #pause
 
 $ argmin_bold(theta) sum_(i=1)^n - log p(bold(x)_([i]); bold(theta)) $ #pause
 
-Can also think of the equivalent maximization, it is more intuitive #pause
+It may not seem intuitive #pause
+- More intuitive to think about equivalent maximization objective #pause
+  - $min => max$, $- => +$ #pause
 
 $ argmax_bold(theta) sum_(i=1)^n log p(bold(x)_([i]); bold(theta)) $ #pause
 
-Find $bold(theta)$ so probability is maximized at datapoints $bold(x)_([i])$
+Find $bold(theta)$ so likelihood $p$ is maximized at datapoints $bold(x)_([i])$
 
 ==
 #align(center, pdf_pmf)
@@ -503,7 +508,7 @@ To summarize, probabilistic generative models: #pause
 + Use a finite dataset distribution $P_bold(X)(bold(x))$ #pause
 + To approximate the true data distribution $p_* (bold(x))$ #pause
 + By learning a *continuous* distribution $p(bold(x); bold(theta))$ #pause
-+ That maximizes some approximation of log likelihood objective #pause
++ That minimizes some approximation of negative log likelihood #pause
 
 #side-by-side[
   Generative model
@@ -511,7 +516,7 @@ To summarize, probabilistic generative models: #pause
   $ p(bold(x); bold(theta)) $
 ]
 #side-by-side[
-  Log likelihood objective
+  Negative log likelihood objective
  ][
  $ argmin_bold(theta) sum_(i=1)^n - log p(bold(x)_([i]); bold(theta)) $
 ]
