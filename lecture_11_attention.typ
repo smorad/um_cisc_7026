@@ -44,7 +44,7 @@ Preliminary questions (still making exam, may change) #pause
 - 1 Question rewriting functions as recurrent function 
 - 1 Question evaluating scans
 - 1 Question log likelihood derivation
-- 1 Question key/query attention
+- 1 Question $bold(Q) bold(K)^top$ attention
 
 // TODO: Cleanup attention shapes
 
@@ -539,25 +539,7 @@ Many ways to teach attention, but I like the RNN-style approach more
 ==
     All these models are *transformers* #pause
 
-    At the core of each transformer is *attention* #pause
-
-    We will write attention slightly differently than you see in textbooks #pause
-    - I want to stay with column-vector notation #pause
-
-    #side-by-side[
-        Textbook
-
-        $ softmax(bold(Q) bold(K)^top) bold(V) $ #pause
-    ][
-        Our representation
-
-        $ bold(V) softmax(bold(K)^top bold(Q)) $ #pause
-    ]
-
-    Same results, but easier to write scalar/vector
-
-
-
+    At the core of each transformer is *attention* 
 
 ==
     We can derive attention from composite memory #pause
@@ -761,7 +743,7 @@ Many ways to teach attention, but I like the RNN-style approach more
     $ 1.0 dot bold(theta)^top overline(bold(x))_5 $
     ] #pause
     
-    #cimage("figures/lecture_11/composite_swift.png") #pause
+    #cimage("figures/lecture_11/composite_swift.png") 
 
 ==
     #side-by-side[
@@ -778,7 +760,7 @@ Many ways to teach attention, but I like the RNN-style approach more
 
     Why does this model of attention pay attention to everyone? #pause
     - Honest answer is I do not know #pause
-        - But I have tried it myself, and this usually happens #pause
+        - But you can try it yourself, and this usually happens #pause
         - Maybe one of you can figure out why! #pause
 
     We need to prevent all attention weights going to 1
@@ -973,50 +955,46 @@ Many ways to teach attention, but I like the RNN-style approach more
     Remember, there are multiple inputs to pay attention to
 
 ==
-    We compute a key for each input 
+So far, we only consider single operations $bold(q)^top bold(k)_i$ #pause
 
-    $ bold(K) 
-        = mat(bold(k)_1, bold(k)_2, dots, bold(k)_T) 
-        = mat(bold(theta)_K^top bold(x)_1, bold(theta)_K^top bold(x)_2, dots, bold(theta)_K^top bold(x)_T), 
-        quad bold(K) in bb(R)^(d_h times T) 
-    $ #pause
+But we have many $bold(k)$, can compute attention over all keys at once? #pause
 
-==
-    Then compute attention for each key
+First, let us construct a vector of keys (matrix of scalars) #pause
 
-    $
-        bold(q)^top bold(K) = bold(q)^top mat(bold(k)_1, bold(k)_2, dots, bold(k)_T) = mat( 
-        bold(q)^top bold(k)_1,
-        bold(q)^top bold(k)_2,
-        dots,
-        bold(q)^top bold(k)_T,
-        //(bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_1),
-        //(bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_2),
-    )
-    $ #pause
-
-    $ bold(q)^top in bb(R)^(1, d_h), quad bold(K) in bb(R)^(d_h times T) $ #pause
-
-    *Question:* What is the shape of $bold(q)^top bold(K)$ ? #pause
-
-    *Answer:* T #pause
-
-    Do not forget to normalize with softmax! 
+$ bold(K) 
+    = vec(bold(k)_1, bold(k)_2, dots.v, bold(k)_T) 
+    = vec(bold(theta)_K^top bold(x)_1, bold(theta)_K^top bold(x)_2, dots.v, bold(theta)_K^top bold(x)_T), 
+    quad bold(K) in bb(R)^(T times d_h) 
+$ 
 
 ==
-    Normalize, only pay attention to important matches #pause
+Consider the shapes of our tensors #pause
 
+$ bold(q) in bb(R)^(d_h times 1); bold(K) in bb(R)^(T times d_h) $ #pause
 
-    $ softmax(bold(q)^top bold(K)) 
-        &= softmax(bold(q)^top mat(bold(k)_1, bold(k)_2, dots, bold(k)_T)) 
-        \ &= softmax(mat( 
-        bold(q)^top bold(k)_1,
-        bold(q)^top bold(k)_2,
-        dots,
-        bold(q)^top bold(k)_T,
-        //(bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_1),
-        //(bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_2),
-    )) $ #pause
+$ bold(K) bold(q) in bb(R)^(T times 1) $ #pause
+
+$ bold(K) bold(q) = vec(bold(k)_1, dots.v, bold(k)_T) bold(q) #pause = vec(bold(k)_1^top bold(q), dots.v, bold(k)^top_T bold(q)) #pause = vec(bold(q)^top bold(k)_1, dots.v, bold(q)^top bold(k)_T) $ #pause
+
+Can also write transpose (output row instead of column) #pause
+
+$ bold(q)^top bold(K)^top = bold(q)^top mat(bold(k)_1, dots, bold(k)_T) = mat(bold(q)^top bold(k)_1, dots, bold(q)^top bold(k)_T) $
+
+==
+$ bold(K) bold(q) = vec(bold(k)_1, dots.v, bold(k)_T) bold(q) = vec(bold(k)_1^top bold(q), dots.v, bold(k)^top_T bold(q)) = vec(bold(q)^top bold(k)_1, dots.v, bold(q)^top bold(k)_T) $ #pause
+
+$ bold(q)^top bold(K)^top = bold(q)^top mat(bold(k)_1, dots, bold(k)_T) = mat(bold(q)^top bold(k)_1, dots, bold(q)^top bold(k)_T) $
+
+*Question:* Are we missing anything? #pause
+
+$ softmax(bold(K) bold(q)) = softmax(vec(bold(k)_1^top bold(q), dots.v, bold(k)^top_T bold(q))) $
+
+$ softmax(bold(q)^top bold(K)^top) = softmax(mat(bold(q)^top bold(k)_1, dots, bold(q)^top bold(k)_T)) $
+
+==
+$ softmax(bold(K) bold(q)) = softmax(vec(bold(k)_1^top bold(q), dots.v, bold(k)^top_T bold(q))) $
+
+$ softmax(bold(q)^top bold(K)^top) = softmax(mat(bold(q)^top bold(k)_1, dots, bold(q)^top bold(k)_T)) $
 
     We call this *dot-product attention*
 
@@ -1071,7 +1049,7 @@ Many ways to teach attention, but I like the RNN-style approach more
     Put dot product attention into our composite model #pause
 
     $
-        lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i = 
+        lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i = softmax(bold(q)^top bold(K)^top)_i = 
         softmax(bold(q)^top mat(bold(k)_1, bold(k)_2, dots, bold(k)_T))_i 
     
     $ #pause
@@ -1099,105 +1077,127 @@ Many ways to teach attention, but I like the RNN-style approach more
 
     Previously, we chose our own query $bold(x)_q = "Musician"$ #pause
 
-    We can also create queries from all the inputs #pause
+    *Self attention* creates create queries from all the inputs #pause
 
-    $ bold(Q) = mat(bold(q)_1, bold(q)_2, dots, bold(q)_T) = mat(bold(theta)_Q^top bold(x)_1, bold(theta)_Q^top bold(x)_2, dots, bold(theta)_Q^top bold(x)_T), quad bold(Q) in bb(R)^(T times d_h) $ #pause
+    $ bold(Q) = vec(bold(q)_1, bold(q)_2, dots.v, bold(q)_T) = vec(bold(theta)_Q^top bold(x)_1, bold(theta)_Q^top bold(x)_2, dots.v, bold(theta)_Q^top bold(x)_T), quad bold(Q) in bb(R)^(T times d_h) $ #pause
 
-    We call this dot-product *self* attention 
+    Let us see how to combine $bold(Q)$ and $bold(K)$
+
 ==
 
-    $
-    bold(Q) &= mat(bold(q)_1, dots, bold(q)_T) &&= mat(bold(theta)_Q^top bold(x)_1, dots, bold(theta)_Q^top bold(x)_T) \
+#side-by-side[
+    $ bold(K) &= vec(bold(k)_1, dots.v, bold(k)_T) &&= vec(bold(theta)_K^top bold(x)_1, dots.v, bold(theta)_K^top bold(x)_T) $ #pause
 
-    bold(K) &= mat(bold(k)_1, dots, bold(k)_T) &&= mat(bold(theta)_K^top bold(x)_1, dots, bold(theta)_K^top bold(x)_T) \
+][
+$ bold(Q) &= vec(bold(q)_1, dots.v, bold(q)_T) &&= vec(bold(theta)_Q^top bold(x)_1, dots.v, bold(theta)_Q^top bold(x)_T) $ #pause
+]
 
-    bold(V) &= mat(bold(v)_1, dots, bold(v)_T) &&= mat(bold(theta)_V^top bold(x)_1, dots, bold(theta)_V^top bold(x)_T) quad
-
-    $ #pause
+$ bold(q)^top bold(k) => bold(q)^top bold(K)^top => dots $ #pause
 
 $ bold(Q) bold(K)^top = vec(bold(q)_1, dots.v, bold(q)_T) mat(bold(k)_1, dots, bold(k)_T) = mat(
-    bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
-    bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
-    dots.v, dots.down, dots.v;
-    bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T;
-    ) $
+bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
+bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
+dots.v, dots.down, dots.v;
+bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T;
+) $ #pause
+
+By stacking $bold(q)$ row-wise, we do not need a transpose
 
 ==
-$
-    bold(V) &= mat(bold(v)_1, dots, bold(v)_T) &&= mat(bold(theta)_V^top bold(x)_1, dots, bold(theta)_V^top bold(x)_T)
-$
-$ bold(Q) bold(K)^top = vec(bold(q)_1, dots.v, bold(q)_T) mat(bold(k)_1, dots, bold(k)_T) = mat(
-    bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
-    bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
-    dots.v, dots.down, dots.v;
-    bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T;
-    ) $
 
-$ bold(Q) bold(K)^top bold(V) = mat(
-    bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
-    bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
-    dots.v, dots.down, dots.v;
-    bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T;
-    )  vec(bold(v)_1, bold(v)_2, dots.v, bold(v)_T) = vec(
-        bold(q)_1 bold(k)_1 bold(v)_1 + dots + bold(q)_1 bold(k)_T bold(v)_T,
-        bold(q)_2 bold(k)_1 bold(v)_1 + dots + bold(q)_2 bold(k)_T bold(v)_T,
-        dots.v,
-        bold(q)_T bold(k)_1 bold(v)_1 + dots + bold(q)_T bold(k)_T bold(v)_T,
-    ) $
+$ underbrace(bold(Q),bb(R)^(T times d_h))  
+  overbrace(bold(K)^top, bb(R)^(d_h times T)) = vec(bold(q)_1, dots.v, bold(q)_T) mat(bold(k)_1, dots, bold(k)_T) = underbrace(mat(
+bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
+bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
+dots.v, dots.down, dots.v;
+bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T;
+), bb(R)^(d_h times d_h)) $ #pause
+
+Do not forget softmax! #pause
+
+$ softmax(bold(Q) bold(K)^top) = softmax(mat(
+bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
+bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
+dots.v, dots.down, dots.v;
+bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T;
+)) $
 
 ==
-$ bold(Q) bold(K)^top bold(V) = mat(
-    bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
-    bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
-    dots.v, dots.down, dots.v;
-    bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T;
-    )  vec(bold(v)_1, bold(v)_2, dots.v, bold(v)_T) = vec(
-        bold(q)_1 bold(k)_1 bold(v)_1 + dots + bold(q)_1 bold(k)_T bold(v)_T,
-        bold(q)_2 bold(k)_1 bold(v)_1 + dots + bold(q)_2 bold(k)_T bold(v)_T,
-        dots.v,
-        bold(q)_T bold(k)_1 bold(v)_1 + dots + bold(q)_T bold(k)_T bold(v)_T,
-    ) $ #pause
 
-*Question:* Did we forget anything? #pause *Answer:* Softmax! #pause
+$ softmax(bold(Q) bold(K)^top) = softmax(mat(
+bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
+bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
+dots.v, dots.down, dots.v;
+bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T;
+)) $
+
+$ lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i = softmax(bold(Q) bold(K)^top)_i $
+
+$ f(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = sum_(i=1)^T bold(theta)_V^top bold(x)_i dot lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i $ #pause
+
+==
+$ f(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = sum_(i=1)^T bold(theta)_V^top bold(x)_i dot lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i $ #pause
+
+This is ugly and confusing #pause
+
+Try and delete the sum and indexes #pause
+
+$ bold(V) &= vec(bold(v)_1, dots.v, bold(v)_T) &&= vec(bold(theta)_V^top bold(x)_1, dots.v, bold(theta)_V^top bold(x)_T) $ 
+
+==
+$ bold(V) &= vec(bold(v)_1, dots.v, bold(v)_T) &&= vec(bold(theta)_V^top bold(x)_1, dots.v, bold(theta)_V^top bold(x)_T) $ #pause
+
+$
+f(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) #pause = sum_(i=1)^T bold(theta)_V^top bold(x)_i dot lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i #pause = 
+sum_(i=1)^T bold(v)_i dot softmax(bold(Q) bold(K)^top)_i #pause \
+= softmax(mat(
+bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
+bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
+dots.v, dots.down, dots.v;
+bold(q)_T bold(k)_1, dots, bold(q)_T bold(k)_T;
+)) vec(bold(v)_1, dots.v, bold(v)_T) #pause = softmax(bold(Q) bold(K)^top) bold(V)
+$ 
+
+==
+We can forget all the sums, and write self attention in matrix form
+
+$ 
+f(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax(bold(Q) bold(K)^top) bold(V)
+$ 
+
+To get the result for the $i$ element, just index the result
+
+$ 
+f(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta))_i = [softmax(bold(Q) bold(K)^top) bold(V)]_i
+$ 
+
+==
 
 $ softmax(bold(Q) bold(K)^top) bold(V) = softmax(mat(
     bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
-    bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
     dots.v, dots.down, dots.v;
     bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T;
-    ))  vec(bold(v)_1, bold(v)_2, dots.v, bold(v)_T) $ 
-==
-
-$ softmax(bold(Q) bold(K)^top) bold(V) = softmax(mat(
-    bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
-    bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
-    dots.v, dots.down, dots.v;
-    bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T;
-    ))  vec(bold(v)_1, bold(v)_2, dots.v, bold(v)_T) $  #pause
+    ))  vec(bold(v)_1, dots.v, bold(v)_T) $  #pause
 
 Be very careful with softmax dimension #pause
 - Writing attention different ways uses different softmax dimensions #pause
 - When in doubt, write out full matrix #pause
 
-*Question:* Softmax rows or columns? *Answer:* Rows #pause
+*Question:* Softmax rows or columns? #pause *Answer:* Rows #pause
 
 #side-by-side[
     Only one query index
   ][
     $ softmax(mat(bold(q)_i bold(k)_1, dots, bold(q)_i bold(k)_T))  $ 
-  ]  #pause
+  ]  
 
 ==
     Attention paper suggests normalizing constant for faster learning #pause
 
-    $ "attn"(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( (bold(Q) bold(K)^top) / sqrt(d_h)) bold(V) $ #pause
+    $ f(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( (bold(Q) bold(K)^top) / sqrt(d_h)) bold(V) $ #pause
 
-    This operation powers today's biggest models
-
-==
-    $ bold(Q) in bb(R)^(T times d_h) quad bold(K) in bb(R)^(T times d_h) quad bold(V) in bb(R)^(T times d_h) $
-
-    $ underbrace("attn"(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)), bb(R)^(T times d_x)) = softmax overbrace( (( bold(Q) bold(K)^top, ) / sqrt(d_h)), bb(R)^(T times T) ) underbrace(bold(V), bb(R)^(T times d_h)) $ #pause
+    This operation powers today's biggest models #pause
+    - Two matrix multiplies and softmax
 
 ==
     ```python
