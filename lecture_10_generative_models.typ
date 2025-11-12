@@ -10,7 +10,6 @@
 
 #let handout = false
 
-
 // FUTURE TODO: Repeat self too much on locality/equivariance, restructure and replace with something else
 
 #set math.vec(delim: "[")
@@ -37,10 +36,6 @@
 #components.adaptive-columns(
     outline(title: none, indent: 1em, depth: 1)
 )
-
-
-#set math.vec(delim: "[")
-#set math.mat(delim: "[")
 
 // Review VAE
 // VAEs are a class of probabilistic generative model

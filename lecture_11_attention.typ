@@ -1,149 +1,84 @@
-#import "@preview/polylux:0.3.1": *
+#import "@preview/touying:0.6.1": *
 #import themes.university: *
-#import "@preview/cetz:0.2.2": canvas, draw, plot
+#import "@preview/cetz:0.4.0"
+#import "@preview/fletcher:0.5.8" as fletcher: node, edge
 #import "common.typ": *
-#import "@preview/algorithmic:0.1.0"
-#import algorithmic: algorithm
-#import "@preview/fletcher:0.5.2" as fletcher: diagram, node, edge
+#import "plots.typ": *
+#import "@preview/algorithmic:1.0.5"
+#import algorithmic: style-algorithm, algorithm-figure, algorithm
+#import "@preview/mannot:0.3.0": *
+
+#let handout = false
 
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
 
-// TODO: Cleanup attention shapes
-
-#let varinf = diagram(
-  node-stroke: .1em,
-  spacing: 4em,
-  node((0,0), $bold(z)$, radius: 2em),
-  edge($P(bold(x) | bold(z); bold(theta))$, "-|>"),
-  node((2,0), $bold(x)$, radius: 2em),
-  edge((0,0), (2,0), $P(bold(z) | bold(x); bold(theta))$, "<|-", bend: -40deg),
-)
-
-#let forgetting = { 
-    set text(size: 22pt)
-    canvas(length: 1cm, {
-  plot.plot(size: (8, 6),
-    x-tick-step: 10,
-    y-tick-step: 0.5,
-    y-min: 0,
-    y-max: 1,
-    x-label: [Time],
-    y-label: [],
-    {
-      plot.add(
-        domain: (0, 40), 
-        label: [Memory Strength],
-        style: (stroke: (thickness: 5pt, paint: red)),
-        t => calc.pow(0.9, t)
-      )
-    })
-})}
-
-#let ag = (
-  [GNN Review],
-  [VAE Review and Coding],
-  [Attention],
-  [Keys and Queries],
-  [Self Attention],
-  //[Transformer],
-  //[Positional Encoding],
-  //[Coding]
-  [Homework]
-)
-
 #show: university-theme.with(
   aspect-ratio: "16-9",
-  short-title: "CISC 7026: Introduction to Deep Learning",
-  short-author: "Steven Morad",
-  short-date: "Lecture 10: Attention"
+  config-common(handout: handout),
+  config-info(
+    title: [Attention],
+    subtitle: [CISC 7026 - Introduction to Deep Learning],
+    author: [Steven Morad],
+    institution: [University of Macau],
+    logo: image("figures/common/bolt-logo.png", width: 4cm)
+  ),
+  header-right: none,
+  header: self => utils.display-current-heading(level: 1)
 )
 
-#title-slide(
-  title: [Attention],
-  subtitle: "CISC 7026: Introduction to Deep Learning",
-  institution-name: "University of Macau",
+#title-slide()
+
+== Outline <touying:hidden>
+
+#components.adaptive-columns(
+    outline(title: none, indent: 1em, depth: 1)
 )
 
-#sslide[
-    New laptop, bigger translation model, better captions? #pause
+= Admin
+==
+Last exam next week #pause
 
-    Final homework uploaded, due 12/18
+Preliminary questions (still making exam, may change) #pause
+- 1 Question perceptron autoencoder and objective
+- 1 Question rewriting functions as recurrent function 
+- 1 Question evaluating scans
+- 1 Question log likelihood derivation
+- 1 Question key/query attention
 
-    All quiz 3 grades uploaded #pause
+// TODO: Cleanup attention shapes
 
-    If you submitted a quiz but have no grade, come see me after class #pause
+= Review
 
-    3 more lectures #pause
-
-    + Today: Attention #pause
-    + 11/25: Transformers #pause
-    + 12/3: (Virtual) Introduction to reinforcement learning
-]
-
-#sslide[
-    Next term: CISC 7404 Special Topics in Artificial Intelligence (preliminary) #pause
-
-    Still designing course, but will focus on deep reinforcement learning 
-]
-
-#aslide(ag, none)
-#aslide(ag, 0)
-
-#sslide[
-    Graph is a structure of nodes (vertices) and edges #pause
-
+= Short Intro to Graph Neural Networks
+==
     #side-by-side[
         #cimage("figures/lecture_11/graph.png") #pause
     ][
         A *node* is a vector of information #pause
 
-        An *edge* connects two nodes 
-    ] #pause
-
-    /*
-    #side-by-side[
-        $ G = (bold(X), bold(E)) $
-    ][
-        $ bold(X) in bb(R)^(T times d_x) $
-    ][
-        $ bold(E) in cal(P)(bb(Z)_T times bb(Z)_T) $
+        An *edge* connects two nodes  #pause
     ] 
-    */
-
-
-    //#A *graph neural network* (GNN) is a model for learning on graph data 
-]
-
-#sslide[
-    #side-by-side[
-        #cimage("figures/lecture_11/graph.png")
-    ][
-        A *node* is a vector of information 
-
-        An *edge* connects two nodes 
-
-    ] #pause
+    
     If we connect nodes $i$ and $j$ with edge $(i, j)$, then $i$ and $j$ are *neighbors* #pause
 
     The *neighborhood* $bold(N)(i)$ contains all neighbors of node $i$
-]
 
-#sslide[
+==
     Let us think of graphs as *signals* #pause
 
     *Question:* Where did we see signals before? #pause
 
-    Rather than time $t$ or space $u, v$, graphs are a function of index $i$ #pause
+    *Answer:* Convolution #pause
+
+    Rather than time $t$ or space $u, v$, graphs are a function of neighborhood #pause
 
     $ "Node" i quad bold(x)(i) in bb(R)^(d_x); quad i in 1, dots, T $ #pause
 
     $ "Neighborhood of" i quad bold(N)(i) = vec(i, j, k, dots.v); quad bold(N)(i) in cal(P)(i); quad i in 1, dots, T $
-]
 
-
-#sslide[
-    Prof. Li introduced the *graph convolution layer* #pause
+==
+    Consider a *graph convolution layer* #pause
 
     For a node $i$, the graph convolution layer is: #pause
 
@@ -152,9 +87,8 @@
     Combine information from the neighbors of $bold(x)(i)$ #pause
 
     This is just one node, we use this graph layer for all nodes in the graph
-]
 
-#sslide[
+==
     Apply graph convolution over all nodes in the graph #pause
 
     $ f(bold(x), bold(N), bold(theta)) = vec(
@@ -171,9 +105,8 @@
     $ #pause
 
     How does this compare to regular convolution (images, sound, etc)?
-]
 
-#sslide[
+==
     #side-by-side[
     Standard 1D convolution 
 
@@ -200,11 +133,8 @@
     *Question:* What is the output size of standard convolution? #pause
 
     *Answer:* $(T - k - 1) times d_h$
-]
 
-
-
-#sslide[
+==
     #side-by-side[
     Standard 1D convolution 
 
@@ -231,9 +161,8 @@
     *Question:* What is the output size of graph convolution? #pause
 
     *Answer:* $T times d_h$
-]
 
-#sslide[
+==
     We can use pooling with graph convolutions too
 
     $ "SumPool"(vec(
@@ -244,29 +173,27 @@
     )) = \ 
     sigma(sum_(j in bold(N)(1)) bold(theta)^top overline(bold(x))(j)) +  sigma(sum_(j in bold(N)(2)) bold(theta)^top overline(bold(x))(j)) + dots + sigma(sum_(j in bold(N)(T)) bold(theta)^top overline(bold(x))(j))
     $ 
-]
+
+==
+We can write attention and transformers as a graph neural network #pause
+    - Make the neighborhood the entire graph $bold(N)(i) = bold(X)$ #pause
+    - Learnable continuous edge weights (key $times$ query) #pause
+
+#side-by-side(columns: (0.4fr, 0.6fr))[
+    Edge weights
+][
+    $ bold(A)(i) = softmax(((bold(theta)_Q^top bold(x)_i) (bold(theta)_K^top bold(X))) / sqrt(d_z)) $
+] #pause
+
+#side-by-side(columns: (0.4fr, 0.6fr))[
+    Graph convolution
+][
+    $ f(bold(X), i) = sum_(j in bold(N)(i)) bold(theta)^top_V bold(x)_j dot bold(A)(i)_j $
+] #pause
+
+Many ways to teach attention, but I like the RNN-style approach more
+
 /*
-#sslide[
-    Standard convolution is *translation equivariant*, graph convolution is *permutation equivariant* #pause
-
-    $ "SumPool"(f(bold(X), bold(E), bold(theta))) &= "SumPool"(vec(
-        f(bold(X), bold(E), bold(theta))_1,
-        f(bold(X), bold(E), bold(theta))_2,
-        dots.v,
-        f(bold(X), bold(E), bold(theta))_T,
-    )) \ &= "SumPool"(vec(
-        f(bold(X), bold(E), bold(theta))_2,
-        f(bold(X), bold(E), bold(theta))_T,
-        dots.v,
-        f(bold(X), bold(E), bold(theta))_1,
-    ))
-    $ #pause
-]
-*/
-
-#aslide(ag, 0)
-#aslide(ag, 1)
-
 #sslide[
 
   We can use autoencoders as *generative models* #pause
@@ -544,10 +471,9 @@
 
   https://openai.com/index/glow/
 ]
+*/
 
-#aslide(ag, 1)
-#aslide(ag, 2)
-
+= Attention
 // Discussed seq models and conv
 // We find various issues
 // Locality not present
@@ -578,53 +504,64 @@
 // other applications of attention
 
 
-#sslide[
+==
     Attention and transformers are the "hottest" topic in deep learning #pause
 
     People use them for almost every task (even if they shouldn't!) #pause
 
     Let's review some projects based on attention
-]
 
-#sslide[
+==
     AlphaFold (Nobel prize)
 
     #cimage("figures/lecture_11/alphafold.png", height: 85%)
-]
 
-#sslide[
+==
     ChatGPT, Qwen, LLaMA, Mistral, Doubou, Ernie chatbots
 
     #cimage("figures/lecture_11/llm.jpg", height: 85%)
-]
 
-#sslide[
+==
     MusicTransformer, MuLan
 
     #cimage("figures/lecture_11/mulan.jpg", height: 85%)
-]
 
-#sslide[
+==
     Google Translate, Baidu Translate, Apple Translate
 
     #cimage("figures/lecture_11/translate.jpeg", height: 85%)
-]
 
-#sslide[
+==
     ViT, DinoV2
 
     #cimage("figures/lecture_9/dino.png", height: 85%)
-]
 
-#sslide[
+==
     All these models are *transformers* #pause
 
     At the core of each transformer is *attention* #pause
 
-    We can derive attention from composite memory
-]
+    We will write attention slightly differently than you see in textbooks #pause
+    - I want to stay with column-vector notation #pause
 
-#sslide[
+    #side-by-side[
+        Textbook
+
+        $ softmax(bold(Q) bold(K)^top) bold(V) $ #pause
+    ][
+        Our representation
+
+        $ bold(V) softmax(bold(K)^top bold(Q)) $ #pause
+    ]
+
+    Same results, but easier to write scalar/vector
+
+
+
+
+==
+    We can derive attention from composite memory #pause
+
     #side-by-side[
         Francis Galton (1822-1911) \ photo composite memory
 
@@ -634,9 +571,8 @@
 
         #cimage("figures/lecture_8/composite_memory.jpg", height: 70%)
     ]
-]
 
-#sslide[
+==
     *Task:* Find a mathematical model of how our mind represents memories #pause
 
     $ X: bb(R)^(h times w) quad "People you see at the party" $ #pause
@@ -648,21 +584,19 @@
     Composite photography/memory uses a weighted sum #pause
 
     $ f(bold(x), bold(theta)) = sum_(i=1)^T bold(theta)^top overline(bold(x))_i $
-]
 
-#sslide[
+==
     Limited space, cannot remember everything #pause
 
     Introduced forgetting term $gamma in [0, 1]$ #pause
 
-    #side-by-side[$ f(bold(x), bold(theta)) = sum_(i=1)^T gamma^(T - i) dot bold(theta)^top overline(bold(x))_i $ #pause][
+    #side-by-side(columns: (0.4fr, 0.6fr))[$ f(bold(x), bold(theta)) = sum_(i=1)^T gamma^(T - i) dot bold(theta)^top overline(bold(x))_i $ #pause][
         #align(center)[#forgetting]
     ] #pause
 
     *Question:* Does this accurately model what *you* remember?
-]
 
-#sslide[
+==
     *Example:* We attend a party in 1850s #pause
 
     We talk with many people at this party #pause
@@ -678,9 +612,8 @@
     ][
     1 AM
     ]
-]
 
-#sslide[
+==
     According to forgetting, the memories should fade with time #pause
 
     #cimage("figures/lecture_11/composite_fade.png") #pause
@@ -694,13 +627,11 @@
     ][
     $ gamma^0 bold(theta)^top overline(bold(x))_4 $
     ] #pause
-]
 
-#sslide[
+==
     Any questions before moving on?
-]
 
-#sslide[
+==
     Consider another party, with one more guest #pause
 
     #cimage("figures/lecture_11/composite_swift.png") #pause
@@ -719,9 +650,8 @@
     ] #pause
 
     *Question:* What will happen to Taylor Swift?
-]
 
-#sslide[
+==
     #cimage("figures/lecture_11/composite_swift_fade.png")
 
     #side-by-side[
@@ -739,9 +669,8 @@
     We will forget meeting her! #pause
 
     *Question:* Would you forget meeting Taylor Swift?
-]
 
-#sslide[
+==
     Our model of memory is incomplete #pause
 
     Memories are not created equal, some are more important than others #pause
@@ -749,9 +678,8 @@
     Important memories persist longer than unimportant memories #pause
 
     We will *pay more attention* to certain memories
-]
 
-#slide[
+==
     What does human memory actually look like?
 
     #cimage("figures/lecture_11/composite_softmax.png") #pause
@@ -769,9 +697,8 @@
     ] #pause
 
     *Question:* How can we achieve this forgetting?
-]
 
-#sslide[
+==
     In our composite model, forgetting is a function of time #pause
 
     *Question:* Any forgetting mechanism that is not a function of time? #pause
@@ -781,22 +708,8 @@
     $ f_"forget" (bold(x), bold(theta)) = sigma(bold(theta)^top_lambda overline(bold(x))) $ #pause
 
     $ f(bold(h), bold(x), bold(theta)) = f_"forget" (bold(x), bold(theta)) dot.o bold(h) +  bold(theta)_x^top overline(bold(x)) $ 
-]
 
-/*
-#sslide[
-    *Question:* How did we achieve forgetting in our recurrent neural network? #pause
-
-    $ f_"forget" (bold(x), bold(theta)) = sigma(bold(theta)^top_lambda overline(bold(x))) $ #pause
-
-    $ f(bold(h), bold(x), bold(theta)) = f_"forget" (bold(x), bold(theta)) dot.o bold(h) +  bold(theta)_x^top overline(bold(x)) $ #pause
-
-    Let us do something similar #pause
-
-    However, we will write it slightly differently (without recurrence)
-]
-*/
-#sslide[
+==
     First, write our forgetting function with slightly different notation #pause
     $
         lambda(bold(x), bold(theta)_lambda) = sigma(bold(theta)^top_lambda overline(bold(x))); quad bold(theta)_lambda in bb(R)^((d_x + 1) times 1)
@@ -810,16 +723,13 @@
     $ #pause
 
     Only pay attention to important inputs 
-]
 
-#sslide[
+==
     We can use this simple form of attention to remember Taylor Swift #pause
 
     #cimage("figures/lecture_11/composite_swift.png")
-]
 
-#sslide[
-    
+== 
     #side-by-side[
     $ lambda(bold(x)_1, bold(theta)_lambda) \ dot bold(theta)^top overline(bold(x))_1 $
     ][
@@ -835,9 +745,8 @@
     *Question:* What do the images look like now? #pause
 
     #cimage("figures/lecture_11/composite_swift.png")
-]
 
-#sslide[
+==
     This form of attention will learn to pay attention to everyone! #pause
 
     #side-by-side[
@@ -854,10 +763,27 @@
     
     #cimage("figures/lecture_11/composite_swift.png") #pause
 
-    Not a good model of attention!
-]
+==
+    #side-by-side[
+    $ 1.0 dot bold(theta)^top overline(bold(x))_1 $
+    ][
+    $ 1.0 dot bold(theta)^top overline(bold(x))_2 $
+    ][
+    $ 1.0 dot bold(theta)^top overline(bold(x))_3 $
+    ][
+    $ 1.0 dot bold(theta)^top overline(bold(x))_4 $
+    ][
+    $ 1.0 dot bold(theta)^top overline(bold(x))_5 $
+    ] #pause
 
-#sslide[
+    Why does this model of attention pay attention to everyone? #pause
+    - Honest answer is I do not know #pause
+        - But I have tried it myself, and this usually happens #pause
+        - Maybe one of you can figure out why! #pause
+
+    We need to prevent all attention weights going to 1
+
+==
     We should normalize $lambda(bold(x), bold(theta)_lambda)$ to model finite (human) attention span #pause
 
     For example, normalize attention to sum to one
@@ -869,9 +795,8 @@
     *Question:* How can we ensure that the attention sums to one? #pause
 
     *Answer:* Softmax!
-]
 
-#sslide[
+==
   The softmax function maps real numbers to the simplex (probabilities) #pause
 
   $ "softmax": bb(R)^k |-> Delta^(k - 1) $ #pause
@@ -882,9 +807,8 @@
     dots.v,
     exp(x_k) / (exp(x_1) + exp(x_2) + dots exp(x_k)),
   ) $
-]
 
-#sslide[
+==
     //$ lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda) = exp(bold(theta)^top_lambda overline(bold(x))) / (sum_(j=1)^k exp(bold(theta)^top_lambda overline(bold(x))_j)) $ #pause
 
     Let us rewrite attention using softmax #pause
@@ -900,9 +824,8 @@
     = exp(bold(theta)^top_lambda overline(bold(x))_i) 
         / (sum_(j=1)^T exp(bold(theta)^top_lambda overline(bold(x))_j)) 
     $
-]
 
-#sslide[
+==
     #cimage("figures/lecture_11/composite_swift.png") #pause
     
     #side-by-side[
@@ -916,11 +839,8 @@
     ][
     $ lambda(vec(bold(x)_1, dots.v, bold(x)_5), bold(theta)_lambda)_5 \ dot bold(theta)^top overline(bold(x))_5 $
     ] #pause
-]
 
-
-#sslide[
-    
+==
     #cimage("figures/lecture_11/composite_softmax.png") #pause
 
     #side-by-side[
@@ -936,9 +856,8 @@
     ] #pause
 
     $ 0.70 + 0.04 + 0.03 + 0.20 + 0.03 = 1.0 $
-]
 
-#sslide[
+==
     $ lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i = exp(bold(theta)^top_lambda overline(bold(x)_i)) / (sum_(j=1)^T exp(bold(theta)^top_lambda overline(bold(x))_j)) $ #pause
 
     Compute attention for all inputs at once #pause
@@ -948,18 +867,14 @@
         dots.v,
         exp(bold(theta)^top_lambda overline(bold(x))_#redm[$T$]) / (sum_(j=1)^T exp(bold(theta)^top_lambda overline(bold(x))_j))
     ) $
-]
 
-#sslide[
+==
     This is a simple form of attention #pause
 
     Next, we will investigate the attention used in transformers
-]
 
-#aslide(ag, 2)
-#aslide(ag, 3)
-
-#sslide[
+= Keys and Queries
+==
     The modern form of attention behaves like a database #pause
 
     We label each person at the party with a *key* #pause
@@ -969,9 +884,8 @@
     #cimage("figures/lecture_11/composite_swift_einstein.svg") #pause
 
     #side-by-side[Musician #pause][Lawyer #pause][Shopkeeper #pause][Chef #pause][Scientist ]
-]
 
-#sslide[
+==
     We can search through our keys using a *query* #pause
 
     *Query:* Which person will help me on my exam? #pause
@@ -983,9 +897,8 @@
     #side-by-side[Musician][Lawyer][Shopkeeper][Chef][Scientist] #pause
 
     #only(5)[#cimage("figures/lecture_11/composite_swift_einstein_attn_einstein.png")]
-]
 
-#sslide[
+==
     *Query:* I want to have fun #pause
 
     #only((2,3))[
@@ -997,15 +910,13 @@
     #only((4,5))[#cimage("figures/lecture_11/composite_swift_einstein_attn_chef.png")] #pause
 
     How do we represent keys and queries mathematically?
-]
 
-#sslide[
+==
     For each input, we create a key $bold(k)$ #pause
 
     $ bold(k)_j = bold(theta)^top_K bold(x)_j, quad bold(theta)_K in bb(R)^(d_x times d_h), quad bold(k)_j in bb(R)^(d_h) $ #pause
-]
 
-#sslide[
+==
     Now, create a query from some $bold(x)_q$ #pause
 
     $ bold(q) = bold(theta)^top_Q bold(x)_q,  quad bold(theta)_Q in bb(R)^(d_x times d_h), quad bold(q) in bb(R)^(d_h) $ #pause
@@ -1019,9 +930,8 @@
     *Answer:* $(1, d_h) times (d_h, 1) = 1$, the output is a scalar #pause
 
     Large dot product $=>$ match! Small dot product $=>$ no match.
-]
 
-#sslide[
+==
     *Example:* #pause
 
     #side-by-side[
@@ -1033,9 +943,8 @@
     $ bold(q)^top bold(k)_i = (bold(theta)_Q^top "Musician")^top (bold(theta)_K^top #image("figures/lecture_11/swift.jpg", height: 20%)) = 100 $ #pause
 
     Large attention!
-]
 
-#sslide[
+==
     *Example:*
 
     #side-by-side[
@@ -1047,9 +956,8 @@
     $ bold(q)^top bold(k)_i = (bold(theta)_Q^top "Mathematician")^top (bold(theta)_K^top #image("figures/lecture_11/swift.jpg", height: 20%)) = -50 $ #pause
 
     Small attention!
-]
 
-#sslide[
+==
     *Example:*
 
     #side-by-side[
@@ -1063,9 +971,8 @@
     Large attention! #pause
 
     Remember, there are multiple inputs to pay attention to
-]
 
-#sslide[
+==
     We compute a key for each input 
 
     $ bold(K) 
@@ -1074,8 +981,7 @@
         quad bold(K) in bb(R)^(d_h times T) 
     $ #pause
 
-]
-#sslide[
+==
     Then compute attention for each key
 
     $
@@ -1095,38 +1001,11 @@
 
     *Answer:* T #pause
 
-    Do not forget to normalize with softmax!
-]
+    Do not forget to normalize with softmax! 
 
-/*
-#sslide[
-    We compute attention for each input #pause
-
-    $ bold(q)^top bold(K) = bold(q)^top vec(bold(k)_1, bold(k)_2, dots.v, bold(k)_T) = vec( 
-        (bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_1),
-        (bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_2),
-        dots.v,
-        (bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_T),
-    )
-    $ #pause
-
-    Do not forget to normalize with softmax!
-]
-*/
-
-
-#sslide[
+==
     Normalize, only pay attention to important matches #pause
 
-    /*
-    $ softmax(bold(q)^top bold(K)) = softmax(bold(q)^top vec(bold(k)_1, bold(k)_2, dots.v, bold(k)_T)) = softmax(vec( 
-        (bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_1),
-        (bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_2),
-        dots.v,
-        (bold(theta)_Q^top bold(x)_q)^top (bold(theta)_K^top bold(x)_T),
-    ))
-    $ #pause
-    */
 
     $ softmax(bold(q)^top bold(K)) 
         &= softmax(bold(q)^top mat(bold(k)_1, bold(k)_2, dots, bold(k)_T)) 
@@ -1140,9 +1019,8 @@
     )) $ #pause
 
     We call this *dot-product attention*
-]
 
-#sslide[
+==
     *Query:* Which person will help me on my exam? #pause
 
     #only((2,3,4))[
@@ -1188,9 +1066,8 @@
     ][
         $0.84$
     ][] 
-]
 
-#sslide[
+==
     Put dot product attention into our composite model #pause
 
     $
@@ -1202,12 +1079,10 @@
     Then, write our composite memory model with dot product attention #pause
 
     $ f(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = sum_(i=1)^T bold(theta)^top bold(x)_i dot lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i
-    $ #pause
+    $ 
 
-    //We call $bold(theta)_V^top bold(x)_i$ the *value*
-]
 
-#sslide[
+==
     $ f(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = sum_(i=1)^T bold(theta)^top bold(x)_i dot lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i
     $ #pause
 
@@ -1216,35 +1091,12 @@
     $ f(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = sum_(i=1)^T bold(theta)_#redm[$V$]^top bold(x)_i dot lambda(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)_lambda)_i $ #pause
 
     In dot-product attention, we call $bold(theta)_V^top bold(x)_i$ the *value*
-]
 
 
-/*
-#sslide[
-    #cimage("figures/lecture_11/composite_swift_einstein_attn_einstein.png", width: 70%)
-        #side-by-side[][
-        $bold(q)^top bold(k)_1 \
-        dot bold(theta)_V^top bold(x)_1$
-    ][
-        $bold(q)^top bold(k)_2 \ 
-        dot bold(theta)_V^top bold(x)_2$
-    ][
-        $bold(q)^top bold(k)_3 \ 
-        dot bold(theta)_V^top bold(x)_3$
-    ][
-        $bold(q)^top bold(k)_4 \ 
-        dot bold(theta)_V^top bold(x)_4$
-    ][
-        $bold(q)^top bold(k)_5 \ 
-        dot bold(theta)_V^top bold(x)_5$
-    ][] #pause
-]
-*/
 
-#aslide(ag, 3)
-#aslide(ag, 4)
+= Self Attention
+==
 
-#sslide[
     Previously, we chose our own query $bold(x)_q = "Musician"$ #pause
 
     We can also create queries from all the inputs #pause
@@ -1252,32 +1104,102 @@
     $ bold(Q) = mat(bold(q)_1, bold(q)_2, dots, bold(q)_T) = mat(bold(theta)_Q^top bold(x)_1, bold(theta)_Q^top bold(x)_2, dots, bold(theta)_Q^top bold(x)_T), quad bold(Q) in bb(R)^(T times d_h) $ #pause
 
     We call this dot-product *self* attention 
-]
-
-#sslide[
-    Attention looks messy, but we can rewrite it in matrix form #pause
+==
 
     $
-    bold(Q) &= mat(bold(q)_1, bold(q)_2, dots, bold(q)_T) &&= mat(bold(theta)_Q^top bold(x)_1, bold(theta)_Q^top bold(x)_2, dots, bold(theta)_Q^top bold(x)_T) \
+    bold(Q) &= mat(bold(q)_1, dots, bold(q)_T) &&= mat(bold(theta)_Q^top bold(x)_1, dots, bold(theta)_Q^top bold(x)_T) \
 
-    bold(K) &= mat(bold(k)_1, bold(k)_2, dots, bold(k)_T) &&= mat(bold(theta)_K^top bold(x)_1, bold(theta)_K^top bold(x)_2, dots, bold(theta)_K^top bold(x)_T) \
+    bold(K) &= mat(bold(k)_1, dots, bold(k)_T) &&= mat(bold(theta)_K^top bold(x)_1, dots, bold(theta)_K^top bold(x)_T) \
 
-    bold(V) &= mat(bold(v)_1, bold(v)_2, dots, bold(v)_T) &&= mat(bold(theta)_V^top bold(x)_1, bold(theta)_V^top bold(x)_2, dots, bold(theta)_V^top bold(x)_T) quad
+    bold(V) &= mat(bold(v)_1, dots, bold(v)_T) &&= mat(bold(theta)_V^top bold(x)_1, dots, bold(theta)_V^top bold(x)_T) quad
 
     $ #pause
+
+$ bold(Q) bold(K)^top = vec(bold(q)_1, dots.v, bold(q)_T) mat(bold(k)_1, dots, bold(k)_T) = mat(
+    bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
+    bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
+    dots.v, dots.down, dots.v;
+    bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T;
+    ) $
+
+==
+$
+    bold(V) &= mat(bold(v)_1, dots, bold(v)_T) &&= mat(bold(theta)_V^top bold(x)_1, dots, bold(theta)_V^top bold(x)_T)
+$
+$ bold(Q) bold(K)^top = vec(bold(q)_1, dots.v, bold(q)_T) mat(bold(k)_1, dots, bold(k)_T) = mat(
+    bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
+    bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
+    dots.v, dots.down, dots.v;
+    bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T;
+    ) $
+
+$ bold(Q) bold(K)^top bold(V) = mat(
+    bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
+    bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
+    dots.v, dots.down, dots.v;
+    bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T;
+    )  vec(bold(v)_1, bold(v)_2, dots.v, bold(v)_T) = vec(
+        bold(q)_1 bold(k)_1 bold(v)_1 + dots + bold(q)_1 bold(k)_T bold(v)_T,
+        bold(q)_2 bold(k)_1 bold(v)_1 + dots + bold(q)_2 bold(k)_T bold(v)_T,
+        dots.v,
+        bold(q)_T bold(k)_1 bold(v)_1 + dots + bold(q)_T bold(k)_T bold(v)_T,
+    ) $
+
+==
+$ bold(Q) bold(K)^top bold(V) = mat(
+    bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
+    bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
+    dots.v, dots.down, dots.v;
+    bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T;
+    )  vec(bold(v)_1, bold(v)_2, dots.v, bold(v)_T) = vec(
+        bold(q)_1 bold(k)_1 bold(v)_1 + dots + bold(q)_1 bold(k)_T bold(v)_T,
+        bold(q)_2 bold(k)_1 bold(v)_1 + dots + bold(q)_2 bold(k)_T bold(v)_T,
+        dots.v,
+        bold(q)_T bold(k)_1 bold(v)_1 + dots + bold(q)_T bold(k)_T bold(v)_T,
+    ) $ #pause
+
+*Question:* Did we forget anything? #pause *Answer:* Softmax! #pause
+
+$ softmax(bold(Q) bold(K)^top) bold(V) = softmax(mat(
+    bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
+    bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
+    dots.v, dots.down, dots.v;
+    bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T;
+    ))  vec(bold(v)_1, bold(v)_2, dots.v, bold(v)_T) $ 
+==
+
+$ softmax(bold(Q) bold(K)^top) bold(V) = softmax(mat(
+    bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T;
+    bold(q)_2 bold(k)_1, dots, bold(q)_2 bold(k)_T;
+    dots.v, dots.down, dots.v;
+    bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T;
+    ))  vec(bold(v)_1, bold(v)_2, dots.v, bold(v)_T) $  #pause
+
+Be very careful with softmax dimension #pause
+- Writing attention different ways uses different softmax dimensions #pause
+- When in doubt, write out full matrix #pause
+
+*Question:* Softmax rows or columns? *Answer:* Rows #pause
+
+#side-by-side[
+    Only one query index
+  ][
+    $ softmax(mat(bold(q)_i bold(k)_1, dots, bold(q)_i bold(k)_T))  $ 
+  ]  #pause
+
+==
+    Attention paper suggests normalizing constant for faster learning #pause
 
     $ "attn"(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( (bold(Q) bold(K)^top) / sqrt(d_h)) bold(V) $ #pause
 
     This operation powers today's biggest models
-]
 
-#sslide[
+==
     $ bold(Q) in bb(R)^(T times d_h) quad bold(K) in bb(R)^(T times d_h) quad bold(V) in bb(R)^(T times d_h) $
 
-    $ underbrace("attn"(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)), bb(R)^(T times d_h)) = softmax overbrace( (( bold(Q) bold(K)^top, ) / sqrt(d_h)), bb(R)^(T times T) ) underbrace(bold(V), bb(R)^(T times d_h)) $ #pause
-]
+    $ underbrace("attn"(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)), bb(R)^(T times d_x)) = softmax overbrace( (( bold(Q) bold(K)^top, ) / sqrt(d_h)), bb(R)^(T times T) ) underbrace(bold(V), bb(R)^(T times d_h)) $ #pause
 
-#sslide[
+==
     ```python
 
     class Attention(nn.Module):
@@ -1287,22 +1209,27 @@
             self.theta_V = nn.Linear(d_x, d_h, bias=False)
 
         def forward(self, x):
+            # Shape:  (column, row), be very careful with axis!
             A = softmax(
                 self.theta_Q(x) @ self.theta_K(x).T / d_h, axis=1
             )
-            return A @ self.theta_V(x)
+            V = self.theta_V(x)
+            return A @ V 
     ```
+
+= Guest Lecture - Dr. Matteo Bettini
+==
+#side-by-side(columns: (0.4fr, 0.7fr))[
+   #cimage("figures/lecture_11/matteo.jpg") 
+][
+    Dr. Matteo Bettini is a good friend of mine #pause
+
+    We did our PhDs together
 ]
-
-
-#sslide[
-    Next lecture, we will create the transformer #pause
-
-    We will also discuss foundation models
-]
-
-#aslide(ag, 4)
-#aslide(ag, 5)
-#sslide[
-    https://colab.research.google.com/drive/18VBb7sz0u8ul5vsFEJnQaepn0pQy4cUa?usp=sharing
-]
+==
+Dr. Matteo Bettini 
+- Incoming Research Scientist at Meta's SuperIntelligence Lab #pause
+- Focus on agentic LLMs #pause
+- PhD in Computer Science at Cambridge #pause
+- MS in Computer Science at Cambridge #pause
+- BS in Computer Engineering at Milan Polytechnic
