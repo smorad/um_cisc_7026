@@ -8,7 +8,7 @@
 #import algorithmic: style-algorithm, algorithm-figure, algorithm
 #import "@preview/mannot:0.3.0": *
 
-#let handout = false
+#let handout = true
 
 // FUTURE TODO: Repeat self too much on locality/equivariance, restructure and replace with something else
 

@@ -644,7 +644,7 @@ Focus on modern methods that solve hard problems #pause
 ==
     $ bold(h)_T = gamma^3 bold(h)_(T - 3) + gamma^2 bold(theta)^top overline(bold(x))_(T - 2) + gamma bold(theta)^top overline(bold(x))_(T - 1) + bold(theta)^top overline(bold(x))_T $ #pause
 
-    $ bold(h)_T = gamma^T bold(theta)^top overline(bold(x))_1 + gamma^(T - 1) bold(theta)^top overline(bold(x))_2 + dots + gamma^2 bold(theta)^top overline(bold(x))_(T - 2) + gamma bold(theta)^top overline(bold(x))_(T - 1) + bold(theta)^top overline(bold(x))_T $ #pause
+    $ bold(h)_T = gamma^(T-1) bold(theta)^top overline(bold(x))_1 + gamma^(T - 2) bold(theta)^top overline(bold(x))_2 + dots + gamma^2 bold(theta)^top overline(bold(x))_(T - 3) + gamma bold(theta)^top overline(bold(x))_(T - 1) + bold(theta)^top overline(bold(x))_T $ #pause
 
     //$ bold(h)_T = sum_(i=1)^T gamma^(T - i - 1) bold(theta)^top bold(x)_i $ #pause
 
@@ -1014,7 +1014,7 @@ All work, and all are recurrent neural networks! #pause
     $ 
     f (bold(h), bold(x), bold(theta)) = 
     sigma(
-        bold(theta)_1^top bold(h) #redm[$dot.circle f_"forget" (bold(h), bold(x), bold(theta))$] + bold(theta)_2^top overline(bold(x)) 
+        bold(theta)_1^top bold(h) #redm[$dot.o f_"forget" (bold(h), bold(x), bold(theta))$] + bold(theta)_2^top overline(bold(x)) 
     )
     $ #pause
 
@@ -1048,16 +1048,16 @@ All work, and all are recurrent neural networks! #pause
     $ 
     f_2(bold(h), bold(x), bold(theta)) = underbrace(sigma(
         bold(theta)_3^top overline(bold(x)) + bold(theta)_4^top 
-            f_"forget" (bold(h), bold(x), bold(theta)) dot.circle bold(h)
+            f_"forget" (bold(h), bold(x), bold(theta)) dot.o bold(h)
     ), "Make new memories") 
     $ #pause
 
     $
     f(bold(h), bold(x), bold(theta)) = 
         underbrace(
-          f_"forget" (bold(h), bold(x), bold(theta)) dot.circle bold(h)
+          f_"forget" (bold(h), bold(x), bold(theta)) dot.o bold(h)
         , "Forget old memories") + 
-        underbrace((1 - f_"forget" (bold(h), bold(x), bold(theta))), "Replace") dot.circle underbrace(f_2(bold(h), bold(x), bold(theta)), "New memories")
+        underbrace((1 - f_"forget" (bold(h), bold(x), bold(theta))), "Replace") dot.o underbrace(f_2(bold(h), bold(x), bold(theta)), "New memories")
     $ #pause
 
     Only forget when we have new information to remember
