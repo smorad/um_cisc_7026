@@ -8,7 +8,7 @@
 #import algorithmic: style-algorithm, algorithm-figure, algorithm
 #import "@preview/mannot:0.3.0": *
 
-#let handout = false
+#let handout = true
 
 #set math.vec(delim: "[")
 #set math.mat(delim: "[")
@@ -1242,6 +1242,7 @@ Many ways to teach attention!
 Dr. Matteo Bettini 
 - Incoming Research Scientist at Meta's SuperIntelligence Lab #pause
 - Focus on agentic LLMs #pause
+- Previously worked at PyTorch #pause
 - PhD in Computer Science at Cambridge #pause
 - MS in Computer Science at Cambridge #pause
 - BS in Computer Engineering at Milan Polytechnic

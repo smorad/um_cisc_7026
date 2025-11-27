@@ -5,8 +5,11 @@
 #import "@preview/pinit:0.2.2": *
 #import "@preview/algorithmic:1.0.4"
 #import algorithmic: style-algorithm, algorithm-figure, algorithm
-#import "@preview/mannot:0.3.0": *
+#import "@preview/mannot:0.3.0": * 
 
+// TODO 2025:
+// Rename to categorical cross entropy loss
+// to differentiate from negative log likelihood in generative modeling
 #let handout = true
 
 #show: university-theme.with(
