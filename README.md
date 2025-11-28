@@ -17,6 +17,7 @@ There is a very nice tool that will automatically compile and render `typst` sou
 - [Lecture 9 - Autoencoders](https://gistd.myriad-dreamin.com/@any/github.com/smorad/um_cisc_7026/blob/main/lecture_09_autoencoders.typ?g-mode=slide)
 - [Lecture 10 - Generative Models](https://gistd.myriad-dreamin.com/@any/github.com/smorad/um_cisc_7026/blob/main/lecture_10_generative.typ?g-mode=slide)
 - [Lecture 11 - Attention](https://gistd.myriad-dreamin.com/@any/github.com/smorad/um_cisc_7026/blob/main/lecture_11_attention.typ?g-mode=slide)
+- [Lecture 12 - Transformers](https://gistd.myriad-dreamin.com/@any/github.com/smorad/um_cisc_7026/blob/main/lecture_12_transformers.typ?g-mode=slide)
 
 
 
