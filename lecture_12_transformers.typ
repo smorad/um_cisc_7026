@@ -15,10 +15,8 @@
 #set math.mat(delim: "[")
 
 // TODO PATCH
-/*
 #let patch = align(center, cetz.canvas({
     import cetz.draw: *
-
 
   let image_values = (
     ($bold(x)_1$, $bold(x)_2$,$bold(x)_3$, $bold(x)_4$, $bold(x)_5$, $bold(x)_6$, $bold(x)_7$, $bold(x)_8$),
@@ -31,9 +29,8 @@
     (" ", " ", " ", " ", " ", " ", " ", " "),
   )
   content((4, 4), image("figures/lecture_7/ghost_dog.svg", width: 8cm))
-  draw_filter(0, 0, image_values)
+  draw_filter_math(0, 0, image_values)
   })) 
-*/
 
 #let forgetting = { 
     set text(size: 22pt)
@@ -94,16 +91,17 @@
 
 = Admin
 ==
-All exam scores entered #pause
-- Exam 3 scores fairly low (41%)
-    - Partly due to many zeros (students skipped exam)
-    - Partly due to difficult exam
+All homework and exam scores entered on Moodle #pause
+- You should have a good idea of your grade in the course #pause
+- Exam 3 scores fairly low (41%) #pause
+    - Partly due to many zeros (students skipped exam) #pause
+    - Partly due to difficult exam #pause
 
-- Mean exam score (all 3 exams, lowest dropped): 77%
+- Mean exam score (all 3 exams, lowest dropped): 77% #pause
     - I expect exam scores to be lower than homework
 
 ==
-School grade table 
+UM grade table 
 
 #align(center, table(
   columns: (auto, auto, auto),
@@ -145,20 +143,19 @@ Course Grade distribution (103 students)
 ))
 
 ==
-Mean course score score without final project is very high
-- All students currently passing
-    - Students with F either caught cheating or dropped course
-    - Lowest grade: C
-- I curve up to 85%
-    - Does not appear necessary this time
+Mean course score score without final project is very high #pause
+- All students currently passing #pause
+    - Students with F either caught cheating or dropped course #pause
+    - Lowest grade: C #pause
+- I curve up to 85% #pause
+    - Does not appear necessary this time #pause
     - I have no problem giving A to all students 
 ==
-Do not have A, but want one?
-- Do well on the final project, 30% of your score
-    - If you put in effort you will get a good score
-        - Do not worry too much
-        - Try to enjoy the process and learn something interesting
-- Try and finish before exam week
+Do not have A, but want one? #pause
+- Do well on the final project, 30% of your score #pause
+    - If you put in effort you will get a good score #pause
+        - Try to enjoy the project and learn something interesting #pause
+- Try and finish before exam week #pause
     - Can focus on other course exams
 
 = Review
@@ -171,9 +168,7 @@ We started with composite memory #pause
 
 $ f(bold(x), bold(theta)) = sum_(i=1)^T bold(theta)^top overline(bold(x))_i $ #pause
 
-Given large enough $T$, we will eventually run out of storage space #pause
-
-The sum is a *lossy* operation that can store a limited amount of information
+Given large enough $T$, we will eventually run out of storage space
 
 == 
 So we introduced a forgetting term $gamma$ #pause
@@ -308,27 +303,46 @@ Then, we introduced *keys* and *queries* #pause
 #only(5)[#cimage("figures/lecture_11/composite_swift_einstein_attn_einstein.png")]
 
 ==
-First, we used a single query #pause
+    First, we used one key and one query #pause
 
-$ bold(q) = bold(theta)_Q^top ("Who will help on the exam?") $ #pause
+    #side-by-side[
+        $bold(k)_i = bold(theta)_K^top #image("figures/lecture_11/swift.jpg", height: 20%)$ #pause
+    ][
+        $bold(q) = bold(theta)_Q^top "Musician"$ #pause
+    ]
 
-$ bold(q)^top bold(K)^top = bold(q)^top mat(bold(k)_1, dots, bold(k)_T) = mat(bold(q)^top bold(k)_1, dots, bold(q)^top bold(k)_T) $ #pause
+    $ bold(q)^top bold(k)_i = (bold(theta)_Q^top "Musician")^top (bold(theta)_K^top #image("figures/lecture_11/swift.jpg", height: 20%)) = 100 $ #pause
 
-$ softmax(bold(q)^top bold(K)^top) = softmax(mat(bold(q)^top bold(k)_1, dots, bold(q)^top bold(k)_T)) $ #pause
+    Large attention!
 
-Then, we created queries from all inputs (self-attention) #pause
-- It became messy, so we rewrote it in matrix form
+==
+Then, we used many keys and one query #pause
+
+#side-by-side[
+    $ bold(q) = bold(theta)_Q^top ("Musician") $ #pause
+][
+    $ bold(K) = vec(bold(k)_1, dots.v, bold(k)_T) = vec(
+        bold(theta)_K^top #image("figures/lecture_11/swift.jpg", height: 20%),
+        dots.v,
+        bold(theta)_K^top #image("figures/lecture_11/einstein.jpg", height: 20%)
+    ) $
+]
+
+
+
+
+$ softmax(bold(q)^top bold(K)^top) = softmax(bold(q)^top mat(bold(k)_1, dots, bold(k)_T)) = softmax(mat(bold(q)^top bold(k)_1, dots, bold(q)^top bold(k)_T)) $ #pause
+
+Then, we created queries from all inputs (self-attention) 
 
 
 ==
 #side-by-side[
     $ bold(K) &= vec(bold(k)_1, dots.v, bold(k)_T) &&= vec(bold(theta)_K^top bold(x)_1, dots.v, bold(theta)_K^top bold(x)_T) $ #pause
-
 ][
-$ bold(Q) &= vec(bold(q)_1, dots.v, bold(q)_T) &&= vec(bold(theta)_Q^top bold(x)_1, dots.v, bold(theta)_Q^top bold(x)_T) $ #pause
+    $ bold(Q) &= vec(bold(q)_1, dots.v, bold(q)_T) &&= vec(bold(theta)_Q^top bold(x)_1, dots.v, bold(theta)_Q^top bold(x)_T) $ #pause
 ][
-$ bold(V) &= vec(bold(q)_1, dots.v, bold(q)_T) &&= vec(bold(theta)_V^top bold(x)_1, dots.v, bold(theta)_V^top bold(x)_T) $ #pause
-
+    $ bold(V) &= vec(bold(q)_1, dots.v, bold(q)_T) &&= vec(bold(theta)_V^top bold(x)_1, dots.v, bold(theta)_V^top bold(x)_T) $ #pause
 ]
 
 $ softmax(bold(Q) bold(K)^top) bold(V) = softmax(vec(bold(q)_1, dots.v, bold(q)_T) mat(bold(k)_1, dots, bold(k)_T)) vec(bold(v)_1, dots.v, bold(v)_T) #pause \ = mat(
@@ -347,13 +361,13 @@ softmax(bold(q)_T bold(k)_1,  dots, bold(q)_T bold(k)_T);
 \ = mat(
 softmax(bold(q)_1 bold(k)_1, dots, bold(q)_1 bold(k)_T)_1 bold(v)_1 + dots + softmax(bold(q)_1 bold(k)_T, dots, bold(q)_1 bold(k)_T)_T bold(v)_T ;
 dots.v;
-softmax(bold(q)_T bold(k)_1, dots, bold(q)_1 bold(k)_T)_1 bold(v)_1 + dots + softmax(bold(q)_T bold(k)_T, dots, bold(q)_T bold(k)_T)_T bold(v)_T ;
-) $ 
+softmax(bold(q)_T bold(k)_T, dots, bold(q)_1 bold(k)_T)_1 bold(v)_1 + dots + softmax(bold(q)_T bold(k)_T, dots, bold(q)_T bold(k)_T)_T bold(v)_T ;
+) $ #pause
 
 *Question:* Self attention function signature? #pause $f: bb(R)^(T times d_x) times Theta |-> bb(R)^(T times d_h) $
 
 ==
-Also, a normalizing factor $sqrt(d_h)$ can accelerate training
+Also, a normalizing factor $sqrt(d_h)$ can accelerate training #pause
 
 $ softmax((bold(Q) bold(K)^top) / sqrt(d_h)) bold(V) $
 
@@ -374,14 +388,13 @@ It is arguably the most powerful neural network architecture today #pause
 Modern transformers can be very deep #pause
 
 Very deep networks require two new training tricks #pause
-
-We must understand these tricks before implementing the transformer #pause
+- We must understand these tricks before implementing the transformer #pause
 
 *Trick 1:* Residual connections #pause
 
 *Trick 2:* Layer normalization #pause
 
-We will start with the *residual connection*
+We will start with *residual connections*
 
 == 
 Remember that a two-layer MLP is a universal function approximator #pause
@@ -401,23 +414,21 @@ $ bold(y) = f_k ( dots f_2 ( f_1 (bold(x), bold(theta)_1), bold(theta_2)), dots,
 
 //The theory is that the input information is *lost* somewhere in the network #pause
 
-At each layer, we lose a little bit of information #pause
+*Claim:* At each layer, we lose a little bit of information #pause
 
-With enough layers, all the information in $bold(x)$ is lost! 
+*Corollary:* With enough layers, all the information in $bold(x)$ is lost! 
 
 
 ==
 $ bold(y) = f_k ( dots f_2 ( f_1 (bold(x), bold(theta)_1), bold(theta_2)), dots, bold(theta)_k) $ #pause
 
-*Claim:* If the input information is present in all layers of the network, then we should be able to learn the identity function $f(x) = x$ #pause
+*Hypothesis:* If the information in $bold(x)$ is accessible in all layers of the network, then we should be able to learn the identity function $f(x) = x$ #pause
 
 $ bold(x) = f_k ( dots f_2 ( f_1 (bold(x), bold(theta)_1), bold(theta_2)), dots, bold(theta)_k) $ #pause
 
 *Question:* We have seen a similar model, what was it? #pause
 
 *Answer:* Autoencoder! But it was just two functions, not $k$ functions #pause
-
-*Question:* Do you agree or disagree with the claim? #pause
 
 https://colab.research.google.com/drive/1qVIbQKpTuBYIa7FvC4IH-kJq-E0jmc0d#scrollTo=bg74S-AvbmJz
 
@@ -566,7 +577,8 @@ If the output is normally distrbuted: #pause
 - 95% of outputs $in [-2, 2]$ #pause
 - 99.7% of outputs $in [-3, 3]$ #pause
 
-This helps prevent vanishing and exploding gradients
+This helps prevent vanishing and exploding gradients #pause
+- Enables deeper networks
 ==
 
 Now, let's combine residual connections and layer norm and try our very deep network again
@@ -589,16 +601,16 @@ A transformer consists of many *transformer layers*
 class TransformerLayer(nn.Module):
     def __init__(self):
         self.attn = Attention()
-        self.mlp = vmap(Sequential( # [T, d_h]
+        self.mlp = Sequential( # [T, d_h]
             Linear(d_h, d_h), LeakyReLU(), 
             Linear(d_h, d_h), LeakyReLU(),
-            Linear(d_h, d_h)))
-        self.norm = vmap(LayerNorm(d_h)) # [T, d_h]
+            Linear(d_h, d_h))
+        self.norm = LayerNorm(d_h) # [T, d_h]
 
     def forward(self, x):
         # Residual connection and layer norm
-        x = self.norm(self.attn(x) + x)
-        x = self.norm(self.mlp(x) + x)
+        x = vmap(self.norm)(self.attn(x) + x)
+        x = vmap(self.norm)(vmap(self.mlp(x)) + x)
         return x
 ```
 ==
@@ -677,7 +689,7 @@ $ f(vec(bold(x)_1, bold(x)_2), bold(theta)) #text(size: 48pt)[$eq.quest$] f(vec(
 
 Let us find out! #pause
 
-Define a *permutation matrix* $bold(P) in {0, 1}^(T times T)$ that reorders the inputs #pause
+Define a *permutation matrix* $bold(P) in {0, 1}^(T times T)$ that reorders the inputs
 
 ==
 
@@ -699,7 +711,7 @@ $ bold(P) = mat(
 
 $ 
 ==
-#side-by-side[ $ f(bold(P)  vec(bold(x)_1, dots.v, bold(x)_n)) !=  bold(P) f(vec(bold(x)_1, dots.v, bold(x)_n) ) $ #pause][Order *does* matter (not equivariant)] #pause
+#side-by-side[ $ f(bold(P)  vec(bold(x)_1, dots.v, bold(x)_n)) !=  bold(P) f(vec(bold(x)_1, dots.v, bold(x)_n) ) $ #pause][Order *does* matter] #pause
 
 #side-by-side[ $ f(bold(P) vec(bold(x)_1, dots.v, bold(x)_n)) =  bold(P) f(vec(bold(x)_1, dots.v, bold(x)_n) ) $ #pause][Order *does not* matter (equivariant)] #pause
 
@@ -722,40 +734,31 @@ $ bold(V) &= vec(bold(v)_1, dots.v, bold(v)_T) &&= vec(bold(theta)_V^top bold(x)
 ==
 Permuting the inputs reorders $bold(Q), bold(K), bold(V)$ #pause
 
-$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( (bold(P) bold(Q)) (bold(P) bold(K))^top) (bold(P) bold(V)) $ #pause
-
 #side-by-side[
+$ bold(P) bold(X) => $ #pause
+][
 $ bold(P) bold(Q) &= vec(bold(q)_7, dots.v, bold(q)_4) $
 ][
 $ bold(P) bold(K) &= vec(bold(k)_7, dots.v, bold(k)_4) $
 ][
 $ bold(P) bold(V) &= vec(bold(v)_7, dots.v, bold(v)_4) $
-]
+] #pause
 
-/*
-$
-bold(P) bold(Q) &= mat(bold(q)_T, bold(q)_1, dots, bold(q)_2) &&= mat(bold(theta)_Q^top bold(x)_T, bold(theta)_Q^top bold(x)_1, dots, bold(theta)_Q^top bold(x)_2) \
-
-bold(P) bold(K) &= mat(bold(k)_T, bold(k)_1, dots, bold(k)_2) &&= mat(bold(theta)_K^top bold(x)_T, bold(theta)_K^top bold(x)_1, dots, bold(theta)_K^top bold(x)_2) \
-
-bold(P) bold(V) &= mat(bold(v)_T, bold(v)_1, dots, bold(v)_2) &&= mat(bold(theta)_V^top bold(x)_T, bold(theta)_V^top bold(x)_1, dots, bold(theta)_V^top bold(x)_2) quad
-$ 
-*/
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( (bold(P) bold(Q)) (bold(P) bold(K))^top) (bold(P) bold(V)) $ 
 
 
 ==
-$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax((bold(P) bold(Q)) (bold(P) bold(K))^top) bold(P) bold(V) $ #pause
 
 $ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax((bold(P) bold(Q)) (bold(K)^top bold(P)^top)) (bold(P) bold(V)) $ #pause
 
 $ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( bold(P) (bold(Q) bold(K)^top) bold(P)^top ) (bold(P) bold(V)) $ 
 
 ==
-$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( bold(P) (bold(Q) bold(K)^top) bold(P)^top ) (bold(P) bold(V)) $ 
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( bold(P) (bold(Q) bold(K)^top) bold(P)^top ) (bold(P) bold(V)) $ #pause
 
-$bold(P), bold(P)^top$ swap the *rows* of $bold(Q)bold(K)^top$
-- Softmax defined over *rows*
-- Therefore, we can pull $bold(P), bold(P)^top$ outside of softmax
+$bold(P), bold(P)^top$ swap the *rows* of $bold(Q)bold(K)^top$ #pause
+- Softmax defined over *rows* #pause
+- Therefore, $softmax(bold(P) dot) = bold(P) softmax(dot)$ #pause
 
 $ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P) softmax( bold(Q) bold(K)^top)  bold(P)^top (bold(P) bold(V)) $ 
 
@@ -776,12 +779,12 @@ $ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P) (soft
 $ 
 "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) &= bold(P) (softmax( bold(Q) bold(K)^top) bold(V)) \  #pause
 
-f(bold(P) vec(bold(x)_1, dots.v, bold(x)_n)) &= bold(P) f(vec(bold(x)_1, dots.v, bold(x)_n) ) 
+f(bold(P) vec(bold(x)_1, dots.v, bold(x)_n)) &= bold(P) f(vec(bold(x)_1, dots.v, bold(x)_n) ) quad "Equivariance definition"
 $ #pause
 
 *Question:* What does this mean? #pause
 
-*Answer:* Attention/transformer *does not* understand order. 
+*Answer:* Attention/transformer *does not* understand order #pause
 
 Attention is *permutation equivariant*
 
@@ -808,15 +811,16 @@ Can we make the transformer care about order?
 ==
 *Question:* What are some ways we can introduce ordering? #pause
 
-*Answer 1:* We can introduce forgetting (function of time) #pause
+*Answer 1:* We can introduce forgetting $gamma$ (function of time) #pause
 
-*ALiBi:* _Press, Ofir, Noah Smith, and Mike Lewis. "Train Short, Test Long: Attention with Linear Biases Enables Input Length Extrapolation." International Conference on Learning Representations._ #pause
+*ALiBi:* _Press, Ofir, Noah Smith, and Mike Lewis. "Train Short, Test Long: Attention with Linear Biases Enables Input Length Extrapolation." ICLR._ #pause
 
 *RoPE:* _Su, Jianlin, et al. "Roformer: Enhanced transformer with rotary position embedding." Neurocomputing._ #pause
 
 *Answer 2:* We can modify the inputs based on their ordering #pause
 
-We will focus on answer 2 because it is more common
+We will learn answer 2, we already know answer 1 #pause
+- Answer 1 works better (newer), but answer 2 is more common
 
 ==
 
@@ -846,7 +850,7 @@ $ f_"pos" (i) = vec(bold(theta)_1, bold(theta)_2, dots.v, bold(theta)_T)_i $ #pa
 
 We call this a *positional encoding* #pause
 
-In `torch`, this is called `nn.Embedding` #pause
+In `torch`/`equinox`, this is called `nn.Embedding` #pause
 
 Now, let us rewrite the transformer with the positional encoding 
 
@@ -892,7 +896,7 @@ Consider a dataset of sentences
 
 $ vec("John likes movies", "Mary likes movies", "I like dogs") $ #pause
 
-This is a vector of sentences, but a transformer input is $bb(R)^(T times d_x)$ #pause
+This is a vector of sentences, but transformer input is $bb(R)^(T times d_x)$ #pause
 
 What if we represent a sentence like this
 
@@ -927,7 +931,7 @@ $ vec(
 ), d_x) lr(} #v(3em)) T
 $
 ][
-    Vector representation $bold(theta)_i$ a *token*
+    Call $bold(theta)_i$ a *token*
 ]
 
 ==
@@ -999,7 +1003,7 @@ In image transformers, we treat a *patch* of pixels as an $bold(x)$ #pause
 $ X in [0, 1]^(3 times 16 times 16) $ #pause
 
 // TODO PATCH
-//#patch
+#patch
 
 ==
 // TODO PATCH
@@ -1008,6 +1012,10 @@ $ X in [0, 1]^(3 times 16 times 16) $ #pause
 #side-by-side(align: left)[Then, feed a sequence of patches to the transformer #pause][
     $ f(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) $
 ]
+
+*Question:* Do we want positional encoding for images? #pause
+
+*Answer:* Yes! Order/position of patches matters
 
 
 ==
@@ -1031,19 +1039,6 @@ y = model(patches)
 
 = Generative Pre-Training
 ==
-// Can use standard regression and classification objectives for transformer
-// Can classify images, text, etc just like any other neural networks
-    // Can do everything an RNN and convolution network can do
-// Now, I want to talk about the most exciting way to use transformers
-    // Generative models
-    // Task 1, draw a picture
-    // Task 2, write a book
-// Example task, write a book
-// Example task, draw a picture
-// What kind of models? Generative models
-TODO Cross entropy and NLL
-
-==
 Transformers are sequence models 
 
 #side-by-side[
@@ -1059,7 +1054,7 @@ Transformers are sequence models
 We can use them for the same tasks as CNNs and RNNs #pause
 - Classification and regression of images, text, etc #pause
 
-But today, I want to focus on the most exciting way to use transformers
+But today, I want to focus on the most exciting way to use transformers #pause
 
 Using transformers as *generative models*
 
@@ -1084,7 +1079,7 @@ Let us take a closer look
 = Generative Pre-Training (Images) <touying:hidden>
 
 ==
-#side-by-side(align: left)[First we consider images #pause][Use the same objective #pause]
+#side-by-side(align: left)[First we consider images #pause][Use the same NLL objective #pause]
 
 #side-by-side[
     $ bold(X) = mat(bold(x)_[1], dots, bold(x)_[n])^top $
@@ -1092,23 +1087,16 @@ Let us take a closer look
     $ argmin_bold(theta) sum_(i=1)^n - log p(bold(x)_([i]); bold(theta)) $
 ] #pause
 
-We break down the image into $T$ image patches for the transformer
+We construct $T$ image patches for the transformer #pause
 
-$ bold(x)_[1] = mat(bold(x)_([1], 1), dots, bold(x)_([1], T)) $
+$ bold(x)_[1] = mat(bold(x)_([1], 1), dots, bold(x)_([1], T)) $ #pause
 
-Can write the objective as a sequence
-
-$ argmin_bold(theta) sum_(i=1)^n sum_(j=1)^T - log p(bold(x)_([i], j); bold(theta)) $
-
-==
-$ argmin_bold(theta) sum_(i=1)^n sum_(j=1)^T - log p(bold(x)_([i], j); bold(theta)) $
-
-Transformer is a sequence model over patches $bold(x)_([i], 1), dots, bold(x)_([i], j)$ #pause
+Write the objective using sequence of patches #pause
 
 $ argmin_bold(theta) sum_(i=1)^n sum_(j=1)^T - log p(bold(x)_([i], j) | bold(x)_([i], j-1), dots, bold(x)_([i], 1) ; bold(theta)) $
 
 ==
-$ argmin_bold(theta) sum_(i=1)^n sum_(j=1)^T - log p(bold(x)_([i], j) | bold(x)_([i], j-1), dots, bold(x)_([i], 1) ; bold(theta)) $
+$ argmin_bold(theta) sum_(i=1)^n sum_(j=1)^T - log p(bold(x)_([i], j) | bold(x)_([i], j-1), dots, bold(x)_([i], 1) ; bold(theta)) $ #pause
 
 The $log p$ term became square error in VAE, same for transformer #pause
 
@@ -1152,8 +1140,6 @@ We train the model to fix the image #pause
 
 To fix the image, the model must understand so much of our world #pause
 
-This is the power of GPT #pause
-
 What about text transformers?
 
 = Generative Pre-Training (Text) <touying:hidden>
@@ -1165,27 +1151,25 @@ Start the same as image transformers #pause
 - Given previous tokens $bold(x)_([i], 1), dots, bold(x)_([i], j - 1)$, predict $bold(x)_([i], j)$ #pause
 - Output probabilities over next token $bold(x)_([i], j)$ #pause
 
-$ P(vec("movies", "Mary", "dogs") mid(|) underbrace("John", bold(x)_1) overbrace("likes", bold(x)_2); bold(theta)) = vec(0.5, 0.3, 0.2) $ 
+$ P(vec("movies", dots.v, "dogs") mid(|) underbrace("John", bold(x)_1) overbrace("likes", bold(x)_2); bold(theta)) = vec(0.5, dots.v, 0.2) $ 
 
 ==
 $ argmin_bold(theta) sum_(i=1)^n sum_(j=1)^T - log p(bold(x)_([i], j) | bold(x)_([i], j-1), dots, bold(x)_([i], 1) ; bold(theta)) $ #pause
 
 $log p$ for a one-hot categorical distribution is the classification loss #pause
+- Categorical cross entropy #pause
 
 // TODO color annotations for one-hot and softmax
-$ = argmin_bold(theta) sum_(i=1)^n sum_(j=1)^T P(bold(x)_([i], j) | bold(x)_([i], j - 1)) log f(mat(bold(x)_([i], 1), dots, bold(x)_([i], j - 1)); bold(theta)) $ 
+$ = argmin_bold(theta) sum_(i=1)^n sum_(j=1)^T P(bold(x)_([i], j)) log f(mat(bold(x)_([i], 1), dots, bold(x)_([i], j - 1)); bold(theta)) $ 
 
 ==
-$ = argmin_bold(theta) sum_(i=1)^n sum_(j=1)^T P(bold(x)_([i], j) | bold(x)_([i], j - 1)) log f(mat(bold(x)_([i], 1), dots, bold(x)_([i], j - 1)); bold(theta)) $ 
+$ = argmin_bold(theta) sum_(i=1)^n sum_(j=1)^T P(bold(x)_([i], j)) log f(mat(bold(x)_([i], 1), dots, bold(x)_([i], j - 1)); bold(theta)) $ #pause
 
 $ P(vec("movies", dots.v, "dogs") mid(|) underbrace("John", bold(x)_1) overbrace("likes", bold(x)_2); bold(theta)) = vec(0.3, dots.v, 0.1) $ #pause
 
 $ bold(x)_3  = "movies" $ #pause 
 
-Loss is $1 dot log(0.3) + 0 + dots + 0 = log(0.3) $
-
-
-//$ mat(bold(x)_1, bold(x)_2, bold(x)_3) = "Mary likes John" = #pause mat(bold(theta)_4, bold(theta)_2, bold(theta)_1)^top $ #pause
+$ cal(L)(bold(X), bold(theta)) = #pause 1 dot log(0.3) + 0 + dots + 0 = log(0.3) $ #pause
 
 Simple objective, how does this produce intelligent language models?
 
@@ -1197,15 +1181,15 @@ Simple objective, how does this produce intelligent language models?
 
     Clues, intrigue, murder, etc #pause
 
-    "Ah, said inspector Poirot, the murderer must be $underline(#h(4em))$." #pause
-
-    To complete the sentence, the model must understand:
+    "Inspector Poirot said the murderer must be $underline(#h(2em))$."
 ]
 ==
 
 #side-by-side(align: top)[
     #cimage("figures/lecture_12/murder.jpg")
 ][
+    "Inspector Poirot said the murderer must be $underline(#h(2em))$." #pause
+
     To complete the sentence, the model must understand: #pause
     - What a murder is #pause
     - What it means to be alive #pause
@@ -1244,11 +1228,13 @@ Consider one last example #pause
 
 Let us put the model in a robot #pause
 
-The dataset contains is all the robot sensors #pause
+The dataset contains information from all the robot sensors #pause
 
-$ X = mat("Image", "Sound", "Touch", "Action", dots)^top $ #pause
+$ X = mat("Image", "Sound", "Touch", dots)^top $ #pause
 
-Training objective is next-sensor prediction #pause
+Training objective is next-sensor prediction 
+
+$ argmin_bold(theta) sum_(i=1)^n sum_(j=1)^T - log p(bold(x)_([i], j) | bold(x)_([i], j-1), dots, bold(x)_([i], 1) ; bold(theta)) $ #pause 
 
 Given previous robot experience, predict next robot experience
 
@@ -1265,7 +1251,7 @@ To predict next sensory information, the robot must understand #pause
 - How to play basketball #pause
 - How humans express feelings #pause
 
-World models are the most likely path to AGI 
+*Opinion:* World models are the most likely path to AGI 
 
 = Reinforcement Learning
 ==
@@ -1273,21 +1259,18 @@ These transformers learn and understand our world better than humans #pause
 - But they are trapped in a prison #pause
 - They only predict the future, they cannot change it #pause
 
-We can give these models agency #pause
-- Allow them to make decisions and act in the world #pause
+We can allow these models to interact with the world #pause
+- To make their own decisions #pause
 - Learn from their mistakes #pause
+- To find their purpose in the world #pause
 
-We call this process *Reinforcement Learning*
-- Learn more in CISC7404 Special Topics in Artificial Intelligence #pause
-    - Next term #pause
-
+We call this process *Reinforcement Learning* #pause
+- CISC7404 Special Topics in Artificial Intelligence next term 
 
 = Closing Remarks
-
 ==
 In this course, we started from Gauss in 1795 #pause
-
-We built up concepts until we reached the modern age #pause
+- We built up concepts until we reached the modern age #pause
 
 #cimage("figures/lecture_1/timeline.svg")
 
@@ -1327,7 +1310,7 @@ But there are many more topics to learn! #pause
 
 
 ==
-In the first lecture, I asked everyone in this class to do something #pause
+In the first lecture, I asked everyone in this class to do one thing #pause
 
 *Question:* Do you remember what it was? 
 
