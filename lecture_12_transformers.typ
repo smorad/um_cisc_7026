@@ -8,6 +8,8 @@
 #import algorithmic: style-algorithm, algorithm-figure, algorithm
 #import "@preview/mannot:0.3.0": *
 
+#let handout = true
+
 // TODO: Move permutation to attention slide
 // cast it as a function over sets
 
@@ -54,7 +56,7 @@
 
 #show: university-theme.with(
   aspect-ratio: "16-9",
-  // config-common(handout: true),
+  config-common(handout: handout),
   config-info(
     title: [Transformers],
     subtitle: [CISC 7026 - Introduction to Deep Learning],
@@ -756,14 +758,14 @@ $ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( bold
 ==
 $ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = softmax( bold(P) (bold(Q) bold(K)^top) bold(P)^top ) (bold(P) bold(V)) $ #pause
 
-$bold(P), bold(P)^top$ swap the *rows* of $bold(Q)bold(K)^top$ #pause
+$bold(P)$ swaps the *rows* of $bold(Q)bold(K)^top$ #pause
 - Softmax defined over *rows* #pause
 - Therefore, $softmax(bold(P) dot) = bold(P) softmax(dot)$ #pause
 
-$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P) softmax( bold(Q) bold(K)^top)  bold(P)^top (bold(P) bold(V)) $ 
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P) softmax( bold(Q) bold(K)^top  bold(P)^top) (bold(P) bold(V)) $ 
 
 ==
-$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P) softmax( bold(Q) bold(K)^top)  bold(P)^top (bold(P) bold(V)) $ #pause
+$ "attn"(bold(P) vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) = bold(P) softmax( bold(Q) bold(K)^top  bold(P)^top) (bold(P) bold(V)) $ #pause
 
 #side-by-side[$bold(P)$ swaps row $i$ and $j$ #pause][
 $bold(P)^T$ swaps row $j$ and $i$ #pause
@@ -888,9 +890,7 @@ But today we will focus on text and images #pause
 Let us see how to create inputs for our transformers
 
 
-= Text Transformers
-
-
+= Applications (Text Transformers) <touying:hidden>
 ==
 Consider a dataset of sentences 
 
@@ -898,7 +898,7 @@ $ vec("John likes movies", "Mary likes movies", "I like dogs") $ #pause
 
 This is a vector of sentences, but transformer input is $bb(R)^(T times d_x)$ #pause
 
-What if we represent a sentence like this
+We represent a sentence like this
 
 $ underbrace(vec(
     "John",
@@ -995,7 +995,7 @@ for sentence_representation in xs:
 ```
 
 
-= Image Transformers
+= Applications (Image Transformers) <touying:hidden>
 
 ==
 In image transformers, we treat a *patch* of pixels as an $bold(x)$ #pause
@@ -1007,7 +1007,7 @@ $ X in [0, 1]^(3 times 16 times 16) $ #pause
 
 ==
 // TODO PATCH
-//#patch
+#patch
 
 #side-by-side(align: left)[Then, feed a sequence of patches to the transformer #pause][
     $ f(vec(bold(x)_1, dots.v, bold(x)_T), bold(theta)) $
@@ -1213,12 +1213,17 @@ Simple objective, how does this produce intelligent language models?
 
     Model must learn human emotions, history, and math
 ]
-
 ==
+Now you have everything you need to train your own LLM! #pause
+- Transformer architecture #pause
+- Tokenization and positional encoding #pause
+- Loss function #pause
+- #strike[\$10M]
+
 We can apply this same concept to: #pause
-- Predict missing base pairs in a strand of DNA #pause
-- Predict missing audio from a song #pause
-- Predict the outcome of particle collisions at the Large Hadron Collider #pause
+- Predict next base pair in a strand of DNA #pause
+- Predict next audio from a song #pause
+- Predict next particle emission at the Large Hadron Collider #pause
 
 All we need is a large enough dataset!
 
@@ -1253,10 +1258,10 @@ To predict next sensory information, the robot must understand #pause
 
 *Opinion:* World models are the most likely path to AGI 
 
-= Reinforcement Learning
 ==
 These transformers learn and understand our world better than humans #pause
 - But they are trapped in a prison #pause
+- They watch the world like you watch a film #pause
 - They only predict the future, they cannot change it #pause
 
 We can allow these models to interact with the world #pause
